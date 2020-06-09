@@ -1,0 +1,26 @@
+{
+  "name": "cpay",
+  "version": "1.0.0",
+  "description": "nodejs for wechat pay",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xulayen/cpay.git"
+  },
+  "keywords": [
+    "wechat",
+    "pay"
+  ],
+  "author": "xulayen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xulayen/cpay/issues"
+  },
+  "homepage": "https://github.com/xulayen/cpay#readme",
+  "dependencies": {
+    "xml2js": "^0.4.23"
+  }
+}
