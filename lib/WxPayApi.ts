@@ -1,4 +1,6 @@
 import { cPay_Config } from './config/WxPayConfig';
+import { format } from 'date-fns';
+import { cPay_Exception } from './Exception/WxPayException'
 var xml2js = require("xml2js");
 var cryptojs = require("crypto-js");
 var MD5 = require('crypto-js/md5');
@@ -7,10 +9,11 @@ var MD5 = require('crypto-js/md5');
 export namespace cPay {
 
     const WxPayConfig = cPay_Config.WxPayConfig;
+    const WxPayException = cPay_Exception.WxPayException;
 
     export class WxPayData {
-        public SIGN_TYPE_MD5: string = "MD5";
-        public SIGN_TYPE_HMAC_SHA256: string = "HMAC-SHA256";
+        public static SIGN_TYPE_MD5: string = "MD5";
+        public static SIGN_TYPE_HMAC_SHA256: string = "HMAC-SHA256";
         public m_values = new Map();
 
         constructor() { }
@@ -86,15 +89,15 @@ export namespace cPay {
         //     return "";
         // }
 
-        MakeSign(signType: string = this.SIGN_TYPE_HMAC_SHA256): any {
+        MakeSign(signType: string = WxPayData.SIGN_TYPE_HMAC_SHA256): any {
             //转url格式
             let str = this.ToUrl();
             //在string后加入API KEY
             str += "&key=" + WxPayConfig.GetConfig().GetKey();
-            if (signType === this.SIGN_TYPE_MD5) {
+            if (signType === WxPayData.SIGN_TYPE_MD5) {
                 return this.md5(str, WxPayConfig.GetConfig().GetKey());
             }
-            else if (signType === this.SIGN_TYPE_HMAC_SHA256) {
+            else if (signType === WxPayData.SIGN_TYPE_HMAC_SHA256) {
 
                 return this.CalcHMACSHA256Hash(str, WxPayConfig.GetConfig().GetKey());
 
@@ -166,6 +169,49 @@ export namespace cPay {
         */
         static GenerateNonceStr(): string {
             return (new Date().getTime() + Math.ceil(Math.random() * 1000)) + "";
+        }
+
+        static GenerateOutTradeNo(): string {
+            return `${WxPayConfig.GetConfig().GetMchID()}${format('yyyyMMddHHmmss'), Math.ceil(Math.random() * 1000)}`;
+        }
+
+        static UnifiedOrder(inputObj: WxPayData): string {
+            let url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+            //检测必填参数
+            if (!inputObj.IsSet("out_trade_no")) {
+                throw new WxPayException("缺少统一支付接口必填参数out_trade_no！");
+            }
+            else if (!inputObj.IsSet("body")) {
+                throw new WxPayException("缺少统一支付接口必填参数body！");
+            }
+            else if (!inputObj.IsSet("total_fee")) {
+                throw new WxPayException("缺少统一支付接口必填参数total_fee！");
+            }
+            else if (!inputObj.IsSet("trade_type")) {
+                throw new WxPayException("缺少统一支付接口必填参数trade_type！");
+            }
+
+            //关联参数
+            if (inputObj.GetValue("trade_type").ToString() == "JSAPI" && !inputObj.IsSet("openid")) {
+                throw new WxPayException("统一支付接口中，缺少必填参数openid！trade_type为JSAPI时，openid为必填参数！");
+            }
+            if (inputObj.GetValue("trade_type").ToString() == "NATIVE" && !inputObj.IsSet("product_id")) {
+                throw new WxPayException("统一支付接口中，缺少必填参数product_id！trade_type为JSAPI时，product_id为必填参数！");
+            }
+
+            //异步通知url未设置，则使用配置文件中的url
+            if (!inputObj.IsSet("notify_url")) {
+                inputObj.SetValue("notify_url", WxPayConfig.GetConfig().GetNotifyUrl());//异步通知url
+            }
+
+            inputObj.SetValue("appid", WxPayConfig.GetConfig().GetAppID());//公众账号ID
+            inputObj.SetValue("mch_id", WxPayConfig.GetConfig().GetMchID());//商户号
+            inputObj.SetValue("spbill_create_ip", WxPayConfig.GetConfig().GetIp());//终端ip	  	    
+            inputObj.SetValue("nonce_str", this.GenerateNonceStr());//随机字符串
+            inputObj.SetValue("sign_type", cPay.WxPayData.SIGN_TYPE_HMAC_SHA256);//签名类型
+
+
+            return "";
         }
     }
 }

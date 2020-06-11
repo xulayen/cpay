@@ -1,6 +1,7 @@
 
 import { cPay } from '../WxPayApi';
 import { cPay_Config } from '../config/WxPayConfig';
+import { format } from 'date-fns';
 
 export namespace cPay_NativePay {
 
@@ -53,7 +54,7 @@ export namespace cPay_NativePay {
 
         }
 
-        public ProcessNotify(req, res, next): void {
+        public async ProcessNotify(req, res, next): Promise<void> {
 
         }
 
@@ -85,8 +86,40 @@ export namespace cPay_NativePay {
             super();
         }
 
-        public ProcessNotify(req, res, next): void {
-            let notifyData = this.GetNotifyData(req, res, next);
+        public async ProcessNotify(req, res, next): Promise<void> {
+            let notifyData = await super.GetNotifyData(req, res, next);
+
+            if (!notifyData.IsSet("openid") || !notifyData.IsSet("product_id")) {
+                let res = new WxPayData();
+                res.SetValue("return_code", "FAIL");
+                res.SetValue("return_msg", "回调数据异常");
+                console.error("The data WeChat post is error : " + res.ToXml());
+                return;
+            }
+
+            //调统一下单接口，获得下单结果
+            let openid = notifyData.GetValue("openid").ToString(),
+                product_id = notifyData.GetValue("product_id").ToString(),
+                unifiedOrderResult = new WxPayData();
+
+
+        }
+
+        public UnifiedOrder(openId: string, productId: string) {
+            //统一下单
+            let req = new WxPayData();
+            req.SetValue("body", "test");
+            req.SetValue("attach", "test");
+            req.SetValue("out_trade_no", WxPayApi.GenerateOutTradeNo());
+            req.SetValue("total_fee", 1);
+            req.SetValue("time_start", format("yyyyMMddHHmmss"));
+            req.SetValue("time_expire", format("yyyyMMddHHmmss"));
+            req.SetValue("goods_tag", "test");
+            req.SetValue("trade_type", "NATIVE");
+            req.SetValue("openid", openId);
+            req.SetValue("product_id", productId);
+            let result = WxPayApi.UnifiedOrder(req);
+            return result;
         }
 
 
