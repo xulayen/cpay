@@ -28,6 +28,8 @@
     "crypto-js": "^4.0.0",
     "date-fns": "^2.14.0",
     "qrcode": "^1.4.4",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.5",
     "ts-node-dev": "^1.0.0-pre.44",
     "xml2js": "^0.4.23"
   },

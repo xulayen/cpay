@@ -79,7 +79,7 @@ export namespace cPay_Config {
             return "111";
         }
         GetIp(): string {
-            return "";
+            return "10.20.26.19";
         }
         GetProxyUrl(): string {
             return "";

@@ -1,6 +1,9 @@
-import { cPay_Config } from './config/WxPayConfig';
+import { cPay_Config } from './Config/WxPayConfig';
+import { cPay_Util } from './Util';
 import { format } from 'date-fns';
-import { cPay_Exception } from './Exception/WxPayException'
+import { cPay_Exception } from './Exception/WxPayException';
+import Constant from './Config/Constant';
+const Util = cPay_Util.Util;
 var xml2js = require("xml2js");
 var cryptojs = require("crypto-js");
 var MD5 = require('crypto-js/md5');
@@ -19,34 +22,24 @@ export namespace cPay {
         constructor() { }
 
         SetValue(key, value) {
-            //this.m_values[key] = value;
             this.m_values.set(key, value);
         }
 
         GetValue(key) {
-            //return this.m_values[key];
             return this.m_values.get(key);
         }
 
         IsSet(key) {
             return this.m_values.has(key);
-            // let o = this.m_values.get(key);
-            // if (o)
-            //     return true;
-            // else
-            //     return false;
         }
 
         ToXml() {
-            //数据为空时不能转化为xml格式
             if (this.m_values.size === 0) {
                 throw new Error("WxPayData数据为空!");
             }
 
             let xml = "<xml>";
-            for (let key in this.m_values) {
-                let value = this.m_values[key];
-                //字段值不能为null，会影响后续流程
+            this.m_values.forEach(function (value, key) {
                 if (value == null) {
                     throw new Error("WxPayData内部含有值为null的字段!");
                 }
@@ -61,14 +54,13 @@ export namespace cPay {
                 {
                     throw new Error("WxPayData字段数据类型错误!");
                 }
-            }
+            });
             xml += "</xml>";
             return xml;
         }
 
 
         async FromXml(xml: string) {
-            debugger;
             if (!xml) {
                 throw new Error("将空的xml串转换为WxPayData不合法!");
             }
@@ -83,11 +75,6 @@ export namespace cPay {
             return this.m_values;
 
         }
-
-
-        // MakeSign(signType: string): string {
-        //     return "";
-        // }
 
         MakeSign(signType: string = WxPayData.SIGN_TYPE_HMAC_SHA256): any {
             //转url格式
@@ -107,7 +94,6 @@ export namespace cPay {
         }
 
         ToUrl() {
-            // console.log(this.m_values)
             let buff = '', array_values = Array.from(this.m_values), i = 0;
             this.m_values = new Map(array_values.sort());
             let size = this.m_values.size;
@@ -159,6 +145,7 @@ export namespace cPay {
 
 
     export class WxPayApi {
+
         static GenerateTimeStamp(): string {
             return (new Date().getTime() + Math.ceil(Math.random() * 1000)) + "";
         }
@@ -172,11 +159,19 @@ export namespace cPay {
         }
 
         static GenerateOutTradeNo(): string {
-            return `${WxPayConfig.GetConfig().GetMchID()}${format('yyyyMMddHHmmss'), Math.ceil(Math.random() * 1000)}`;
+            return `${WxPayConfig.GetConfig().GetMchID()}${format(new Date(), 'yyyyMMddHHmmss'), Math.ceil(Math.random() * 1000)}`;
         }
 
-        static UnifiedOrder(inputObj: WxPayData): string {
-            let url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+        /**
+         * 
+         * 1、统一下单
+         * @static
+         * @param {WxPayData} inputObj
+         * @returns {Promise<cPay.WxPayData>}
+         * @memberof WxPayApi
+         */
+        static async UnifiedOrder(inputObj: WxPayData): Promise<cPay.WxPayData> {
+            let url = Constant.WEIXIN_wxpay_unifiedorder;
             //检测必填参数
             if (!inputObj.IsSet("out_trade_no")) {
                 throw new WxPayException("缺少统一支付接口必填参数out_trade_no！");
@@ -192,10 +187,10 @@ export namespace cPay {
             }
 
             //关联参数
-            if (inputObj.GetValue("trade_type").ToString() == "JSAPI" && !inputObj.IsSet("openid")) {
+            if (inputObj.GetValue("trade_type").toString() == "JSAPI" && !inputObj.IsSet("openid")) {
                 throw new WxPayException("统一支付接口中，缺少必填参数openid！trade_type为JSAPI时，openid为必填参数！");
             }
-            if (inputObj.GetValue("trade_type").ToString() == "NATIVE" && !inputObj.IsSet("product_id")) {
+            if (inputObj.GetValue("trade_type").toString() == "NATIVE" && !inputObj.IsSet("product_id")) {
                 throw new WxPayException("统一支付接口中，缺少必填参数product_id！trade_type为JSAPI时，product_id为必填参数！");
             }
 
@@ -209,9 +204,73 @@ export namespace cPay {
             inputObj.SetValue("spbill_create_ip", WxPayConfig.GetConfig().GetIp());//终端ip	  	    
             inputObj.SetValue("nonce_str", this.GenerateNonceStr());//随机字符串
             inputObj.SetValue("sign_type", cPay.WxPayData.SIGN_TYPE_HMAC_SHA256);//签名类型
+            //签名
+            inputObj.SetValue("sign", inputObj.MakeSign());
 
+            let xml = inputObj.ToXml();
 
-            return "";
+            console.log("WxPayApi", "统一下单 request : " + xml);
+            let res = await Util.setMethodWithUri({
+                url: url,
+                method: 'post',
+                data: xml,
+                headers: {
+                    'content-type': 'text/xml'
+                }
+            });
+            console.log("WxPayApi", "统一下单 response : " + res);
+
+            let result = new WxPayData();
+            result.FromXml(res);
+            return result;
         }
+
+        /**
+         *
+         * 查询订单
+         * @static
+         * @param {cPay.WxPayData} inputObj
+         * @returns {Promise<cPay.WxPayData>}
+         * @memberof WxPayApi
+         */
+        static async OrderQuery(inputObj: cPay.WxPayData): Promise<cPay.WxPayData> {
+            let url = Constant.WEIXIN_wxpay_orderquery;
+            //检测必填参数
+            if (!inputObj.IsSet("out_trade_no") && !inputObj.IsSet("transaction_id")) {
+                throw new WxPayException("订单查询接口中，out_trade_no、transaction_id至少填一个！");
+            }
+
+            inputObj.SetValue("appid", WxPayConfig.GetConfig().GetAppID());//公众账号ID
+            inputObj.SetValue("mch_id", WxPayConfig.GetConfig().GetMchID());//商户号
+            inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr());//随机字符串
+            inputObj.SetValue("sign_type", WxPayData.SIGN_TYPE_HMAC_SHA256);//签名类型
+            inputObj.SetValue("sign", inputObj.MakeSign());//签名
+            let xml = inputObj.ToXml();
+
+            console.log(`查询订单-request: \n${xml}`);
+            let res = await Util.setMethodWithUri({
+                url: url,
+                method: 'post',
+                data: xml,
+                headers: {
+                    'content-type': 'text/xml'
+                }
+            });
+            console.log(`查询订单-response: \n${res}`);
+
+            //将xml格式的数据转化为对象以返回
+            let result = new WxPayData();
+            result.FromXml(res);
+
+            return result;
+
+        }
+
+
     }
+
+
+
+
+
 }
