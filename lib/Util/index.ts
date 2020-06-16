@@ -1,4 +1,7 @@
 const rp = require('request-promise');
+const fs = require('fs'),
+    path = require('path');
+
 export namespace cPay_Util {
 
     export class Util {
@@ -8,6 +11,15 @@ export namespace cPay_Util {
 
         public static async setMethodWithUri(option) {
 
+            let certFile, cert;
+            if (option.cert) {
+                certFile = path.resolve(option.cert);
+                cert = {
+                    cert: fs.readFileSync(certFile),
+                    passphrase: option.password
+                };
+            }
+
             var __option = {
                 url: option.url,
                 method: option.method,
@@ -15,6 +27,7 @@ export namespace cPay_Util {
                 headers: {
                     ...option.headers
                 },
+                ...cert,
                 body: option.data
             }
 
@@ -35,6 +48,22 @@ export namespace cPay_Util {
             }
 
 
+        }
+
+       public static ToUrlParams(map: any) {
+            let buff = "";
+            map.forEach(function (value, key) {
+                if (!value) {
+                    throw new Error("WxPayData内部含有值为null的字段!");
+                }
+                if (value != "") {
+                    buff += key + "=" + value + "&";
+                }
+
+            });
+
+            buff = buff.trim();
+            return buff;
         }
     }
 

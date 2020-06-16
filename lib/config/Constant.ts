@@ -28,6 +28,66 @@ export default class Constant {
      */
     public static WEIXIN_wxpay_orderquery: string = "https://api.mch.weixin.qq.com/pay/orderquery";
 
+
+    /**
+     * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_3
+     * 关闭订单
+     * 
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static WEIXIN_wxpay_closeorder: string = "https://api.mch.weixin.qq.com/pay/closeorder";
+
+    /**
+     * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_4
+     * 申请退款
+     * 
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static WEIXIN_wxpay_refund: string = "https://api.mch.weixin.qq.com/secapi/pay/refund";
+
+    /**
+     * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_5
+     * 查询退款
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static WEIXIN_wxpay_refundquery: string = "https://api.mch.weixin.qq.com/pay/refundquery";
+
+    /**
+     * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_9&index=10
+     * 转换短链接
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static WEIXIN_wxpay_shorturl: string = "https://api.mch.weixin.qq.com/tools/shorturl";
+
+
+    /**
+     * 
+     * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
+     * 微信授权，获取code
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static WEIXIN_auth2_authorize:string="https://open.weixin.qq.com/connect/oauth2/authorize?";
+
+
+    /**
+     * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
+     * 根据code获取token、openID
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static WEIXIN_auth2_access_token:string="https://api.weixin.qq.com/sns/oauth2/access_token?";
+
     /**
      *
      *

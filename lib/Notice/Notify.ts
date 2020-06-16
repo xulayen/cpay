@@ -141,9 +141,9 @@ export namespace cPay_Notice {
             return result;
         }
 
-        private SelectProductInfo(productid: string): cPay_Model.Product {
+        private SelectProductInfo(productid: string): cPay_Model.OrderInfo {
 
-            let product = new cPay_Model.Product();
+            let product = new cPay_Model.OrderInfo();
             product.attach = "test";
             product.body="test";
             product.detail="test";

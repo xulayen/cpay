@@ -1,5 +1,5 @@
 export namespace cPay_Model{
-    export class Product{
+    export class OrderInfo{
         constructor(){
 
         }

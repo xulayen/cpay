@@ -58,19 +58,19 @@ export namespace cPay_Config {
 
     export class DemoConfig implements IConfig {
         GetAppID(): string {
-            return "wx2421b1c4370ec43b";
+            return "wxc46c96addcb23ab9";
         }
         GetMchID(): string {
             return "1305176001";
         }
         GetKey(): string {
-            return "789";
+            return "CYRYFWCXtoken130826";
         }
         GetAppSecret(): string {
-            return "999";
+            return "d4624c36b6795d1d99dcf0547af5443d";
         }
         GetSSlCertPath(): string {
-            return "999";
+            return "E:\\工作\\workpace\\txz\\txz2020\\src\\assets\\images\\oao\\bg1.png";
         }
         GetSSlCertPassword(): string {
             return "1111";

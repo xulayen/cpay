@@ -98,7 +98,6 @@ export namespace cPay {
             this.m_values = new Map(array_values.sort());
             let size = this.m_values.size;
 
-
             this.m_values.forEach(function (value, key) {
                 i++;
                 if (!value) {
@@ -119,6 +118,14 @@ export namespace cPay {
             buff = buff.trim();
 
             return buff;
+        }
+
+        ToJson() {
+            let obj = Object.create(null);
+            for (let [k, v] of this.m_values) {
+                obj[k] = v;
+            }
+            return obj;
         }
 
 
@@ -164,7 +171,7 @@ export namespace cPay {
 
         /**
          * 
-         * 1、统一下单
+         * 统一下单
          * @static
          * @param {WxPayData} inputObj
          * @returns {Promise<cPay.WxPayData>}
@@ -187,10 +194,10 @@ export namespace cPay {
             }
 
             //关联参数
-            if (inputObj.GetValue("trade_type").toString() == "JSAPI" && !inputObj.IsSet("openid")) {
+            if (inputObj.GetValue("trade_type").toString() == Constant.WEIXIN_trade_type_JSAPI && !inputObj.IsSet("openid")) {
                 throw new WxPayException("统一支付接口中，缺少必填参数openid！trade_type为JSAPI时，openid为必填参数！");
             }
-            if (inputObj.GetValue("trade_type").toString() == "NATIVE" && !inputObj.IsSet("product_id")) {
+            if (inputObj.GetValue("trade_type").toString() == Constant.WEIXIN_trade_type_NATIVE && !inputObj.IsSet("product_id")) {
                 throw new WxPayException("统一支付接口中，缺少必填参数product_id！trade_type为JSAPI时，product_id为必填参数！");
             }
 
@@ -264,6 +271,154 @@ export namespace cPay {
 
             return result;
 
+        }
+
+        /**
+         * 关闭订单
+         * @static
+         * @param {cPay.WxPayData} inputObj
+         * @returns {Promise<cPay.WxPayData>}
+         * @memberof WxPayApi
+         */
+        static async CloseOrder(inputObj: cPay.WxPayData): Promise<cPay.WxPayData> {
+            let url = Constant.WEIXIN_wxpay_closeorder;
+            //检测必填参数
+            if (!inputObj.IsSet("out_trade_no")) {
+                throw new WxPayException("关闭订单接口中，out_trade_no必填！");
+            }
+            inputObj.SetValue("appid", WxPayConfig.GetConfig().GetAppID());//公众账号ID
+            inputObj.SetValue("mch_id", WxPayConfig.GetConfig().GetMchID());//商户号
+            inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr());//随机字符串		
+            inputObj.SetValue("sign_type", WxPayData.SIGN_TYPE_HMAC_SHA256);//签名类型
+            inputObj.SetValue("sign", inputObj.MakeSign());//签名
+            let xml = inputObj.ToXml();
+            console.log(`关闭订单-request: \n${xml}`);
+            let res = await Util.setMethodWithUri({
+                url: url,
+                method: 'post',
+                data: xml,
+                headers: {
+                    'content-type': 'text/xml'
+                }
+            });
+            console.log(`关闭订单-response: \n${res}`);
+            let result = new WxPayData();
+            result.FromXml(res);
+            return result;
+        }
+
+        /**
+         * 申请退款
+         *
+         * @static
+         * @param {cPay.WxPayData} inputObj
+         * @returns {Promise<cPay.WxPayData>}
+         * @memberof WxPayApi
+         */
+        static async Refund(inputObj: cPay.WxPayData): Promise<cPay.WxPayData> {
+            let url = Constant.WEIXIN_wxpay_refund;
+            //检测必填参数
+            if (!inputObj.IsSet("out_trade_no") && !inputObj.IsSet("transaction_id")) {
+                throw new WxPayException("退款申请接口中，out_trade_no、transaction_id至少填一个！");
+            }
+            else if (!inputObj.IsSet("out_refund_no")) {
+                throw new WxPayException("退款申请接口中，缺少必填参数out_refund_no！");
+            }
+            else if (!inputObj.IsSet("total_fee")) {
+                throw new WxPayException("退款申请接口中，缺少必填参数total_fee！");
+            }
+            else if (!inputObj.IsSet("refund_fee")) {
+                throw new WxPayException("退款申请接口中，缺少必填参数refund_fee！");
+            }
+            else if (!inputObj.IsSet("op_user_id")) {
+                throw new WxPayException("退款申请接口中，缺少必填参数op_user_id！");
+            }
+            inputObj.SetValue("appid", WxPayConfig.GetConfig().GetAppID());//公众账号ID
+            inputObj.SetValue("mch_id", WxPayConfig.GetConfig().GetMchID());//商户号
+            inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr());//随机字符串
+            inputObj.SetValue("sign_type", WxPayData.SIGN_TYPE_HMAC_SHA256);//签名类型
+            inputObj.SetValue("sign", inputObj.MakeSign());//签名
+            let xml = inputObj.ToXml();
+            console.log(`申请退款-request: \n${xml}`);
+            let res = await Util.setMethodWithUri({
+                url: url,
+                method: 'post',
+                data: xml,
+                headers: {
+                    'content-type': 'text/xml'
+                },
+                cert: WxPayConfig.GetConfig().GetSSlCertPath(),
+                password: WxPayConfig.GetConfig().GetSSlCertPassword()
+            });
+            console.log(`申请退款-response: \n${res}`);
+            let result = new WxPayData();
+            result.FromXml(res);
+            return result;
+        }
+
+        /**
+        * 查询退款
+        * @static
+        * @param {cPay.WxPayData} inputObj
+        * @returns {Promise<cPay.WxPayData>}
+        * @memberof WxPayApi
+        */
+        static async RefundQuery(inputObj: cPay.WxPayData): Promise<cPay.WxPayData> {
+            let url = Constant.WEIXIN_wxpay_refundquery;
+            //检测必填参数
+            if (!inputObj.IsSet("out_refund_no") && !inputObj.IsSet("out_trade_no") &&
+                !inputObj.IsSet("transaction_id") && !inputObj.IsSet("refund_id")) {
+                throw new WxPayException("退款查询接口中，out_refund_no、out_trade_no、transaction_id、refund_id四个参数必填一个！");
+            }
+
+            inputObj.SetValue("appid", WxPayConfig.GetConfig().GetAppID());//公众账号ID
+            inputObj.SetValue("mch_id", WxPayConfig.GetConfig().GetMchID());//商户号
+            inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr());//随机字符串
+            inputObj.SetValue("sign_type", WxPayData.SIGN_TYPE_HMAC_SHA256);//签名类型
+            inputObj.SetValue("sign", inputObj.MakeSign());//签名
+            let xml = inputObj.ToXml();
+            console.log(`查询退款-request: \n${xml}`);
+            let res = await Util.setMethodWithUri({
+                url: url,
+                method: 'post',
+                data: xml,
+                headers: {
+                    'content-type': 'text/xml'
+                }
+            });
+            console.log(`查询退款-response: \n${res}`);
+            let result = new WxPayData();
+            result.FromXml(res);
+            return result;
+        }
+
+
+        static async ShortUrl(inputObj: cPay.WxPayData): Promise<cPay.WxPayData> {
+            let url = Constant.WEIXIN_wxpay_shorturl;
+            //检测必填参数
+            if (!inputObj.IsSet("long_url")) {
+                throw new WxPayException("需要转换的URL，签名用原串，传输需URL encode！");
+            }
+
+            inputObj.SetValue("appid", WxPayConfig.GetConfig().GetAppID());//公众账号ID
+            inputObj.SetValue("mch_id", WxPayConfig.GetConfig().GetMchID());//商户号
+            inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr());//随机字符串	
+            inputObj.SetValue("sign_type", WxPayData.SIGN_TYPE_HMAC_SHA256);//签名类型
+            inputObj.SetValue("sign", inputObj.MakeSign());//签名
+            let xml = inputObj.ToXml();
+            console.log(`短链接-request: \n${xml}`);
+            let res = await Util.setMethodWithUri({
+                url: url,
+                method: 'post',
+                data: xml,
+                headers: {
+                    'content-type': 'text/xml'
+                }
+            });
+            console.log(`短链接-response: \n${res}`);
+            let result = new WxPayData();
+            result.FromXml(res);
+            return result;
         }
 
 

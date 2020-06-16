@@ -1,7 +1,9 @@
 import { cPay_NativePay } from '../lib/WechatPay/NativePay';
+import { cPay_JsApiPay } from '../lib/WechatPay/JsApiPay';
 import { cPay } from '../lib/WxPayApi';
 import { cPay_Notice } from '../lib/Notice/Notify';
 const NativePay = cPay_NativePay.NativePay;
+const JsApiPay = cPay_JsApiPay.JsApiPay;
 const WxPayApi = cPay.WxPayApi;
 
 async function Unit() {
@@ -90,16 +92,82 @@ async function Unit() {
   /*****
    * 4、查询订单
    */
-  console.log('查询订单');
-  let data=new cPay.WxPayData();
-  data.SetValue('transaction_id',"1008450740201411110005820873");
-  
-  WxPayApi.OrderQuery(data);
-  
+  // console.log('查询订单');
+  // let data=new cPay.WxPayData();
+  // data.SetValue('transaction_id',"1008450740201411110005820873");
+  // WxPayApi.OrderQuery(data);
+
+  /*****
+   * 5、关闭订单
+   */
+  // console.log('关闭订单');
+  // let data=new cPay.WxPayData();
+  // data.SetValue('out_trade_no',"1008450740201411110005820873");
+  // WxPayApi.CloseOrder(data);
+
+  /*****
+   * 6、申请退款
+   */
+  // console.log('申请退款');
+  // let data = new cPay.WxPayData();
+  // data.SetValue('out_refund_no', "1008450740201411110005820873");
+  // data.SetValue('total_fee', "1008450740201411110005820873");
+  // data.SetValue('refund_fee', "1008450740201411110005820873");
+  // data.SetValue('op_user_id', "1008450740201411110005820873");
+  // data.SetValue('transaction_id', "1008450740201411110005820873");
+  // WxPayApi.Refund(data);
 
 
 
+  /*****
+   * 7、查询退款
+   */
+  // console.log('关闭订单');
+  // let data=new cPay.WxPayData();
+  // data.SetValue('out_trade_no',"1008450740201411110005820873");
+  // WxPayApi.RefundQuery(data);
 
+  /*****
+   * 8、统一下单
+   */
+  // console.log('统一订单');
+  // let data = new cPay.WxPayData();
+  // data.SetValue('out_trade_no', "1008450740201411110005820873");
+  // data.SetValue('body', "1008450740201411110005820873");
+  // data.SetValue('total_fee', 100);
+  // data.SetValue('trade_type', "JSAPI");
+  // data.SetValue('openid', "111111111111");
+  // WxPayApi.UnifiedOrder(data);
+
+
+  /*****
+ * 9、短链接
+ */
+  // console.log('获取短链接');
+  // let data = new cPay.WxPayData();
+  // data.SetValue('long_url', "weixin://wxpay/appid=wx2421b1c4370ec43b&body=1008450740201411110005820873&mch_id=1305176001&nonce_str=1592209651351&notify_url=111&openid=111111111111&out_trade_no=1008450740201411110005820873&sign_type=HMAC-SHA256&spbill_create_ip=10.20.26.19&total_fee=100&trade_type=JSAPI");
+  // WxPayApi.ShortUrl(data);
+
+
+
+  /*****
+   * 
+   */
+  console.log('获取OPENID');
+  let req = {
+
+    query: {
+      code: ''
+    },
+    protocol:'http',
+    headers:{
+      host:'baidu.com'
+    },
+    originalUrl:'/'
+
+  }, res = {}, next = {};
+  let jsapi = new JsApiPay(req, res, next);
+  await jsapi.GetOpenidAndAccessToken();
 
 }
 
