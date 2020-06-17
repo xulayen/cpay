@@ -5,10 +5,10 @@ const JsApiPay = cPay_JsApiPay.JsApiPay;
 // 获取验证码路由
 app.get('/auth', async function (req, res, next) {
     //var codeData = valid.getCode(req, res);
-    let api = new JsApiPay(req, res, next);
-    await api.GetOpenidAndAccessToken('http://baidu.com',false);
-    console.log(api.access_token);
-    console.log(api.openid);
+    let auth = new JsApiPay(req, res, next);
+    await auth.GetWeixinUserInfo('http://baidu.com',false);
+    console.log(auth.access_token);
+    console.log(auth.openid);
 
 
 });

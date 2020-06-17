@@ -20,6 +20,8 @@ export namespace cPay_JsApiPay {
 
     export class JsApiPay {
 
+        public WeixinUserInfo: WeixinUserInfo;
+
         private _openid: string;
         public get openid(): string {
             return this._openid;
@@ -38,10 +40,6 @@ export namespace cPay_JsApiPay {
         private _unifiedOrderResult: cPay.WxPayData;
         public get unifiedOrderResult(): cPay.WxPayData {
             return this._unifiedOrderResult;
-        }
-        private _orderInfo: cPay_Model.OrderInfo;
-        public get orderInfo(): cPay_Model.OrderInfo {
-            return this._orderInfo;
         }
 
         private _refresh_token: string;
@@ -63,19 +61,41 @@ export namespace cPay_JsApiPay {
             this.next = next;
         }
 
+        public async GetWeixinUserInfo(uri: string, silence: boolean = true): Promise<void> {
+            let usecache = await this.UseCaheAccessTokenGetUserInfo();
+            if (usecache)
+                return;
+            let code = this.request.query.code;
+            if (code) {
+                console.log("Get code : " + code);
+                await this.GetOpenidAndAccessTokenFromCode(code, uri);
+            } else {
+                let redirect_uri = config.GetRedirect_uri();
+                let data = new WxPayData();
+                data.SetValue("appid", config.GetAppID());
+                data.SetValue("redirect_uri", redirect_uri);
+                data.SetValue("response_type", "code");
+                data.SetValue("scope", silence ? "snsapi_base" : "snsapi_userinfo");
+                data.SetValue("state", `STATE#wechat_redirect`);
+                //触发微信返回code码
+                let url = `${Constant.WEIXIN_auth2_authorize}${data.ToUrl()}`;
+                console.log("Will Redirect to URL : " + url);
+                this.response.redirect(url);
+            }
+        }
 
-        public async GetUnifiedOrderResult(): Promise<cPay.WxPayData> {
+        public async GetUnifiedOrderResult(orderInfo: cPay_Model.OrderInfo, openid: string): Promise<cPay.WxPayData> {
             //统一下单
             let data = new WxPayData();
-            data.SetValue("body", this.orderInfo.body);
-            data.SetValue("attach", this.orderInfo.attach);
+            data.SetValue("body", orderInfo.body);
+            data.SetValue("attach", orderInfo.attach);
             data.SetValue("out_trade_no", WxPayApi.GenerateOutTradeNo());
             data.SetValue("total_fee", this.total_fee);
             data.SetValue("time_start", format(new Date(), "yyyyMMddHHmmss"));
             data.SetValue("time_expire", format(addMinutes(new Date(), 10), "yyyyMMddHHmmss"));
-            data.SetValue("goods_tag", this.orderInfo.goods_tag);
+            data.SetValue("goods_tag", orderInfo.goods_tag);
             data.SetValue("trade_type", Constant.WEIXIN_trade_type_JSAPI);
-            data.SetValue("openid", this.openid);
+            data.SetValue("openid", openid);
             let result = await WxPayApi.UnifiedOrder(data);
             if (!result.IsSet("appid") || !result.IsSet("prepay_id") || result.GetValue("prepay_id").ToString() == "") {
                 console.log("UnifiedOrder response error!");
@@ -96,34 +116,12 @@ export namespace cPay_JsApiPay {
             jsApiParam.SetValue("package", "prepay_id=" + this.unifiedOrderResult.GetValue("prepay_id"));
             jsApiParam.SetValue("signType", WxPayData.SIGN_TYPE_HMAC_SHA256);
             jsApiParam.SetValue("paySign", jsApiParam.MakeSign());
-            let xml = jsApiParam.ToJson();
-            console.log('JsApiPay::GetJsApiParam - ' + xml);
-            return xml;
+            let param = jsApiParam.ToJson();
+            console.log('JsApiPay::GetJsApiParam - ' + param);
+            return param;
         }
 
-        public async GetOpenidAndAccessToken(uri: string, silence: boolean = true): Promise<void> {
-            let usecache = await this.UseCaheAccessTokenGetUserInfo();
-            if (usecache)
-                return;
 
-            let code = this.request.query.code;
-            if (code) {
-                console.log("Get code : " + code);
-                await this.GetOpenidAndAccessTokenFromCode(code, uri);
-            } else {
-                let redirect_uri = config.GetRedirect_uri();
-                let data = new WxPayData();
-                data.SetValue("appid", config.GetAppID());
-                data.SetValue("redirect_uri", redirect_uri);
-                data.SetValue("response_type", "code");
-                data.SetValue("scope", silence ? "snsapi_base" : "snsapi_userinfo");
-                data.SetValue("state", `STATE#wechat_redirect`);
-                //触发微信返回code码
-                let url = `${Constant.WEIXIN_auth2_authorize}${data.ToUrl()}`;
-                console.log("Will Redirect to URL : " + url);
-                this.response.redirect(url);
-            }
-        }
 
         private async GetOpenidAndAccessTokenFromCode(code: string, uri: string): Promise<void> {
             //构造获取openid及access_token的url
@@ -140,6 +138,8 @@ export namespace cPay_JsApiPay {
             });
             console.log(`获取access_token-response: \n${res}`);
             res = JSON.parse(res);
+            if (res.errcode && res.errcode > 0)
+                return;
             this.updateRedisTokenCache(res);
             await this.UseCaheAccessTokenGetUserInfo();
             this.response.redirect(`${uri}?openid=${this.openid}`);
@@ -191,6 +191,13 @@ export namespace cPay_JsApiPay {
                     method: 'get'
                 });
                 console.log(`使用Redis缓存access_token-获取微信信息-response: \n${res}`);
+                res = JSON.parse(res);
+                if (res.errcode && res.errcode > 0) {
+                    return false;
+                } else {
+                    this.WeixinUserInfo = new WeixinUserInfo();
+                    this.WeixinUserInfo = res;
+                }
                 return true;
             } else {
                 let status = await this.RefreshToken();
@@ -200,9 +207,21 @@ export namespace cPay_JsApiPay {
                     return false
             }
         }
+    }
 
 
+    class WeixinUserInfo {
+        constructor() {
 
-
+        }
+        public openid: string;
+        public nickname: string;
+        public sex: string;
+        public province: string;
+        public city: string;
+        public country: string;
+        public headimgurl: string;
+        public privilege: string[];
+        public unionid: string;
     }
 }
