@@ -1,7 +1,7 @@
 
 
 export namespace cPay_Config {
-    export interface IConfig {
+    export interface IWxConfig {
 
         //=======【基本信息设置】=====================================
         /* 微信公众号信息配置
@@ -54,9 +54,23 @@ export namespace cPay_Config {
         */
         GetLogLevel(): string;
 
+
+        //=======【公众号回调地址】===================================
+        GetRedirect_uri(): string;
+
     }
 
-    export class DemoConfig implements IConfig {
+    export interface IRedisConfig {
+        GetHost(): string;
+        GetPort(): string;
+        GetDB(): number;
+        GetAuth(): string;
+    }
+
+    export class DemoConfig implements IWxConfig {
+        GetRedirect_uri(): string {
+            return "http://10.20.26.19:8888/auth";
+        }
         GetAppID(): string {
             return "wxc46c96addcb23ab9";
         }
@@ -93,18 +107,42 @@ export namespace cPay_Config {
 
     }
 
-    export class WxPayConfig {
-        private static config: IConfig;
+    export class RedisConfig implements IRedisConfig {
+        GetHost(): string {
+            return "10.20.31.11";
+        }
+        GetPort(): string {
+            return "6379";
+        }
+        GetDB(): number {
+            return 10;
+        }
+        GetAuth(): string {
+            return "";
+        }
+    }
+
+    export class Config {
+        private static wxconfig: IWxConfig;
+        private static redisconfig: IRedisConfig;
 
         constructor() {
-   
+
         }
 
-        public static GetConfig(): IConfig {
-            if (!this.config)
-                this.config = new DemoConfig();
-            return this.config;
+        public static GetWxPayConfig(): IWxConfig {
+            if (!this.wxconfig)
+                this.wxconfig = new DemoConfig();
+            return this.wxconfig;
         }
+
+        public static GetRedisConfig(): IRedisConfig {
+            if (!this.redisconfig)
+                this.redisconfig = new RedisConfig();
+            return this.redisconfig;
+        }
+
+
 
     }
 }

@@ -1,5 +1,5 @@
 import { cPay } from '../WxPayApi';
-import { cPay_Config } from '../Config/WxPayConfig';
+import { cPay_Config } from '../Config';
 import { format } from 'date-fns';
 import Constant from '../Config/Constant';
 import { cPay_Model } from '../Model';
@@ -8,7 +8,7 @@ export namespace cPay_Notice {
 
     const WxPayData = cPay.WxPayData;
     const WxPayApi = cPay.WxPayApi;
-    const config = cPay_Config.WxPayConfig.GetConfig();
+    const config = cPay_Config.Config.GetWxPayConfig();
 
     /**
      * @class 回调处理基类

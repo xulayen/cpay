@@ -1,5 +1,5 @@
 import { cPay } from '../WxPayApi';
-import { cPay_Config } from '../Config/WxPayConfig';
+import { cPay_Config } from '../Config';
 import { cPay_Exception } from '../Exception/WxPayException';
 import { cPay_Model } from '../Model';
 import { format, addMinutes } from 'date-fns';
@@ -10,17 +10,49 @@ export namespace cPay_JsApiPay {
 
     const WxPayData = cPay.WxPayData;
     const WxPayApi = cPay.WxPayApi;
-    const config = cPay_Config.WxPayConfig.GetConfig();
+    const config = cPay_Config.Config.GetWxPayConfig();
     const Util = cPay_Util.Util;
+    const redisclient = cPay_Util.Util.redisClient;
     const WxPayException = cPay_Exception.WxPayException;
+
+    const Redis_KEY_access_token = `cpay:wap-auth:${config.GetAppID()}:access_token`;
+    const Redis_KEY_refresh_token = `cpay:wap-auth:${config.GetAppID()}:refresh_token`;
 
     export class JsApiPay {
 
-        public openid: string;
-        public access_token: string;
-        public total_fee: number;
-        public unifiedOrderResult: cPay.WxPayData;
-        public orderInfo: cPay_Model.OrderInfo;
+        private _openid: string;
+        public get openid(): string {
+            return this._openid;
+        }
+        private _access_token: string;
+        public get access_token(): string {
+            return this._access_token;
+        }
+        private _total_fee: number;
+        public get total_fee(): number {
+            return this._total_fee;
+        }
+        public set total_fee(value: number) {
+            this._total_fee = value;
+        }
+        private _unifiedOrderResult: cPay.WxPayData;
+        public get unifiedOrderResult(): cPay.WxPayData {
+            return this._unifiedOrderResult;
+        }
+        private _orderInfo: cPay_Model.OrderInfo;
+        public get orderInfo(): cPay_Model.OrderInfo {
+            return this._orderInfo;
+        }
+
+        private _refresh_token: string;
+        public get refresh_token(): string {
+            return this._refresh_token;
+        }
+
+        private _expires_in: number;
+        public get expires_in(): number {
+            return this._expires_in;
+        }
 
         private request: any;
         private response: any;
@@ -49,7 +81,7 @@ export namespace cPay_JsApiPay {
                 console.log("UnifiedOrder response error!");
                 throw new WxPayException("UnifiedOrder response error!");
             }
-            this.unifiedOrderResult = result;
+            this._unifiedOrderResult = result;
             return result;
 
         }
@@ -69,19 +101,22 @@ export namespace cPay_JsApiPay {
             return xml;
         }
 
+        public async GetOpenidAndAccessToken(uri: string, silence: boolean = true): Promise<void> {
+            let usecache = await this.UseCaheAccessTokenGetUserInfo();
+            if (usecache)
+                return;
 
-        public async GetOpenidAndAccessToken(): Promise<void> {
             let code = this.request.query.code;
             if (code) {
                 console.log("Get code : " + code);
-                this.GetOpenidAndAccessTokenFromCode(code);
+                await this.GetOpenidAndAccessTokenFromCode(code, uri);
             } else {
-                let redirect_uri = decodeURIComponent(`http://auth.weixin.zhsh.co/api/wechat/authorize-code?redirectUrl=http://baidu.com`);
+                let redirect_uri = config.GetRedirect_uri();
                 let data = new WxPayData();
                 data.SetValue("appid", config.GetAppID());
                 data.SetValue("redirect_uri", redirect_uri);
                 data.SetValue("response_type", "code");
-                data.SetValue("scope", "snsapi_base");
+                data.SetValue("scope", silence ? "snsapi_base" : "snsapi_userinfo");
                 data.SetValue("state", `STATE#wechat_redirect`);
                 //触发微信返回code码
                 let url = `${Constant.WEIXIN_auth2_authorize}${data.ToUrl()}`;
@@ -90,7 +125,7 @@ export namespace cPay_JsApiPay {
             }
         }
 
-        public async GetOpenidAndAccessTokenFromCode(code: string): Promise<void> {
+        private async GetOpenidAndAccessTokenFromCode(code: string, uri: string): Promise<void> {
             //构造获取openid及access_token的url
             let data = new WxPayData();
             data.SetValue("appid", config.GetAppID());
@@ -103,9 +138,67 @@ export namespace cPay_JsApiPay {
                 url: url,
                 method: 'get'
             });
-            this.access_token = res.access_token;
-            this.openid = res.openid;
             console.log(`获取access_token-response: \n${res}`);
+            res = JSON.parse(res);
+            this.updateRedisTokenCache(res);
+            await this.UseCaheAccessTokenGetUserInfo();
+            this.response.redirect(`${uri}?openid=${this.openid}`);
+        }
+
+        private async RefreshToken(): Promise<boolean> {
+            let data = new WxPayData(), r_refresh_token = await redisclient.get(Redis_KEY_refresh_token);
+            data.SetValue("appid", config.GetAppID());
+            data.SetValue("grant_type", "refresh_token");
+            data.SetValue("refresh_token", r_refresh_token);
+            let url = `${Constant.WEIXIN_auth2_refresh_token}${data.ToUrl()}`;
+            console.log(`刷新access_token-request: \n${url}`);
+            let res = await Util.setMethodWithUri({
+                url: url,
+                method: 'get'
+            });
+            console.log(`刷新access_token-response: \n${res}`);
+            res = JSON.parse(res);
+            if (res.errcode && res.errcode > 0) {
+                return false;
+            }
+            this.updateRedisTokenCache(res);
+            return true;
+
+        }
+
+        private updateRedisTokenCache(res: any): void {
+            debugger;
+            this._access_token = res.access_token;
+            this._openid = res.openid;
+            this._refresh_token = res.refresh_token;
+            this._expires_in = res.expires_in;
+            redisclient.set(Redis_KEY_access_token, this._access_token);
+            redisclient.set(Redis_KEY_refresh_token, this.refresh_token, (60 * 60 * 24 * 29));
+        }
+
+        private async UseCaheAccessTokenGetUserInfo(): Promise<boolean> {
+            debugger;
+            let r_access_token = await redisclient.get(Redis_KEY_access_token),
+                data = new WxPayData();
+            data.SetValue("access_token", r_access_token);
+            data.SetValue("openid", this.openid);
+            data.SetValue("lang", "zh_CN");
+            if (r_access_token) {
+                let url = `${Constant.WEIXIN_auth2_userinfo}${data.ToUrl()}`;
+                console.log(`使用Redis缓存access_token-获取微信信息-request: \n${url}`);
+                let res = await Util.setMethodWithUri({
+                    url: url,
+                    method: 'get'
+                });
+                console.log(`使用Redis缓存access_token-获取微信信息-response: \n${res}`);
+                return true;
+            } else {
+                let status = await this.RefreshToken();
+                if (status)
+                    await this.UseCaheAccessTokenGetUserInfo();
+                else
+                    return false
+            }
         }
 
 

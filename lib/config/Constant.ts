@@ -76,7 +76,7 @@ export default class Constant {
      * @type {string}
      * @memberof Constant
      */
-    public static WEIXIN_auth2_authorize:string="https://open.weixin.qq.com/connect/oauth2/authorize?";
+    public static WEIXIN_auth2_authorize: string = "https://open.weixin.qq.com/connect/oauth2/authorize?";
 
 
     /**
@@ -86,7 +86,25 @@ export default class Constant {
      * @type {string}
      * @memberof Constant
      */
-    public static WEIXIN_auth2_access_token:string="https://api.weixin.qq.com/sns/oauth2/access_token?";
+    public static WEIXIN_auth2_access_token: string = "https://api.weixin.qq.com/sns/oauth2/access_token?";
+
+    /**
+     * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
+     * 刷新Token
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static WEIXIN_auth2_refresh_token: string = "https://api.weixin.qq.com/sns/oauth2/refresh_token?";
+
+    /**
+     * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
+     * 获取微信信息
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static WEIXIN_auth2_userinfo: string = " https://api.weixin.qq.com/sns/userinfo?";
 
     /**
      *

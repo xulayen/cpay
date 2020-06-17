@@ -1,5 +1,5 @@
 import { cPay } from '../WxPayApi';
-import { cPay_Config } from '../Config/WxPayConfig';
+import { cPay_Config } from '../Config';
 import { cPay_Model } from '../Model';
 import { format, addMinutes } from 'date-fns';
 import Constant from '../Config/Constant';
@@ -9,7 +9,7 @@ export namespace cPay_NativePay {
 
     const WxPayData = cPay.WxPayData;
     const WxPayApi = cPay.WxPayApi;
-    const config = cPay_Config.WxPayConfig.GetConfig();
+    const config = cPay_Config.Config.GetWxPayConfig();
     const Util=cPay_Util.Util;
 
     export class NativePay {
