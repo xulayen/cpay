@@ -1,4 +1,4 @@
-import cPay from '../lib/cPay';
+import cPay from '../lib';
 const Express = require('express'),
     app = new Express();
 
@@ -30,7 +30,19 @@ app.get('/auth', async function (req, res, next) {
         let order = new cPay.Model.OrderInfo("test", "test", "test", "test", 100);
         let res_order = await ojsapipay.UnifiedOrder(order, ojsapipay.WeixinUserInfo.openid);
         console.log(res_order);
+
+        let paramter = ojsapipay.GetJsApiPayParameters();
+        console.log(paramter);
+
     }
+});
+
+
+app.get('/notice', async function (req, res, next) {
+
+    let notify = new cPay.Notify.NativeNotify(req,res,next);
+    notify.ProcessNotify();
+
 });
 
 app.listen(8888, function (err) {

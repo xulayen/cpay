@@ -1,8 +1,8 @@
-import { cPay_NativePay } from '../lib/WechatPay/NativePay';
-import { cPay_JsApiPay } from '../lib/WechatPay/JsApiPay';
-import { cPay } from '../lib/WxPayApi';
-import { cPay_Notice } from '../lib/Notice/Notify';
-const NativePay = cPay_NativePay.NativePay;
+import { cPay_NativePay } from '../lib/WechatPay/nativePay';
+import { cPay_JsApiPay } from '../lib/WechatPay/jsApiPay';
+import { cPay } from '../lib/wxPayApi';
+import { cPay_Notice } from '../lib/Notice/notify';
+const NativePay = cPay_NativePay.nativePay;
 const JsApiPay = cPay_JsApiPay.JsApiPay;
 const WxPayApi = cPay.WxPayApi;
 

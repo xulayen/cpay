@@ -1,7 +1,7 @@
 import * as  cPay from '../WxPayApi';
 import * as  cPay_Config from '../Config';
 import { format } from 'date-fns';
-import Constant from '../Config/Constant';
+import Constant from '../Config/constant';
 import * as  cPay_Model from '../Model';
 
 //export namespace cPay_Notice {
@@ -30,7 +30,7 @@ class Notify {
 
     }
 
-    async GetNotifyData(): Promise<cPay.WxPayData> {
+    protected async GetNotifyData(): Promise<cPay.WxPayData> {
 
         let builder = this.request.body, data = new WxPayData();
         try {

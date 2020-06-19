@@ -1,8 +1,8 @@
 import * as cPay_Config from './Config';
 import * as  cPay_Util from './Util';
 import { format } from 'date-fns';
-import * as cPay_Exception from './Exception/WxPayException';
-import Constant from './Config/Constant';
+import * as cPay_Exception from './Exception/wxPayException';
+import Constant from './Config/constant';
 const Util = cPay_Util.Util;
 var xml2js = require("xml2js");
 var cryptojs = require("crypto-js");

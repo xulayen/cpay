@@ -1,9 +1,9 @@
-import * as  cPay from '../WxPayApi';
+import * as  cPay from '../wxPayApi';
 import * as  cPay_Config from '../Config';
-import * as  cPay_Exception from '../Exception/WxPayException';
+import * as  cPay_Exception from '../Exception/wxPayException';
 import * as  cPay_Model from '../Model';
 import { format, addMinutes } from 'date-fns';
-import Constant from '../Config/Constant';
+import Constant from '../Config/constant';
 import * as  cPay_Util from '../Util';
 
 const WxPayData = cPay.WxPayData;
