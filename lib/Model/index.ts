@@ -12,11 +12,29 @@ export class OrderInfo {
         this.goods_tag = goods_tag;
         this.total_fee = total_fee;
     }
-
+    /**
+     * 商品描述
+     */
     body: string;
+
+    /**
+     * 商品详情
+     */
     detail: string;
+
+    /**
+     * 附加数据
+     */
     attach: string;
+
+    /**
+     * 商品标记
+     */
     goods_tag: string;
+
+    /**
+     * 总金额，订单总金额，单位为分，详见支付金额
+     */
     total_fee: number;
 }
 
@@ -176,7 +194,8 @@ export class ResponseData {
     }
 
     data: WxPayData;
-    status: string;
+    return_code: string;
+    result_code: string;
     msg: string;
 }
 
@@ -197,4 +216,17 @@ export class WeixinConfig {
     ReportLevel: string;
     LogLevel: string;
     Redirect_uri: string;
+}
+
+export class SceneInfo {
+    type: string;
+    wap_url: string;
+    wap_name: string;
+
+    constructor(type: string, wap_url: string, wap_name: string) {
+        this.type = type;
+        this.wap_url = wap_url;
+        this.wap_name = wap_name;
+
+    }
 }

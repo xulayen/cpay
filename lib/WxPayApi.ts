@@ -132,7 +132,7 @@ export class WxPayApi extends BaseApi {
         await result.FromXml(res);
 
         response_data.data = result;
-        response_data.status = result.m_values.get("return_code");
+        response_data.return_code = result.m_values.get("return_code");
         response_data.msg = result.m_values.get("return_msg");
         return response_data;
 
@@ -170,7 +170,7 @@ export class WxPayApi extends BaseApi {
         let result = new Model.WxPayData();
         await result.FromXml(res);
         response_data.data = result;
-        response_data.status = result.m_values.get("return_code");
+        response_data.return_code = result.m_values.get("return_code");
         response_data.msg = result.m_values.get("return_msg");
         return response_data;
     }
@@ -222,7 +222,7 @@ export class WxPayApi extends BaseApi {
         let result = new Model.WxPayData();
         await result.FromXml(res);
         response_data.data = result;
-        response_data.status = result.m_values.get("return_code");
+        response_data.return_code = result.m_values.get("return_code");
         response_data.msg = result.m_values.get("return_msg");
         return response_data;
     }
@@ -261,7 +261,7 @@ export class WxPayApi extends BaseApi {
         let result = new Model.WxPayData();
         await result.FromXml(res);
         response_data.data = result;
-        response_data.status = result.m_values.get("return_code");
+        response_data.return_code = result.m_values.get("return_code");
         response_data.msg = result.m_values.get("return_msg");
         return response_data;
     }
@@ -297,7 +297,7 @@ export class WxPayApi extends BaseApi {
         let result = new Model.WxPayData();
         await result.FromXml(res);
         response_data.data = result;
-        response_data.status = result.m_values.get("return_code");
+        response_data.return_code = result.m_values.get("return_code");
         response_data.msg = result.m_values.get("return_msg");
         return response_data;
     }

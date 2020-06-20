@@ -131,4 +131,12 @@ export default class Constant {
      */
     public static WEIXIN_trade_type_APP: string = "APP";
 
+        /**
+     * 交易类型-H5支付
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static WEIXIN_trade_type_MWEB: string = "MWEB";
+
 }

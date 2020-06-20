@@ -23,7 +23,7 @@ export class JsApiPay {
     private next: any;
     private config: any;
     public WeixinUserInfo: WeixinUserInfo;
-    constructor(request:any, response:any, next:any) {
+    constructor(request: any, response: any, next: any) {
         this.request = request;
         this.response = response;
         this.next = next;
@@ -52,9 +52,9 @@ export class JsApiPay {
         }
     }
 
-    public async UnifiedOrder(orderInfo: cPay_Model.OrderInfo, openid: string): Promise<cPay_Model.WxPayData> {
+    public async UnifiedOrder(orderInfo: cPay_Model.OrderInfo, openid: string): Promise<cPay_Model.ResponseData> {
         //统一下单
-        let data = new WxPayData();
+        let data = new WxPayData(), response_data = new cPay_Model.ResponseData();
         data.SetValue("body", orderInfo.body);
         data.SetValue("attach", orderInfo.attach);
         data.SetValue("out_trade_no", WxPayApi.GenerateOutTradeNo());
@@ -70,7 +70,11 @@ export class JsApiPay {
             throw new WxPayException("UnifiedOrder response error!");
         }
         this._unifiedOrderResult = result;
-        return result;
+        response_data.data = result;
+        response_data.return_code = result.m_values.get("return_code");
+        response_data.msg = result.m_values.get("return_msg");
+        response_data.result_code = result.m_values.get("result_code");
+        return response_data;
     }
 
 
