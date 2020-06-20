@@ -17,9 +17,9 @@ export class RedisClient {
         });
     }
 
-    private async select(key): Promise<any> {
+    private async select(key: any): Promise<any> {
         let doc = await new Promise((resolve, reject) => {
-            this.client.get(key, (err, res) => {
+            this.client.get(key, (err: any, res: any) => {
                 if (err) {
                     reject(err);
                 }
@@ -31,12 +31,12 @@ export class RedisClient {
         return doc;
     };
 
-    public async get(key): Promise<any> {
+    public async get(key: any): Promise<any> {
         let doc = await this.select(key);
         return doc ? JSON.parse(doc) : null;
     };
 
-    public set(key, value, time = 6000): void {
+    public set(key: any, value: any, time = 6000): void {
         value = JSON.stringify(value);
         this.client.set(key, value);
         if (time)
@@ -64,11 +64,11 @@ export class Util {
 
     }
 
-    private static async ErrorInterceptors(err) {
+    private static async ErrorInterceptors(err: any) {
         return err;
     }
 
-    public static async setMethodWithUri(option) {
+    public static async setMethodWithUri(option: any) {
         let certFile, cert;
         if (option.cert) {
             certFile = path.resolve(option.cert);
@@ -88,7 +88,7 @@ export class Util {
             body: option.data
         };
         const reqPromiseOpt = Object.assign({}, __option, {
-            transform: function (body, res, resolveWithFullResponse) {
+            transform: function (body: any, res: any, resolveWithFullResponse: any) {
                 return body;
             }
         });
@@ -104,9 +104,9 @@ export class Util {
 
     public static ToUrlParams(map: any) {
         let buff = "";
-        map.forEach(function (value, key) {
+        map.forEach(function (value: any, key: any) {
             if (!value) {
-                throw new Error("WxPayData内部含有值为null的字段!");
+                throw new Error(`WxPayData内部含有值为null的字段:${key}!`);
             }
             if (value != "") {
                 buff += key + "=" + value + "&";
@@ -116,6 +116,19 @@ export class Util {
 
         buff = buff.trim();
         return buff;
+    }
+
+
+    public static IsString(input: any) {
+
+        return Object.prototype.toString.call(input) === '[object String]'
+
+    }
+
+    public static IsObject(input: any) {
+
+        return Object.prototype.toString.call(input) === '[object Object]'
+
     }
 
 

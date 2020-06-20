@@ -6,7 +6,7 @@ import { format, addMinutes } from 'date-fns';
 import Constant from '../Config/constant';
 import * as  cPay_Util from '../Util';
 
-const WxPayData = cPay.WxPayData;
+const WxPayData = cPay_Model.WxPayData;
 const WxPayApi = cPay.WxPayApi;
 const Util = cPay_Util.Util;
 const WxPayException = cPay_Exception.WxPayException;
@@ -15,7 +15,7 @@ export class JsApiPay {
 
     private _openid: string;
     private _access_token: string;
-    private _unifiedOrderResult: cPay.WxPayData;
+    private _unifiedOrderResult: cPay_Model.WxPayData;
     private _refresh_token: string;
     private _expires_in: number;
     private request: any;
@@ -23,7 +23,7 @@ export class JsApiPay {
     private next: any;
     private config: any;
     public WeixinUserInfo: WeixinUserInfo;
-    constructor(request, response, next) {
+    constructor(request:any, response:any, next:any) {
         this.request = request;
         this.response = response;
         this.next = next;
@@ -52,7 +52,7 @@ export class JsApiPay {
         }
     }
 
-    public async UnifiedOrder(orderInfo: cPay_Model.OrderInfo, openid: string): Promise<cPay.WxPayData> {
+    public async UnifiedOrder(orderInfo: cPay_Model.OrderInfo, openid: string): Promise<cPay_Model.WxPayData> {
         //统一下单
         let data = new WxPayData();
         data.SetValue("body", orderInfo.body);

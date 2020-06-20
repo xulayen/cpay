@@ -6,7 +6,7 @@ import * as  cPay_Model from '../Model';
 
 //export namespace cPay_Notice {
 
-const WxPayData = cPay.WxPayData;
+const WxPayData = cPay_Model.WxPayData;
 const WxPayApi = cPay.WxPayApi;
 const config = cPay_Config.Config.GetWxPayConfig();
 
@@ -20,7 +20,7 @@ class Notify {
     protected request: any;
     protected response: any;
     protected next: any;
-    constructor(request, response, next) {
+    constructor(request: any, response: any, next: any) {
         this.request = request;
         this.response = response;
         this.next = next;
@@ -30,11 +30,11 @@ class Notify {
 
     }
 
-    protected async GetNotifyData(): Promise<cPay.WxPayData> {
+    protected async GetNotifyData(): Promise<cPay_Model.WxPayData> {
 
         let builder = this.request.body, data = new WxPayData();
         try {
-            await data.FromXml(builder.toString());
+            await data.FromXml(builder);
         } catch (ex) {
             console.error(ex);
             //若签名错误，则立即返回结果给微信支付后台
@@ -59,7 +59,7 @@ class Notify {
  */
 export class NativeNotify extends Notify {
 
-    constructor(request, response, next) {
+    constructor(request: any, response: any, next: any) {
         super(request, response, next);
     }
 
@@ -123,7 +123,7 @@ export class NativeNotify extends Notify {
 
     }
 
-    private async  UnifiedOrder(openId: string, productId: string): Promise<cPay.WxPayData> {
+    private async UnifiedOrder(openId: string, productId: string): Promise<cPay_Model.WxPayData> {
         let product = this.SelectProductInfo(productId);
         //统一下单
         let req = new WxPayData();

@@ -4,10 +4,11 @@ import * as  cPay_Model from '../Model';
 import { format, addMinutes } from 'date-fns';
 import Constant from '../Config/constant';
 import * as cPay_Util from '../Util';
+import { WxPayException } from 'lib/Exception/wxPayException';
 
 //export namespace cPay_NativePay {
 
-const WxPayData = cPay.WxPayData;
+const WxPayData = cPay_Model.WxPayData;
 const WxPayApi = cPay.WxPayApi;
 const Util = cPay_Util.Util;
 
@@ -21,7 +22,7 @@ export class NativePay {
 
     public orderInfo: cPay_Model.OrderInfo;
 
-    GetPrePayUrl(productId): string {
+    GetPrePayUrl(productId: string): string {
         console.log("Native pay mode 1 url is producing...");
         let data = new WxPayData();
         data.SetValue("appid", this.config.GetAppID());//公众帐号id
@@ -52,9 +53,11 @@ export class NativePay {
         if (result.IsSet("code_url")) {
             url = result.GetValue("code_url").toString();//获得统一下单接口返回的二维码链接
             console.log("Get native pay mode 2 url : " + url);
+            return url;
         }
-        console.log("生成扫码支付模式2 : " + url);
-        return url;
+        return result.IsSet("return_msg") && result.GetValue("return_msg");
+
+
     }
 }
 
