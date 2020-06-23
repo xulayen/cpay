@@ -46,12 +46,12 @@ app.post('/h5pay', async function (req: any, res: any, next: any) {
     let h5pay = new cPay.H5Pay(),
         scene = new cPay.Model.SceneInfo("11", "22", "444"),
         orderinfo = new cPay.Model.OrderInfo();
-        orderinfo.body="1111111";
-        orderinfo.total_fee=100;
-        h5pay.orderInfo=orderinfo;
-        //out_trade_no
+    orderinfo.body = "1111111";
+    orderinfo.total_fee = 100;
+    h5pay.orderInfo = orderinfo;
+    //out_trade_no
 
-    let res_order = await h5pay.UnifiedOrder("1111111",scene);
+    let res_order = await h5pay.UnifiedOrder("1111111", scene);
     console.log(res_order);
 
     res.send(res_order);
@@ -60,8 +60,8 @@ app.post('/h5pay', async function (req: any, res: any, next: any) {
 app.post('/jspay', async function (req: any, res: any, next: any) {
 
     let ojsapipay = new cPay.JsApiPay(req, res, next);
-    let order = new cPay.Model.OrderInfo("test", "test", "test", "test", 100);
-    let res_order = await ojsapipay.UnifiedOrder(order, "oQ7mswreaeOwzIKtXhaIX1Urcjbo");
+    ojsapipay.orderInfo = new cPay.Model.OrderInfo("test", "test", "test", "test", 100);
+    let res_order = await ojsapipay.UnifiedOrder("oQ7mswreaeOwzIKtXhaIX1Urcjbo");
     console.log(res_order);
     let paramter = ojsapipay.GetJsApiPayParameters();
     res.send(paramter);
@@ -86,6 +86,21 @@ app.post('/native/pay', async function (req: any, res: any, next: any) {
     nativepay.orderInfo = oinfo;
     let url = await nativepay.GetPayUrl("1111111111");
     res.send(url);
+});
+
+app.post('/wxapay', async function (req: any, res: any, next: any) {
+    let wxaPay = new cPay.WxaPay();
+    wxaPay.orderInfo = new cPay.Model.OrderInfo();
+    wxaPay.orderInfo.body = "99999999";
+    wxaPay.orderInfo.total_fee = 100;
+    wxaPay.orderInfo.attach = "vvvv";
+    wxaPay.orderInfo.detail = "bb";
+    wxaPay.orderInfo.goods_tag = "aa";
+    let data = await wxaPay.UnifiedOrder("1111111111", "22222222222222222222222222222222");
+
+    let p = wxaPay.GetWxaApiPayParameters();
+    console.log(p);
+    res.send(data);
 });
 
 

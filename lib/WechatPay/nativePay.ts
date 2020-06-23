@@ -5,6 +5,7 @@ import { format, addMinutes } from 'date-fns';
 import Constant from '../Config/constant';
 import * as cPay_Util from '../Util';
 import { WxPayException } from 'lib/Exception/wxPayException';
+import { BasePay } from './basePay';
 
 //export namespace cPay_NativePay {
 
@@ -12,15 +13,18 @@ const WxPayData = cPay_Model.WxPayData;
 const WxPayApi = cPay.WxPayApi;
 const Util = cPay_Util.Util;
 
-export class NativePay {
+/**
+ * 扫码支付
+ * @export
+ * @class NativePay
+ */
+export class NativePay extends BasePay {
 
     config: any;
     constructor() {
-
+        super();
         this.config = cPay_Config.Config.GetWxPayConfig();
     }
-
-    public orderInfo: cPay_Model.OrderInfo;
 
     GetPrePayUrl(productId: string): string {
         console.log("Native pay mode 1 url is producing...");

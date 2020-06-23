@@ -5,13 +5,20 @@ import * as  cPay_Model from '../Model';
 import { format, addMinutes } from 'date-fns';
 import Constant from '../Config/constant';
 import * as  cPay_Util from '../Util';
+import { BasePay } from './basePay';
 
 const WxPayData = cPay_Model.WxPayData;
 const WxPayApi = cPay.WxPayApi;
 const Util = cPay_Util.Util;
 const WxPayException = cPay_Exception.WxPayException;
 
-export class JsApiPay {
+/**
+ * JSAPI支付
+ *
+ * @export
+ * @class JsApiPay
+ */
+export class JsApiPay extends BasePay {
 
     private _openid: string;
     private _access_token: string;
@@ -24,12 +31,11 @@ export class JsApiPay {
     private config: any;
     public WeixinUserInfo: WeixinUserInfo;
     constructor(request: any, response: any, next: any) {
+        super();
         this.request = request;
         this.response = response;
         this.next = next;
         this.config = cPay_Config.Config.GetWxPayConfig();
-
-
     }
 
     public async GetWeixinUserInfo(uri: string, silence: boolean = true): Promise<void> {
@@ -52,19 +58,30 @@ export class JsApiPay {
         }
     }
 
-    public async UnifiedOrder(orderInfo: cPay_Model.OrderInfo, openid: string): Promise<cPay_Model.ResponseData> {
+    /**
+     * JSAPI统一下单
+     *
+     * @param {string} openid 用户微信号
+     * @param {*} [options] 可选参数对象如{key:value}
+     * @returns {Promise<cPay_Model.ResponseData>}
+     * @memberof JsApiPay
+     */
+    public async UnifiedOrder(openid: string, options?: any): Promise<cPay_Model.ResponseData> {
         //统一下单
-        let data = new WxPayData(), response_data = new cPay_Model.ResponseData();
-        data.SetValue("body", orderInfo.body);
-        data.SetValue("attach", orderInfo.attach);
-        data.SetValue("out_trade_no", WxPayApi.GenerateOutTradeNo());
-        data.SetValue("total_fee", orderInfo.total_fee);
-        data.SetValue("time_start", format(new Date(), "yyyyMMddHHmmss"));
-        data.SetValue("time_expire", format(addMinutes(new Date(), 10), "yyyyMMddHHmmss"));
-        data.SetValue("goods_tag", orderInfo.goods_tag);
-        data.SetValue("trade_type", Constant.WEIXIN_trade_type_JSAPI);
-        data.SetValue("openid", openid);
-        let result = await WxPayApi.UnifiedOrder(data);
+        let req = new WxPayData(), response_data = new cPay_Model.ResponseData();
+        req.SetValue("body", this.orderInfo.body);
+        req.SetValue("attach", this.orderInfo.attach);
+        req.SetValue("out_trade_no", WxPayApi.GenerateOutTradeNo());
+        req.SetValue("total_fee", this.orderInfo.total_fee);
+        req.SetValue("time_start", format(new Date(), "yyyyMMddHHmmss"));
+        req.SetValue("time_expire", format(addMinutes(new Date(), 10), "yyyyMMddHHmmss"));
+        req.SetValue("goods_tag", this.orderInfo.goods_tag);
+        req.SetValue("trade_type", Constant.WEIXIN_trade_type_JSAPI);
+        req.SetValue("openid", openid);
+        for (let key in options) {
+            req.SetValue(key, options[key]);
+        }
+        let result = await WxPayApi.UnifiedOrder(req);
         if (!result.IsSet("appid") || !result.IsSet("prepay_id") || result.GetValue("prepay_id").ToString() == "") {
             console.log("UnifiedOrder response error!");
             throw new WxPayException("UnifiedOrder response error!");
