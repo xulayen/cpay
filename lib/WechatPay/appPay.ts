@@ -11,38 +11,28 @@ const WxPayData = cPay_Model.WxPayData;
 const WxPayApi = cPay.WxPayApi;
 const Util = cPay_Util.Util;
 const WxPayException = cPay_Exception.WxPayException;
-const Config = cPay_Config.Config.GetWxPayConfig();
 
 /**
- *
- * 小程序支付
- * @export
- * @class WxaPay
+ * App支付
  */
-export class WxaPay extends BasePay {
+export class AppPay extends BasePay {
 
-
+    Config: cPay_Config.IWxConfig = cPay_Config.Config.GetWxPayConfig();
     constructor() {
         super();
     }
 
     /**
-     * 
-     * 小程序统一下单
-     * @param {string} out_trade_no 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一。
-     * @param {string} openid 用户openid
-     * @param {*} [options] 可选参数对象如{key:value}
-     * @returns {Promise<cPay_Model.ResponseData>}
-     * @memberof WxaPay
+     * 统一下单
+     * @param out_trade_no 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一。
+     * @param options 可选参数对象如{key:value}
      */
-    public async UnifiedOrder(out_trade_no: string, openid: string, options?: any): Promise<cPay_Model.ResponseData> {
-
-        let req = new cPay_Model.WxPayData(), response_data = new cPay_Model.ResponseData();
-        req.SetValue("trade_type", Constant.WEIXIN_trade_type_JSAPI);
+    public async UnifiedOrder(out_trade_no: string, options?: any): Promise<cPay_Model.ResponseData> {
+        let req = new cPay_Model.WxPayData(), response_data = new cPay_Model.ResponseData();;
+        req.SetValue("trade_type", Constant.WEIXIN_trade_type_APP);
         req.SetValue("out_trade_no", out_trade_no);
         req.SetValue("body", this.orderInfo.body);
         req.SetValue("total_fee", this.orderInfo.total_fee);
-        req.SetValue("openid", openid);
         for (let key in options) {
             req.SetValue(key, options[key]);
         }
@@ -53,27 +43,30 @@ export class WxaPay extends BasePay {
         response_data.msg = result.m_values.get("return_msg");
         response_data.result_code = result.m_values.get("result_code");
         return response_data;
-
     }
 
     /**
-     * 获取小程序支付参数
+     * 获取app支付参数
      * @returns {{}} 参数对象
      * @memberof WxaPay
      */
-    public GetWxaApiPayParameters(): {} {
-        console.log("小程序ApiPay::GetWxaApiParam is processing...");
+    public GetAppApiPayParameters(): {} {
+        console.log("App支付ApiPay::GetAppApiPayParameters is processing...");
         let apiParam = new WxPayData();
-        apiParam.SetValue("timeStamp", WxPayApi.GenerateTimeStamp());
+        apiParam.SetValue("appid", this.Config.GetAppID());
+        apiParam.SetValue("partnerid", this.Config.GetMchID());
+        apiParam.SetValue("prepayid", this.UnifiedOrderResult.GetValue("prepay_id"));
+        apiParam.SetValue("package", "Sign=WXPay");
         apiParam.SetValue("nonceStr", WxPayApi.GenerateNonceStr());
-        apiParam.SetValue("package", "prepay_id=" + this.UnifiedOrderResult.GetValue("prepay_id"));
+        apiParam.SetValue("timeStamp", WxPayApi.GenerateTimeStamp());
         apiParam.SetValue("signType", WxPayData.SIGN_TYPE_HMAC_SHA256);
-        apiParam.SetValue("paySign", apiParam.MakeSign());
+        apiParam.SetValue("sign", apiParam.MakeSign());
         let param = apiParam.ToJson();
-        console.log(`小程序ApiPay::GetWxaApiParam :`);
+        console.log(`App支付ApiPay::GetAppApiPayParameters :`);
         console.log(param);
         return param;
     }
+
 
 
 }

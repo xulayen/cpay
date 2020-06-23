@@ -34,4 +34,11 @@ export class BasePay {
     constructor() {
 
     }
-}
+
+
+    public GetApiPayParameters(): {} {
+        return {};
+    }
+
+
+}   

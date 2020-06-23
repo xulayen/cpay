@@ -22,7 +22,6 @@ export class JsApiPay extends BasePay {
 
     private _openid: string;
     private _access_token: string;
-    private _unifiedOrderResult: cPay_Model.WxPayData;
     private _refresh_token: string;
     private _expires_in: number;
     private request: any;
@@ -86,7 +85,7 @@ export class JsApiPay extends BasePay {
             console.log("UnifiedOrder response error!");
             throw new WxPayException("UnifiedOrder response error!");
         }
-        this._unifiedOrderResult = result;
+        this.UnifiedOrderResult = result;
         response_data.data = result;
         response_data.return_code = result.m_values.get("return_code");
         response_data.msg = result.m_values.get("return_msg");
@@ -98,10 +97,10 @@ export class JsApiPay extends BasePay {
     public GetJsApiPayParameters(): string {
         console.log("JsApiPay::GetJsApiParam is processing...");
         let jsApiParam = new WxPayData();
-        jsApiParam.SetValue("appId", this._unifiedOrderResult.GetValue("appid"));
+        jsApiParam.SetValue("appId", this.UnifiedOrderResult.GetValue("appid"));
         jsApiParam.SetValue("timeStamp", WxPayApi.GenerateTimeStamp());
         jsApiParam.SetValue("nonceStr", WxPayApi.GenerateNonceStr());
-        jsApiParam.SetValue("package", "prepay_id=" + this._unifiedOrderResult.GetValue("prepay_id"));
+        jsApiParam.SetValue("package", "prepay_id=" + this.UnifiedOrderResult.GetValue("prepay_id"));
         jsApiParam.SetValue("signType", WxPayData.SIGN_TYPE_HMAC_SHA256);
         jsApiParam.SetValue("paySign", jsApiParam.MakeSign());
         let param = jsApiParam.ToJson();

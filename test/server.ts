@@ -104,6 +104,22 @@ app.post('/wxapay', async function (req: any, res: any, next: any) {
 });
 
 
+app.post('/apppay', async function (req: any, res: any, next: any) {
+    let appPay = new cPay.AppPay();
+    appPay.orderInfo = new cPay.Model.OrderInfo();
+    appPay.orderInfo.body = "99999999";
+    appPay.orderInfo.total_fee = 100;
+    appPay.orderInfo.attach = "vvvv";
+    appPay.orderInfo.detail = "bb";
+    appPay.orderInfo.goods_tag = "aa";
+    let data = await appPay.UnifiedOrder("1111111111", { device_info: "111" }),
+        p = appPay.GetAppApiPayParameters();
+    console.log(p);
+    res.send(data);
+});
+
+
+
 app.post('/orderquery', async function (req: any, res: any, next: any) {
 
     let paydata = new cPay.Model.WxPayData(), orderinfo;
