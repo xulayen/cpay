@@ -63,7 +63,7 @@ class JsApiPay {
             data.SetValue("trade_type", constant_1.default.WEIXIN_trade_type_JSAPI);
             data.SetValue("openid", openid);
             let result = yield WxPayApi.UnifiedOrder(data);
-            if (!result.IsSet("appid") || !result.IsSet("prepay_id") || result.GetValue("prepay_id").ToString() == "") {
+            if (!result.IsSet("appid") || !result.IsSet("prepay_id") || result.GetValue("prepay_id").toString() == "") {
                 console.log("UnifiedOrder response error!");
                 throw new WxPayException("UnifiedOrder response error!");
             }

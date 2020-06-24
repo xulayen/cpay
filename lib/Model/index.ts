@@ -1,5 +1,6 @@
 import { Util, RedisClient } from '../Util';
 import * as cPay_Config from '../Config';
+import { WxPayException } from '../Exception/wxPayException';
 var xml2js = require("xml2js");
 var cryptojs = require("crypto-js");
 var MD5 = require('crypto-js/md5');
@@ -59,11 +60,36 @@ export class WxPayData {
     }
 
     GetValue(key: any) {
-        return this.m_values.get(key);
+        if (this.IsSet(key))
+            return this.m_values.get(key);
+        return "";
     }
 
     IsSet(key: any) {
         return this.m_values.has(key);
+    }
+
+    CheckSign(signType: string): boolean {
+        //如果没有设置签名，则跳过检测
+        if (!this.IsSet("sign")) {
+            throw new WxPayException("WxPayData签名存在但不合法!");
+        }
+        //如果设置了签名但是签名为空，则抛异常
+        else if (this.GetValue("sign") == null || this.GetValue("sign").toString() == "") {
+            throw new WxPayException("WxPayData签名存在但不合法!");
+        }
+
+        //获取接收到的签名
+        let return_sign = this.GetValue("sign").toString();
+
+        //在本地计算新的签名
+        let cal_sign = this.MakeSign(signType);
+
+        if (cal_sign == return_sign) {
+            return true;
+        }
+
+        throw new WxPayException("WxPayData签名验证错误!");
     }
 
     ToXml() {
@@ -196,6 +222,7 @@ export class ResponseData {
     data: WxPayData;
     return_code: string;
     result_code: string;
+    err_code: string;
     msg: string;
 }
 

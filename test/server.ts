@@ -10,10 +10,10 @@ app.use(xmlparser());
 
 
 let weixin = new cPay.Model.WeixinConfig();
-weixin.AppID = 'wxc46c96addcb23ab9';
-weixin.AppSecret = 'd4624c36b6795d1d99dcf0547af5443d';
-weixin.Key = 'CYRYFWCXtoken130826';
-weixin.MchID = '1305176001';
+weixin.AppID = 'wx050f2eb2da69e7d5';
+weixin.AppSecret = 'e818a97c64b41c9da88edc68189003b2';
+weixin.Key = 'zheyoutech';
+weixin.MchID = '1247115001';
 weixin.Redirect_uri = 'http://127.0.0.1:8888/auth';
 weixin.NotifyUrl = "NotifyUrl";
 weixin.SSlCertPath = `E:\\6certs\\test.txt`;
@@ -117,6 +117,20 @@ app.post('/apppay', async function (req: any, res: any, next: any) {
     console.log(p);
     res.send(data);
 });
+
+app.post('/micropay', async function (req: any, res: any, next: any) {
+    let microPay = new cPay.MicroPay();
+    microPay.orderInfo = new cPay.Model.OrderInfo();
+    microPay.orderInfo.body = "99999999";
+    microPay.orderInfo.total_fee = 100;
+    microPay.orderInfo.attach = "vvvv";
+    microPay.orderInfo.detail = "bb";
+    microPay.orderInfo.goods_tag = "aa";
+    let data = await microPay.Scan("1111111111","1111111111111111111111111111111111111111");
+    console.log(data);
+    res.send(data);
+});
+
 
 
 

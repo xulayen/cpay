@@ -134,6 +134,8 @@ export class WxPayApi extends BaseApi {
         response_data.data = result;
         response_data.return_code = result.m_values.get("return_code");
         response_data.msg = result.m_values.get("return_msg");
+        response_data.result_code = result.m_values.get("result_code");
+        response_data.err_code = result.m_values.get("err_code");
         return response_data;
 
     }
@@ -172,6 +174,8 @@ export class WxPayApi extends BaseApi {
         response_data.data = result;
         response_data.return_code = result.m_values.get("return_code");
         response_data.msg = result.m_values.get("return_msg");
+        response_data.result_code = result.m_values.get("result_code");
+        response_data.err_code = result.m_values.get("err_code");
         return response_data;
     }
 
@@ -224,6 +228,8 @@ export class WxPayApi extends BaseApi {
         response_data.data = result;
         response_data.return_code = result.m_values.get("return_code");
         response_data.msg = result.m_values.get("return_msg");
+        response_data.result_code = result.m_values.get("result_code");
+        response_data.err_code = result.m_values.get("err_code");
         return response_data;
     }
 
@@ -263,6 +269,8 @@ export class WxPayApi extends BaseApi {
         response_data.data = result;
         response_data.return_code = result.m_values.get("return_code");
         response_data.msg = result.m_values.get("return_msg");
+        response_data.result_code = result.m_values.get("result_code");
+        response_data.err_code = result.m_values.get("err_code");
         return response_data;
     }
 
@@ -299,10 +307,106 @@ export class WxPayApi extends BaseApi {
         response_data.data = result;
         response_data.return_code = result.m_values.get("return_code");
         response_data.msg = result.m_values.get("return_msg");
+        response_data.result_code = result.m_values.get("result_code");
+        response_data.err_code = result.m_values.get("err_code");
+        return response_data;
+    }
+
+    /**
+     * 付款码支付
+     *
+     * @static
+     * @param {Model.WxPayData} inputObj 入参
+     * @returns {Promise<Model.ResponseData>}
+     * @memberof WxPayApi
+     */
+    static async  Micropay(inputObj: Model.WxPayData): Promise<Model.ResponseData> {
+        let url = Constant.WEIXIN_wxpay_micropay, response_data = new Model.ResponseData();
+        //检测必填参数
+        if (!inputObj.IsSet("body")) {
+            throw new WxPayException("提交被扫支付API接口中，缺少必填参数body！");
+        }
+        else if (!inputObj.IsSet("out_trade_no")) {
+            throw new WxPayException("提交被扫支付API接口中，缺少必填参数out_trade_no！");
+        }
+        else if (!inputObj.IsSet("total_fee")) {
+            throw new WxPayException("提交被扫支付API接口中，缺少必填参数total_fee！");
+        }
+        else if (!inputObj.IsSet("auth_code")) {
+            throw new WxPayException("提交被扫支付API接口中，缺少必填参数auth_code！");
+        }
+
+        inputObj.SetValue("spbill_create_ip", WxPayConfig.GetWxPayConfig().GetIp());//终端ip
+        inputObj.SetValue("appid", WxPayConfig.GetWxPayConfig().GetAppID());//公众账号ID
+        inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID());//商户号
+        inputObj.SetValue("nonce_str", BaseApi.GenerateNonceStr());//随机字符串
+        inputObj.SetValue("sign_type", Model.WxPayData.SIGN_TYPE_HMAC_SHA256);//签名类型
+        inputObj.SetValue("sign", inputObj.MakeSign());//签名
+        let xml = inputObj.ToXml();
+
+        console.log(`付款码支付-request: \n${xml}`);
+        let res = await Util.setMethodWithUri({
+            url: url,
+            method: 'post',
+            data: xml,
+            headers: {
+                'content-type': 'text/xml'
+            }
+        });
+        debugger;
+        console.log(`付款码支付-response: \n${res}`);
+        let result = new Model.WxPayData();
+        await result.FromXml(res);
+        response_data = this.Flatten(result);
         return response_data;
     }
 
 
+    /**
+    * 
+    * 撤销订单API接口
+    * @param WxPayData inputObj 提交给撤销订单API接口的参数，out_trade_no和transaction_id必填一个
+    * @throws WxPayException
+    * @return 成功时返回API调用结果，其他抛异常
+    */
+    static async Reverse(inputObj: Model.WxPayData): Promise<Model.ResponseData> {
+        let url = Constant.WEIXIN_wxpay_reverse, response_data = new Model.ResponseData();
+        //检测必填参数
+        if (!inputObj.IsSet("out_trade_no") && !inputObj.IsSet("transaction_id")) {
+            throw new WxPayException("撤销订单API接口中，参数out_trade_no和transaction_id必须填写一个！");
+        }
+        inputObj.SetValue("appid", WxPayConfig.GetWxPayConfig().GetAppID());//公众账号ID
+        inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID());//商户号
+        inputObj.SetValue("nonce_str", BaseApi.GenerateNonceStr());//随机字符串
+        inputObj.SetValue("sign_type", Model.WxPayData.SIGN_TYPE_HMAC_SHA256);//签名类型
+        inputObj.SetValue("sign", inputObj.MakeSign());//签名
+        let xml = inputObj.ToXml();
+
+        console.log(`撤销订单-request: \n${xml}`);
+        let res = await Util.setMethodWithUri({
+            url: url,
+            method: 'post',
+            data: xml,
+            headers: {
+                'content-type': 'text/xml'
+            }
+        });
+        console.log(`撤销订单-response: \n${res}`);
+        let result = new Model.WxPayData();
+        await result.FromXml(res);
+        response_data = this.Flatten(result);
+        return response_data;
+    }
+
+    private static Flatten(input: Model.WxPayData): Model.ResponseData {
+        let target = new Model.ResponseData()
+        target.data = input;
+        target.return_code =input.GetValue("return_code");
+        target.msg =  input.GetValue("return_msg");
+        target.result_code =input.GetValue("result_code");
+        target.err_code =  input.GetValue("err_code");
+        return target;
+    }
 }
 
 
