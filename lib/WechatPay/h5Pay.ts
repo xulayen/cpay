@@ -27,14 +27,15 @@ export class H5Pay extends BasePay {
 
     /**
      *
-     * H5下统一下单支付
+     * H5下统一下单支付 √
      * @param {string} out_trade_no 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一。
      * @param {cPay_Model.SceneInfo} scene WAP网站应用场景信息
+     * @param {string} redirect_url 应用回调地址
      * @param {*} [options] 可选参数对象如{key:value}
      * @returns {Promise<cPay_Model.ResponseData>}
      * @memberof H5Pay
      */
-    public async UnifiedOrder(out_trade_no: string, scene: cPay_Model.SceneInfo, options?: any): Promise<cPay_Model.ResponseData> {
+    public async UnifiedOrder(out_trade_no: string, scene: cPay_Model.SceneInfo, redirect_url?: string, options?: any): Promise<cPay_Model.ResponseData> {
         if (!scene) {
             throw new WxPayException("缺少H5支付接口必填参数scene_info！");
         }
@@ -48,6 +49,9 @@ export class H5Pay extends BasePay {
             req.SetValue(key, options[key]);
         }
         let result = await WxPayApi.UnifiedOrder(req);
+        if (redirect_url) {
+            result.SetValue('mweb_url', `${result.GetValue("mweb_url").toString()}&redirect_url=${encodeURIComponent(redirect_url)}`);
+        }
         response_data.data = result;
         response_data.return_code = result.m_values.get("return_code");
         response_data.msg = result.m_values.get("return_msg");

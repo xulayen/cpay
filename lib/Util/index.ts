@@ -114,7 +114,7 @@ export class Util {
 
         });
 
-        buff = buff.trim();
+        buff = buff.trim().substr(0, buff.length - 1);;
         return buff;
     }
 

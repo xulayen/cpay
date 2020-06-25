@@ -58,7 +58,7 @@ export class JsApiPay extends BasePay {
     }
 
     /**
-     * JSAPI统一下单
+     * JSAPI统一下单 √
      *
      * @param {string} openid 用户微信号
      * @param {*} [options] 可选参数对象如{key:value}
@@ -93,7 +93,9 @@ export class JsApiPay extends BasePay {
         return response_data;
     }
 
-
+    /**
+     * 下单成功后，获取微信支付相关参数 √
+     */
     public GetJsApiPayParameters(): string {
         console.log("JsApiPay::GetJsApiParam is processing...");
         let jsApiParam = new WxPayData();
@@ -104,7 +106,8 @@ export class JsApiPay extends BasePay {
         jsApiParam.SetValue("signType", WxPayData.SIGN_TYPE_HMAC_SHA256);
         jsApiParam.SetValue("paySign", jsApiParam.MakeSign());
         let param = jsApiParam.ToJson();
-        console.log('JsApiPay::GetJsApiParam - ' + param);
+        console.log('JsApiPay::GetJsApiParam - ' );
+        console.log(param);
         return param;
     }
 

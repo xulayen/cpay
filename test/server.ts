@@ -15,7 +15,7 @@ weixin.AppSecret = '17615bea97ed1952ac2e14ebe289626f';
 weixin.Key = 'CCNHDBURTHGFEQWEDNJHYGDYEWZP9527';
 weixin.MchID = '1499013532';
 weixin.Redirect_uri = 'http://127.0.0.1:8888/auth';
-weixin.NotifyUrl = "NotifyUrl";
+weixin.NotifyUrl = "http://xulayen.imwork.net:13561/notice";
 weixin.SSlCertPath = `E:\\6certs\\test.txt`;
 weixin.SSlCertPassword = "123";
 weixin.Ip = "10.20.26.19";
@@ -33,6 +33,16 @@ app.get('/auth', async function (req: any, res: any, next: any) {
 
 
 app.post('/notice', async function (req: any, res: any, next: any) {
+    console.log('推送-通知：notice');
+    console.log(req);
+    let notify = new cPay.Notify.CommonlyNotify(req, res, next);
+    await notify.ProcessNotify();
+});
+
+
+app.post('/notice/native', async function (req: any, res: any, next: any) {
+    console.log('推送-扫码支付模式1-通知：');
+    console.log(req);
 
     let notify = new cPay.Notify.NativeNotify(req, res, next);
     await notify.ProcessNotify();
@@ -51,7 +61,7 @@ app.post('/h5pay', async function (req: any, res: any, next: any) {
     h5pay.orderInfo = orderinfo;
     //out_trade_no
 
-    let res_order = await h5pay.UnifiedOrder("1111111", scene);
+    let res_order = await h5pay.UnifiedOrder(new Date().getTime().toString(), scene,"http://baidu.com/");
     console.log(res_order);
 
     res.send(res_order);
@@ -59,9 +69,9 @@ app.post('/h5pay', async function (req: any, res: any, next: any) {
 
 app.post('/jspay', async function (req: any, res: any, next: any) {
 
-    let ojsapipay = new cPay.JsApiPay(req, res, next);
+    let ojsapipay = new cPay.JsApiPay(req, res, next),openid=req.body.openid;
     ojsapipay.orderInfo = new cPay.Model.OrderInfo("test", "test", "test", "test", 100);
-    let res_order = await ojsapipay.UnifiedOrder("oQ7mswreaeOwzIKtXhaIX1Urcjbo");
+    let res_order = await ojsapipay.UnifiedOrder(openid);
     console.log(res_order);
     let paramter = ojsapipay.GetJsApiPayParameters();
     res.send(paramter);
@@ -72,17 +82,17 @@ app.post('/jspay', async function (req: any, res: any, next: any) {
 
 app.post('/native/prepay', async function (req: any, res: any, next: any) {
     let nativepay = new cPay.NativePay();
-    let url = await nativepay.GetPrePayUrl("1111111111");
+    let url = await nativepay.GetPrePayUrl("111111");
     res.send(url);
 });
 
 app.post('/native/pay', async function (req: any, res: any, next: any) {
     let nativepay = new cPay.NativePay(), oinfo = new cPay.Model.OrderInfo();
-    oinfo.body = "99999999";
-    oinfo.total_fee = 100;
-    oinfo.attach = "vvvv";
-    oinfo.detail = "bb";
-    oinfo.goods_tag = "aa";
+    oinfo.body = "商品描述";
+    oinfo.total_fee = 1;
+    oinfo.attach = "附件信息";
+    oinfo.detail = "详细信息";
+    oinfo.goods_tag = "测试";
     nativepay.orderInfo = oinfo;
     let url = await nativepay.GetPayUrl("1111111111");
     res.send(url);
@@ -96,7 +106,7 @@ app.post('/wxapay', async function (req: any, res: any, next: any) {
     wxaPay.orderInfo.attach = "vvvv";
     wxaPay.orderInfo.detail = "bb";
     wxaPay.orderInfo.goods_tag = "aa";
-    let data = await wxaPay.UnifiedOrder("1111111111", "22222222222222222222222222222222");
+    let data = await wxaPay.UnifiedOrder(new Date().getTime().toString(), "oi4qm1cAO4em3nUtBgOsOORvJhOk");
 
     let p = wxaPay.GetWxaApiPayParameters();
     console.log(p);
@@ -119,14 +129,14 @@ app.post('/apppay', async function (req: any, res: any, next: any) {
 });
 
 app.post('/micropay', async function (req: any, res: any, next: any) {
-    let microPay = new cPay.MicroPay();
+    let microPay = new cPay.MicroPay(),auth_code=req.body.auth_code;
     microPay.orderInfo = new cPay.Model.OrderInfo();
     microPay.orderInfo.body = "99999999";
-    microPay.orderInfo.total_fee = 100;
-    microPay.orderInfo.attach = "vvvv";
+    microPay.orderInfo.total_fee = 1;
+    microPay.orderInfo.attach = "56565656565";
     microPay.orderInfo.detail = "bb";
     microPay.orderInfo.goods_tag = "aa";
-    let data = await microPay.Scan("1111111111","1111111111111111111111111111111111111111");
+    let data = await microPay.Scan(new Date().getTime().toString(),auth_code);
     console.log(data);
     res.send(data);
 });
@@ -136,9 +146,10 @@ app.post('/micropay', async function (req: any, res: any, next: any) {
 
 app.post('/orderquery', async function (req: any, res: any, next: any) {
 
-    let paydata = new cPay.Model.WxPayData(), orderinfo;
-    paydata.SetValue("transaction_id", "111");
-
+    let paydata = new cPay.Model.WxPayData(), orderinfo,
+    ordernumber=req.body.ordernumber;
+    paydata.SetValue("out_trade_no", ordernumber);
+    
     try {
         orderinfo = await cPay.BaseApi.OrderQuery(paydata);
 

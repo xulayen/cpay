@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "cPay",
-		"_postman_id": "56514565-6224-78dd-a8cb-b84ff4e22d84",
+		"_postman_id": "2bd0a571-5fa2-f3c5-3e3a-970a78fafb11",
 		"description": "weixin pay tool  ",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -44,8 +44,17 @@
 					"request": {
 						"url": "http://192.168.1.116:8888/jspay",
 						"method": "POST",
-						"header": [],
-						"body": {},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"openid\":\"oi4qm1cAO4em3nUtBgOsOORvJhOk\"\n}"
+						},
 						"description": ""
 					},
 					"response": []
@@ -79,7 +88,10 @@
 						"url": "http://192.168.1.116:8888/wxapay",
 						"method": "POST",
 						"header": [],
-						"body": {},
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
 						"description": ""
 					},
 					"response": []
@@ -94,6 +106,52 @@
 					"name": "App支付",
 					"request": {
 						"url": "http://192.168.1.116:8888/apppay",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "付款码支付",
+			"description": "",
+			"item": [
+				{
+					"name": "付款码支付",
+					"request": {
+						"url": "http://192.168.1.116:8888/micropay",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"auth_code\":\"134662300517845106\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "回调通知",
+			"description": "",
+			"item": [
+				{
+					"name": "扫码回调通知",
+					"request": {
+						"url": "http://xulayen.imwork.net:13561/notice",
 						"method": "POST",
 						"header": [],
 						"body": {},
@@ -157,7 +215,10 @@
 				"url": "http://192.168.1.116:8888/auth",
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": ""
 			},
 			"response": []
@@ -167,8 +228,17 @@
 			"request": {
 				"url": "http://192.168.1.116:8888/orderquery",
 				"method": "POST",
-				"header": [],
-				"body": {},
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"ordernumber\":\"1593045068964\"\n}"
+				},
 				"description": ""
 			},
 			"response": []
@@ -179,7 +249,10 @@
 				"url": "http://192.168.1.116:8888/closeorder",
 				"method": "POST",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": ""
 			},
 			"response": []
@@ -190,7 +263,10 @@
 				"url": "http://192.168.1.116:8888/Refund ",
 				"method": "POST",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": ""
 			},
 			"response": []
@@ -201,7 +277,10 @@
 				"url": "http://192.168.1.116:8888/RefundQuery",
 				"method": "POST",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": ""
 			},
 			"response": []
@@ -212,7 +291,10 @@
 				"url": "http://192.168.1.116:8888/ShortUrl",
 				"method": "POST",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"description": ""
 			},
 			"response": []

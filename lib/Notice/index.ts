@@ -27,6 +27,16 @@ class Notify {
     }
 
     public async ProcessNotify(): Promise<void> {
+        let notifyData = await this.GetNotifyData();
+        if (this instanceof NativeNotify &&
+            (!notifyData.IsSet("openid") || !notifyData.IsSet("product_id"))) {
+            let res = new WxPayData();
+            res.SetValue("return_code", "FAIL");
+            res.SetValue("return_msg", "回调数据异常");
+            console.error("The data WeChat post is error : " + res.ToXml());
+            this.response.send(res.ToXml());
+            return;
+        }
 
     }
 
@@ -51,6 +61,42 @@ class Notify {
 
 }
 
+/**
+ * @export JSAPI支付、App支付、H5支付、小程序支付、扫码支付模式二，统一回调类;接收微信支付后台发送的扫码结果，调用统一下单接口并将下单结果返回给微信支付后台
+ * @class CommonlyNotify 一般通知类
+ * @extends {Notify}
+ * 
+ */
+export class CommonlyNotify extends Notify {
+    constructor(request: any, response: any, next: any) {
+        super(request, response, next);
+    }
+
+    public async ProcessNotify(): Promise<void> {
+        super.ProcessNotify();
+        let notifyData = await super.GetNotifyData(),
+            checksign = notifyData.CheckSign(WxPayData.SIGN_TYPE_HMAC_SHA256),
+            res = new WxPayData();
+
+        if (!checksign) {
+            res = new WxPayData();
+            res.SetValue("return_code", "FAIL");
+            res.SetValue("return_msg", "签名错误");
+            console.error("Sign check error : " + res.ToXml());
+            this.response.send(res.ToXml());
+            return;
+        }
+
+        res = new WxPayData();
+        res.SetValue("return_code", "SUCCESS");
+        res.SetValue("return_msg", "OK");
+        console.log("UnifiedOrder success , send data to WeChat : " + res.ToXml());
+        this.response.send(res.ToXml());
+        return;
+    }
+
+}
+
 
 /**
  * @export 扫码支付模式一回调处理类；接收微信支付后台发送的扫码结果，调用统一下单接口并将下单结果返回给微信支付后台
@@ -64,17 +110,8 @@ export class NativeNotify extends Notify {
     }
 
     public async ProcessNotify(): Promise<void> {
-
+        super.ProcessNotify();
         let notifyData = await super.GetNotifyData();
-
-        if (!notifyData.IsSet("openid") || !notifyData.IsSet("product_id")) {
-            let res = new WxPayData();
-            res.SetValue("return_code", "FAIL");
-            res.SetValue("return_msg", "回调数据异常");
-            console.error("The data WeChat post is error : " + res.ToXml());
-            this.response.send(res.ToXml());
-            return;
-        }
 
         //调统一下单接口，获得下单结果
         let openid = notifyData.GetValue("openid").toString(),

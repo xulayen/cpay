@@ -28,7 +28,7 @@ export class WxaPay extends BasePay {
 
     /**
      * 
-     * 小程序统一下单
+     * 小程序统一下单 √
      * @param {string} out_trade_no 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一。
      * @param {string} openid 用户openid
      * @param {*} [options] 可选参数对象如{key:value}

@@ -170,18 +170,12 @@ export class WxPayData {
                 throw new Error(`WxPayData内部含有值为null的字段:${key}!`);
             }
             if (key != "sign" && value != "") {
-                buff += key + "=" + value;
+                buff += key + "=" + value + "&";
             }
-
-
-            if (size !== i) {
-                buff += "&";
-            }
-
 
         });
 
-        buff = buff.trim();
+        buff = buff.trim().substr(0, buff.length - 1);
 
         return buff;
     }

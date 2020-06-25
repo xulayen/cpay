@@ -22,7 +22,7 @@ export class MicroPay extends BasePay {
     }
 
     /**
-     * 微信付款码支付
+     * 微信付款码支付 √
      *
      * @param {string} out_trade_no 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一。
      * @param {string} auth_code 付款码，扫码支付付款码，设备读取用户微信中的条码或者二维码信息
@@ -36,6 +36,7 @@ export class MicroPay extends BasePay {
         req.SetValue("out_trade_no", out_trade_no);
         req.SetValue("total_fee", this.orderInfo.total_fee);
         req.SetValue("auth_code", auth_code);
+        req.SetValue("attach", this.orderInfo.attach)
         for (let key in options) {
             req.SetValue(key, options[key]);
         }
@@ -79,6 +80,10 @@ export class MicroPay extends BasePay {
                     Util.sleep(10000);
                     continue;
                 }
+                else if ((orderstates.data.GetValue("trade_state") === "PAYERROR")) {
+                    //支付失败，直接取消订单
+                    break;
+                }
             }
             //如果返回错误码为“此交易订单号不存在”则直接认定失败
             if (orderstates.err_code === 'ORDERNOTEXIST') {
@@ -92,7 +97,7 @@ export class MicroPay extends BasePay {
 
         //确认失败，取消订单
         let res_cannel = await this.Cancel(orderInput);
-        if(!res_cannel){
+        if (!res_cannel) {
             throw new WxPayException("MicroPay Reverse order failure");
         }
 

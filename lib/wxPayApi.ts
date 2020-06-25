@@ -320,7 +320,7 @@ export class WxPayApi extends BaseApi {
      * @returns {Promise<Model.ResponseData>}
      * @memberof WxPayApi
      */
-    static async  Micropay(inputObj: Model.WxPayData): Promise<Model.ResponseData> {
+    static async Micropay(inputObj: Model.WxPayData): Promise<Model.ResponseData> {
         let url = Constant.WEIXIN_wxpay_micropay, response_data = new Model.ResponseData();
         //检测必填参数
         if (!inputObj.IsSet("body")) {
@@ -353,7 +353,6 @@ export class WxPayApi extends BaseApi {
                 'content-type': 'text/xml'
             }
         });
-        debugger;
         console.log(`付款码支付-response: \n${res}`);
         let result = new Model.WxPayData();
         await result.FromXml(res);
@@ -389,7 +388,9 @@ export class WxPayApi extends BaseApi {
             data: xml,
             headers: {
                 'content-type': 'text/xml'
-            }
+            },
+            cert: WxPayConfig.GetWxPayConfig().GetSSlCertPath(),
+            password: WxPayConfig.GetWxPayConfig().GetSSlCertPassword()
         });
         console.log(`撤销订单-response: \n${res}`);
         let result = new Model.WxPayData();
@@ -401,10 +402,10 @@ export class WxPayApi extends BaseApi {
     private static Flatten(input: Model.WxPayData): Model.ResponseData {
         let target = new Model.ResponseData()
         target.data = input;
-        target.return_code =input.GetValue("return_code");
-        target.msg =  input.GetValue("return_msg");
-        target.result_code =input.GetValue("result_code");
-        target.err_code =  input.GetValue("err_code");
+        target.return_code = input.GetValue("return_code");
+        target.msg = input.GetValue("return_msg");
+        target.result_code = input.GetValue("result_code");
+        target.err_code = input.GetValue("err_code");
         return target;
     }
 }
