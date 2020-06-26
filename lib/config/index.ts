@@ -70,11 +70,18 @@ export interface IRedisConfig {
     Auth: string;
 }
 
+export interface IMySqlConfig {
+    host: string,
+    user: string,
+    password: string,
+    database: string
+}
+
 export class WeixinPayConfig implements IWxConfig {
 
     constructor(CustomerWeixinConfig?: Model.WeixinConfig) {
         this.CustomerWeixinConfig = CustomerWeixinConfig;
-        Config.wxconfig=this;
+        Config.wxconfig = this;
     }
     CustomerWeixinConfig: Model.WeixinConfig;
 
@@ -134,6 +141,25 @@ export class RedisConfig implements IRedisConfig {
     Auth: string = "";
 }
 
+export class MySqlConfig implements IMySqlConfig {
+    host: string = "192.168.101.30";
+    user: string = "root";
+    password: string = "abc123.";
+    database: string = "cPay";
+
+    constructor(host: string, user: string, password: string, database: string) {
+        if (host)
+            this.host = host;
+        if (user)
+            this.user = user;
+        if (password)
+            this.password = password;
+        if (database)
+            this.database = database;
+    }
+
+}
+
 export class Config {
     private static _wxconfig: IWxConfig;
     public static set wxconfig(value: IWxConfig) {
@@ -141,6 +167,15 @@ export class Config {
     }
 
     private static redisconfig: IRedisConfig;
+
+    private static _mysqlconfig: IMySqlConfig;
+    public static get mysqlconfig(): IMySqlConfig {
+        return Config._mysqlconfig;
+    }
+    public static set mysqlconfig(value: IMySqlConfig) {
+        Config._mysqlconfig = value;
+    }
+
 
     constructor() {
 
@@ -158,6 +193,13 @@ export class Config {
             this.redisconfig = new RedisConfig(host, port, db, auth);
         }
         return this.redisconfig;
+    }
+
+    public static GetMySqlConfig(host?: string, user?: string, password?: string, database?: string): IMySqlConfig {
+        if (!this.mysqlconfig) {
+            this.mysqlconfig = new MySqlConfig(host, user, password, database);
+        }
+        return this.mysqlconfig;
     }
 
 

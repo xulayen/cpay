@@ -4,6 +4,8 @@ import { format } from 'date-fns';
 import * as cPay_Exception from './Exception/wxPayException';
 import Constant from './Config/constant';
 import * as Model from './Model';
+import * as BLL from './BLL/cPayBLL';
+
 const Util = cPay_Util.Util;
 
 const WxPayConfig = cPay_Config.Config;
@@ -77,6 +79,8 @@ export class WxPayApi extends BaseApi {
         inputObj.SetValue("sign", inputObj.MakeSign());
 
         let xml = inputObj.ToXml();
+
+        await BLL.CpayOrderBLL.IncreasedOrder(inputObj.ToJson());
 
         console.log("WxPayApi", "统一下单 request : " + xml);
         let res = await Util.setMethodWithUri({
