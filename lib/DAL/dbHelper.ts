@@ -14,38 +14,33 @@ class DbHelper {
     }
 
     constructor() {
-        // try {
 
-        //     debugger;
+        this.connection = mysql.createConnection({
+            host: cPay_Config.Config.GetMySqlConfig().host,
+            user: cPay_Config.Config.GetMySqlConfig().user,
+            password: cPay_Config.Config.GetMySqlConfig().password,
+            database: cPay_Config.Config.GetMySqlConfig().database
+        });
 
-        //     this.connection = mysql.createConnection({
-        //         host: cPay_Config.Config.GetMySqlConfig().host,
-        //         user: cPay_Config.Config.GetMySqlConfig().user,
-        //         password: cPay_Config.Config.GetMySqlConfig().password,
-        //         database: cPay_Config.Config.GetMySqlConfig().database
-        //     });
-        //     this.connection.connect();
+        this.connection.connect(function (err: any) {
+            if (err) {
+                console.warn('error connecting: ' + err.message);
+                return;
+            }
 
-        //     if(this.connection.state==='disconnected' ){
-        //         console.warn('数据库连接失败！');
-                
-        //         return;
+            console.log('connected as id ' + this.connection.threadId);
+        });
 
-        //     }
+        this.connection.config.queryFormat = (query: any, values: any) => {
+            if (!values) return query;
+            return query.replace(/\:(\w+)/g, function (txt: any, key: any) {
+                if (values.hasOwnProperty(key)) {
+                    return mysql.escape(values[key]);
+                }
+                return txt;
+            }.bind(this));
+        };
 
-        //     this.connection.config.queryFormat = (query: any, values: any) => {
-        //         if (!values) return query;
-        //         return query.replace(/\:(\w+)/g, function (txt: any, key: any) {
-        //             if (values.hasOwnProperty(key)) {
-        //                 return mysql.escape(values[key]);
-        //             }
-        //             return txt;
-        //         }.bind(this));
-        //     };
-        // } catch (error) {
-        //     console.error(error);
-
-        // }
     }
 
     /**
@@ -73,11 +68,12 @@ class DbHelper {
     /**
      * 插入
      * @param tablename 数据表名称
-     * @param columns 列名，如[":id",":name"]
-     * @param params 参数，如{"id":"1","name":"测试"}
+     * @param columns 列名，如["id","name"]
+     * @param params_columns 参数列名，如[":id",":name"]
+     * @param params 参数数据，如{"id":"1","name":"测试"}
      */
-    async insert(tablename: string, columns: string[], params: {}): Promise<any> {
-        let sql = `insert into ${tablename} (${columns.join(',')}) values ( ${params} )`,
+    async insert(tablename: string, columns: string[], params_columns: string[], params: {}): Promise<any> {
+        let sql = `insert into ${tablename} (${columns.join(',')}) values ( ${params_columns.join(',')} )`,
             res = await new Promise((resolve, reject) => {
                 this.connection.query(sql, params, function (error: any, results: any, fields: any) {
                     if (error) {

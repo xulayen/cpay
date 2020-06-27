@@ -80,7 +80,8 @@ export class WxPayApi extends BaseApi {
 
         let xml = inputObj.ToXml();
 
-        await BLL.CpayOrderBLL.IncreasedOrder(inputObj.ToJson());
+        //异步执行插入
+        BLL.CpayOrderBLL.IncreasedOrder(inputObj.ToJson(), "00000");
 
         console.log("WxPayApi", "统一下单 request : " + xml);
         let res = await Util.setMethodWithUri({
@@ -95,6 +96,10 @@ export class WxPayApi extends BaseApi {
 
         let result = new Model.WxPayData();
         await result.FromXml(res);
+
+        //异步执行修改
+        BLL.CpayOrderBLL.UpdateOrder(inputObj.GetValue("out_trade_no"), result.ToJson());
+
         return result;
     }
 
