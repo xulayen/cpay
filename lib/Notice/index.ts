@@ -3,6 +3,7 @@ import * as  cPay_Config from '../Config';
 import { format } from 'date-fns';
 import Constant from '../Config/constant';
 import * as  cPay_Model from '../Model';
+import * as BLL from '../BLL/cPayBLL';
 
 //export namespace cPay_Notice {
 
@@ -45,6 +46,7 @@ class Notify {
         let builder = this.request.body, data = new WxPayData();
         try {
             await data.FromXml(builder);
+
         } catch (ex) {
             console.error(ex);
             //若签名错误，则立即返回结果给微信支付后台
@@ -55,6 +57,10 @@ class Notify {
             this.response.send(res.ToXml());
             return;
         }
+        finally {
+            BLL.CpayOrderBLL.WxPayCallBack(data.ToJson());
+        }
+
         return data;
 
     }

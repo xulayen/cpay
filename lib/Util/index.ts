@@ -131,11 +131,13 @@ export class Util {
 
     }
 
-    public static sleep(milliSeconds:number){ 
-        var StartTime =new Date().getTime(); 
+    public static sleep(milliSeconds: number) {
+        var StartTime = new Date().getTime();
         let i = 0;
-        while (new Date().getTime() <StartTime+milliSeconds);
+        while (new Date().getTime() < StartTime + milliSeconds);
     }
+
+   
 
 
 

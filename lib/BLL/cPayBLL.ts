@@ -1,5 +1,6 @@
 import * as DAL from '../DAL/dbHelper';
-import { de } from 'date-fns/locale';
+import { de, tr } from 'date-fns/locale';
+import * as cPay_Util from '../Util';
 
 
 export class CayConfigBLL {
@@ -139,12 +140,50 @@ export class CpayOrderBLL {
     }
 
     static async UpdateOrder(out_trade_no: string, orderRes: any): Promise<boolean> {
+        
         let columns = ` return_code=:return_code,result_code=:result_code,err_code=:err_code,err_code_des=:err_code_des `,
-            condition = ` out_trade_no=:out_trade_no `;
-        orderRes.out_trade_no = out_trade_no;
-        let res_order = await this.dal.update(this.tablename, columns, condition, orderRes);
+            condition = ` out_trade_no=:out_trade_no `, params: any = {};
+        // params.out_trade_no = out_trade_no;
+        // params.return_code = orderRes.return_code ? orderRes.return_code : '';
+        // params.result_code = orderRes.result_code ? orderRes.result_code : '';
+        // params.err_code = orderRes.err_code ? orderRes.err_code : '';
+        // params.err_code_des = orderRes.err_code_des ? orderRes.err_code_des : '';
+        orderRes.out_trade_no=out_trade_no;
+        params = this.BuildParameters(`${columns},${condition},`, orderRes);
+        let res_order = await this.dal.update(this.tablename, columns, condition, params);
         return res_order.affectedRows > 0;
     }
+
+    static async WxPayCallBack(orderRes: any): Promise<boolean> {
+
+        let columns = ` return_code=:return_code,result_code=:result_code,err_code=:err_code,err_code_des=:err_code_des,transaction_id=:transaction_id,openid=:openid `,
+            condition = ` out_trade_no=:out_trade_no `, params: any = {};
+        // params.out_trade_no = orderRes.out_trade_no;
+        // params.return_code = orderRes.return_code ? orderRes.return_code : '';
+        // params.result_code = orderRes.result_code ? orderRes.result_code : '';
+        // params.err_code = orderRes.err_code ? orderRes.err_code : '';
+        // params.err_code_des = orderRes.err_code_des ? orderRes.err_code_des : '';
+        // params.transaction_id = orderRes.transaction_id ? orderRes.transaction_id : '';
+        // params.openid = orderRes.openid ? orderRes.openid : '';
+        params = this.BuildParameters(`${columns},${condition},`, orderRes);
+        let res_order = await this.dal.update(this.tablename, columns, condition, params);
+        return res_order.affectedRows > 0;
+    }
+
+    public static BuildParameters(params: string, orderRes: any): any {
+        let res: any = {};
+        let paramkey = params.match(/(?<=:).*?(?=,)/ig);
+        for (let i = 0; i < paramkey.length; i++) {
+            let key = paramkey[i].trim();
+            res[key] = orderRes[key] ? orderRes[key] : '';
+        }
+        return res;
+
+
+    }
+
+
+
 
 
 }

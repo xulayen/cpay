@@ -27,8 +27,6 @@ class DbHelper {
                 console.warn('error connecting: ' + err.message);
                 return;
             }
-
-            console.log('connected as id ' + this.connection.threadId);
         });
 
         this.connection.config.queryFormat = (query: any, values: any) => {
