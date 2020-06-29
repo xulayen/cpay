@@ -58,7 +58,7 @@ class Notify {
             return;
         }
         finally {
-            BLL.CpayOrderBLL.WxPayCallBack(data.ToJson());
+            BLL.CpayOrderBLL.WxPayCallBack(data.ToJson(), "00000");
         }
 
         return data;
