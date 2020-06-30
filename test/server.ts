@@ -19,6 +19,7 @@ weixin.NotifyUrl = "http://xulayen.imwork.net:13561/notice";
 weixin.SSlCertPath = `E:\\6certs\\test.txt`;
 weixin.SSlCertPassword = "123";
 weixin.Ip = "10.20.26.19";
+weixin.Facid="00000";
 
 new cPay.Config.WeixinPayConfig(weixin);
 new cPay.Config.RedisConfig("10.20.31.11", "6379", 10);
@@ -82,6 +83,12 @@ app.post('/jspay', async function (req: any, res: any, next: any) {
 
 app.post('/native/prepay', async function (req: any, res: any, next: any) {
     let nativepay = new cPay.NativePay();
+    nativepay.orderInfo =new cPay.Model.OrderInfo();
+    nativepay.orderInfo.body = "商品描述";
+    nativepay.orderInfo.total_fee = 1;
+    nativepay.orderInfo.attach = "附件信息";
+    nativepay.orderInfo.detail = "详细信息";
+    nativepay.orderInfo.goods_tag = "测试";
     let url = await nativepay.GetPrePayUrl("111111");
     res.send(url);
 });

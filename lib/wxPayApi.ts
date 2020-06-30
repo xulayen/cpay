@@ -13,6 +13,13 @@ const WxPayException = cPay_Exception.WxPayException;
 
 
 class BaseApi {
+    /**
+     * 随机生成时间戳
+     *
+     * @static
+     * @returns {string}
+     * @memberof BaseApi
+     */
     public static GenerateTimeStamp(): string {
         return (new Date().getTime() + Math.ceil(Math.random() * 1000)) + "";
     }
@@ -25,8 +32,26 @@ class BaseApi {
         return (new Date().getTime() + Math.ceil(Math.random() * 1000)) + "";
     }
 
+    /**
+     * 随机生成商户订单号
+     *
+     * @static
+     * @returns {string} 订单号
+     * @memberof BaseApi
+     */
     public static GenerateOutTradeNo(): string {
-        return `${WxPayConfig.GetWxPayConfig().GetMchID()}${format(new Date(), 'yyyyMMddHHmmss'), Math.ceil(Math.random() * 1000)}`;
+        return `${format(new Date(), 'yyyyMMddHHmmss')}${Math.ceil(Math.random() * 1000)}`;
+    }
+
+    public static async Log(input: Model.WxPayData, output: any, uri: string, times: number = 0): Promise<void> {
+        let out_trade_no = input.GetValue("out_trade_no").toString(), req_input = {
+            out_trade_no: out_trade_no,
+            req: input.ToXml(),
+            response: output,
+            uri: uri,
+            times: times
+        };
+        await BLL.CpayLogsBLL.InsertLogs(req_input);
     }
 }
 
@@ -81,7 +106,7 @@ export class WxPayApi extends BaseApi {
         let xml = inputObj.ToXml();
 
         //异步执行插入
-        BLL.CpayOrderBLL.IncreasedOrder(inputObj.ToJson(), "00000");
+        BLL.CpayOrderBLL.IncreasedOrder(inputObj.ToJson(), WxPayConfig.GetWxPayConfig().GetFacID());
 
         console.log("WxPayApi", "统一下单 request : " + xml);
         let res = await Util.setMethodWithUri({
@@ -93,7 +118,8 @@ export class WxPayApi extends BaseApi {
             }
         });
         console.log("WxPayApi", "统一下单 response : " + res);
-
+        this.Log(inputObj, res, url);
+        
         let result = new Model.WxPayData();
         await result.FromXml(res);
 
@@ -118,7 +144,7 @@ export class WxPayApi extends BaseApi {
             throw new WxPayException("订单查询接口中，out_trade_no、transaction_id至少填一个！");
         }
 
-        inputObj.SetValue("appid", WxPayConfig.GetWxPayConfig().GetAppID());//公众账号ID
+        inputObj.SetValue( "app id", WxPayConfig.GetWxPayConfig().GetAppID());//公众账号ID
         inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID());//商户号
         inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr());//随机字符串
         inputObj.SetValue("sign_type", Model.WxPayData.SIGN_TYPE_HMAC_SHA256);//签名类型
@@ -135,6 +161,7 @@ export class WxPayApi extends BaseApi {
             }
         });
         console.log(`查询订单-response: \n${res}`);
+        this.Log(inputObj, res, url);
 
         //将xml格式的数据转化为对象以返回
         let result = new Model.WxPayData();
@@ -178,6 +205,8 @@ export class WxPayApi extends BaseApi {
             }
         });
         console.log(`关闭订单-response: \n${res}`);
+        this.Log(inputObj, res, url);
+
         let result = new Model.WxPayData();
         await result.FromXml(res);
         response_data.data = result;
@@ -232,6 +261,8 @@ export class WxPayApi extends BaseApi {
             password: WxPayConfig.GetWxPayConfig().GetSSlCertPassword()
         });
         console.log(`申请退款-response: \n${res}`);
+        this.Log(inputObj, res, url);
+
         let result = new Model.WxPayData();
         await result.FromXml(res);
         response_data.data = result;
@@ -273,6 +304,8 @@ export class WxPayApi extends BaseApi {
             }
         });
         console.log(`查询退款-response: \n${res}`);
+        this.Log(inputObj, res, url);
+
         let result = new Model.WxPayData();
         await result.FromXml(res);
         response_data.data = result;
@@ -311,6 +344,8 @@ export class WxPayApi extends BaseApi {
             }
         });
         console.log(`短链接-response: \n${res}`);
+        this.Log(inputObj, res, url);
+
         let result = new Model.WxPayData();
         await result.FromXml(res);
         response_data.data = result;
@@ -363,6 +398,8 @@ export class WxPayApi extends BaseApi {
             }
         });
         console.log(`付款码支付-response: \n${res}`);
+        this.Log(inputObj, res, url);
+        
         let result = new Model.WxPayData();
         await result.FromXml(res);
         response_data = this.Flatten(result);

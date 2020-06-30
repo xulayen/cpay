@@ -148,7 +148,7 @@ export class WxPayData {
         //在string后加入API KEY
         str += "&key=" + WxPayConfig.GetWxPayConfig().GetKey();
         if (signType === WxPayData.SIGN_TYPE_MD5) {
-            return this.md5(str, WxPayConfig.GetWxPayConfig().GetKey());
+            return this.md5(str);
         }
         else if (signType === WxPayData.SIGN_TYPE_HMAC_SHA256) {
 
@@ -202,8 +202,8 @@ export class WxPayData {
     }
 
 
-    md5(plaintext: string, salt: string) {
-        return MD5(plaintext + salt);
+    md5(plaintext: string) {
+        return MD5(plaintext).toString();
     }
 }
 
@@ -225,6 +225,7 @@ export class WeixinConfig {
     constructor() {
 
     }
+    Facid:string;
     AppID: string;
     MchID: string;
     Key: string;

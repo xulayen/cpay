@@ -14,7 +14,6 @@ class DbHelper {
     }
 
     constructor() {
-
         this.connection = mysql.createConnection({
             host: cPay_Config.Config.GetMySqlConfig().host,
             user: cPay_Config.Config.GetMySqlConfig().user,

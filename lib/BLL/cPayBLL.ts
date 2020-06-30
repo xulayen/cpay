@@ -18,13 +18,39 @@ export class CayConfigBLL {
     }
 }
 
-export class CpayOrderBLL {
+class BaseBLL {
+    public static BuildParameters(params: string, orderRes: any): any {
+        let res: any = {};
+        let paramkey = params.match(/(?<=:).*?(?=,)/ig);
+        for (let i = 0; i < paramkey.length; i++) {
+            let key = paramkey[i].trim();
+            res[key] = orderRes[key] ? orderRes[key] : '';
+        }
+        return res;
+    }
+
+    public static BuildOrderParameters(params: string[], orderRes: any, facid: string = null) {
+        let params_data: any = {}, columns: string[] = [];
+        let paramkey = `${params.join(',')},`.match(/(?<=:).*?(?=,)/ig);
+        for (let i = 0; i < paramkey.length; i++) {
+            let key = paramkey[i].trim();
+            params_data[key] = orderRes[key] ? orderRes[key] : '';
+            columns.push(key);
+        }
+        if (facid) {
+            params_data.facid = facid;
+        }
+        return { columns, params_data };
+    }
+}
+
+export class CpayOrderBLL extends BaseBLL {
 
     static readonly tablename = "t_cPay_order";
     static readonly tablename_order_detail = "t_cPay_order_detail";
     static dal: DAL.DbHelper = DAL.DbHelper.instance;
     constructor() {
-
+        super();
     }
 
     static async IncreasedOrder(order: any, facid: string): Promise<boolean> {
@@ -100,30 +126,27 @@ export class CpayOrderBLL {
         return res_order.affectedRows > 0;
     }
 
-    public static BuildParameters(params: string, orderRes: any): any {
-        let res: any = {};
-        let paramkey = params.match(/(?<=:).*?(?=,)/ig);
-        for (let i = 0; i < paramkey.length; i++) {
-            let key = paramkey[i].trim();
-            res[key] = orderRes[key] ? orderRes[key] : '';
-        }
-        return res;
+
+
+}
+
+
+export class CpayLogsBLL extends BaseBLL {
+
+    static readonly tablename = "t_cpay_logs";
+    static dal: DAL.DbHelper = DAL.DbHelper.instance;
+    constructor() {
+        super();
     }
 
-    public static BuildOrderParameters(params: string[], orderRes: any, facid: string) {
-        let params_data: any = {}, columns: string[] = [];
-        let paramkey = `${params.join(',')},`.match(/(?<=:).*?(?=,)/ig);
-        for (let i = 0; i < paramkey.length; i++) {
-            let key = paramkey[i].trim();
-            params_data[key] = orderRes[key] ? orderRes[key] : '';
-            columns.push(key);
-        }
-        params_data.facid = facid;
-        return { columns, params_data };
+    public static async InsertLogs(inputRes: any) {
+
+        let params_columns: string[] = [':out_trade_no', ':req', ':response', ':uri', ':times'], res;
+
+        let { columns, params_data } = this.BuildOrderParameters(params_columns, inputRes);
+        res = await this.dal.insert(this.tablename, columns, params_columns, params_data);
+        return res.affectedRows > 0;
+
     }
-
-
-
-
 
 }

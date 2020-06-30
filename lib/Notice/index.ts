@@ -1,6 +1,6 @@
 import * as  cPay from '../WxPayApi';
 import * as  cPay_Config from '../Config';
-import { format } from 'date-fns';
+import { format, addMinutes } from 'date-fns';
 import Constant from '../Config/constant';
 import * as  cPay_Model from '../Model';
 import * as BLL from '../BLL/cPayBLL';
@@ -9,7 +9,7 @@ import * as BLL from '../BLL/cPayBLL';
 
 const WxPayData = cPay_Model.WxPayData;
 const WxPayApi = cPay.WxPayApi;
-const config = cPay_Config.Config.GetWxPayConfig();
+
 
 /**
  * @class 回调处理基类
@@ -21,6 +21,7 @@ class Notify {
     protected request: any;
     protected response: any;
     protected next: any;
+    config = cPay_Config.Config.GetWxPayConfig();
     constructor(request: any, response: any, next: any) {
         this.request = request;
         this.response = response;
@@ -58,7 +59,7 @@ class Notify {
             return;
         }
         finally {
-            BLL.CpayOrderBLL.WxPayCallBack(data.ToJson(), "00000");
+            BLL.CpayOrderBLL.WxPayCallBack(data.ToJson(), this.config.GetFacID());
         }
 
         return data;
@@ -152,13 +153,13 @@ export class NativeNotify extends Notify {
         let data = new WxPayData();
         data.SetValue("return_code", "SUCCESS");
         data.SetValue("return_msg", "OK");
-        data.SetValue("appid", config.GetAppID());
-        data.SetValue("mch_id", config.GetMchID());
+        data.SetValue("appid", this.config.GetAppID());
+        data.SetValue("mch_id", this.config.GetMchID());
         data.SetValue("nonce_str", WxPayApi.GenerateNonceStr());
         data.SetValue("prepay_id", unifiedOrderResult.GetValue("prepay_id"));
         data.SetValue("result_code", "SUCCESS");
         data.SetValue("err_code_des", "OK");
-        data.SetValue("sign", data.MakeSign());
+        data.SetValue("sign", data.MakeSign(WxPayData.SIGN_TYPE_MD5));
 
         console.log("UnifiedOrder success , send data to WeChat : " + data.ToXml());
         this.response.send(data.ToXml());
@@ -175,7 +176,7 @@ export class NativeNotify extends Notify {
         req.SetValue("out_trade_no", WxPayApi.GenerateOutTradeNo());
         req.SetValue("total_fee", product.total_fee);
         req.SetValue("time_start", format(new Date(), "yyyyMMddHHmmss"));
-        req.SetValue("time_expire", format(new Date(), "yyyyMMddHHmmss"));
+        req.SetValue("time_expire", format(addMinutes(new Date(), 5), "yyyyMMddHHmmss"));
         req.SetValue("goods_tag", product.goods_tag);
         req.SetValue("trade_type", Constant.WEIXIN_trade_type_NATIVE);
         req.SetValue("openid", openId);
@@ -191,7 +192,7 @@ export class NativeNotify extends Notify {
         product.body = "test";
         product.detail = "test";
         product.goods_tag = "test";
-        product.total_fee = 88;
+        product.total_fee = 1;
         return product;
 
     }

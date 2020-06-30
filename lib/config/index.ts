@@ -1,10 +1,13 @@
 
 import * as Model from '../Model';
 
+
 //export namespace cPay_Config {
 export interface IWxConfig {
 
     CustomerWeixinConfig: Model.WeixinConfig;
+
+    GetFacID(): string;
 
     //=======【基本信息设置】=====================================
     /* 微信公众号信息配置
@@ -79,11 +82,16 @@ export interface IMySqlConfig {
 
 export class WeixinPayConfig implements IWxConfig {
 
+
     constructor(CustomerWeixinConfig?: Model.WeixinConfig) {
         this.CustomerWeixinConfig = CustomerWeixinConfig;
         Config.wxconfig = this;
     }
     CustomerWeixinConfig: Model.WeixinConfig;
+
+    GetFacID(): string {
+        return this.CustomerWeixinConfig && this.CustomerWeixinConfig.Facid || "";
+    }
 
     GetRedirect_uri(): string {
         return this.CustomerWeixinConfig && this.CustomerWeixinConfig.Redirect_uri || "";

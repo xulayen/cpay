@@ -26,6 +26,13 @@ export class NativePay extends BasePay {
         this.config = cPay_Config.Config.GetWxPayConfig();
     }
 
+    /**
+     * 扫码模式1，默认5分钟过期 ✔
+     *
+     * @param {string} productId 产品编号
+     * @returns {string} 二维码
+     * @memberof NativePay
+     */
     GetPrePayUrl(productId: string): string {
         console.log("Native pay mode 1 url is producing...");
         let data = new WxPayData();
@@ -34,7 +41,7 @@ export class NativePay extends BasePay {
         data.SetValue("time_stamp", WxPayApi.GenerateTimeStamp());//时间戳
         data.SetValue("nonce_str", WxPayApi.GenerateNonceStr());//随机字符串
         data.SetValue("product_id", productId);//商品ID
-        data.SetValue("sign", data.MakeSign(WxPayData.SIGN_TYPE_HMAC_SHA256));//签名
+        data.SetValue("sign", data.MakeSign(WxPayData.SIGN_TYPE_MD5));//签名，扫码模式1只能用MD5加密
         let str = Util.ToUrlParams(data.GetValues());//转换为URL串
         let url = `${Constant.WEIXIN_wxpay_bizpayurl}${str}`;
         console.log("生成扫码支付模式1 : " + url);

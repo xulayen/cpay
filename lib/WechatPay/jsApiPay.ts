@@ -106,7 +106,7 @@ export class JsApiPay extends BasePay {
         jsApiParam.SetValue("signType", WxPayData.SIGN_TYPE_HMAC_SHA256);
         jsApiParam.SetValue("paySign", jsApiParam.MakeSign());
         let param = jsApiParam.ToJson();
-        console.log('JsApiPay::GetJsApiParam - ' );
+        console.log('JsApiPay::GetJsApiParam - ');
         console.log(param);
         return param;
     }
