@@ -7,7 +7,6 @@ import * as Model from './Model';
 import * as BLL from './BLL/cPayBLL';
 
 const Util = cPay_Util.Util;
-
 const WxPayConfig = cPay_Config.Config;
 const WxPayException = cPay_Exception.WxPayException;
 
@@ -67,6 +66,7 @@ export class WxPayApi extends BaseApi {
      * @memberof WxPayApi
      */
     static async UnifiedOrder(inputObj: Model.WxPayData): Promise<Model.WxPayData> {
+        //Util.redisClient.set("111111","88888888888888888888888888888888888888888");
         let url = Constant.WEIXIN_wxpay_unifiedorder;
         //检测必填参数
         if (!inputObj.IsSet("out_trade_no")) {
@@ -119,7 +119,7 @@ export class WxPayApi extends BaseApi {
         });
         console.log("WxPayApi", "统一下单 response : " + res);
         this.Log(inputObj, res, url);
-        
+
         let result = new Model.WxPayData();
         await result.FromXml(res);
 

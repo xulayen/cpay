@@ -1,5 +1,6 @@
 
 import * as Model from '../Model';
+import { Util } from 'lib/Util';
 
 
 //export namespace cPay_Config {
@@ -142,18 +143,15 @@ export class RedisConfig implements IRedisConfig {
             this.Port = port;
         if (auth)
             this.Auth = auth;
+        Config.redisconfig = this;
     }
-    Host: string = "10.20.31.11";
-    Port: string = "6379";
-    DB: number = 10;
-    Auth: string = "";
+    Host: string;
+    Port: string ;
+    DB: number;
+    Auth: string;
 }
 
 export class MySqlConfig implements IMySqlConfig {
-    host: string = "192.168.101.30";
-    user: string = "root";
-    password: string = "abc123.";
-    database: string = "cPay";
 
     constructor(host: string, user: string, password: string, database: string) {
         if (host)
@@ -164,7 +162,13 @@ export class MySqlConfig implements IMySqlConfig {
             this.password = password;
         if (database)
             this.database = database;
+        Config.mysqlconfig = this;
     }
+
+    host: string ;
+    user: string;
+    password: string ;
+    database: string ;
 
 }
 
@@ -174,7 +178,13 @@ export class Config {
         this._wxconfig = value;
     }
 
-    private static redisconfig: IRedisConfig;
+    private static _redisconfig: IRedisConfig;
+    public static get redisconfig(): IRedisConfig {
+        return Config._redisconfig;
+    }
+    public static set redisconfig(value: IRedisConfig) {
+        Config._redisconfig = value;
+    }
 
     private static _mysqlconfig: IMySqlConfig;
     public static get mysqlconfig(): IMySqlConfig {
@@ -197,17 +207,17 @@ export class Config {
     }
 
     public static GetRedisConfig(host?: string, port?: string, db?: number, auth?: string): IRedisConfig {
-        if (!this.redisconfig) {
-            this.redisconfig = new RedisConfig(host, port, db, auth);
+        if (!this._redisconfig) {
+            this._redisconfig = new RedisConfig(host, port, db, auth);
         }
-        return this.redisconfig;
+        return this._redisconfig;
     }
 
     public static GetMySqlConfig(host?: string, user?: string, password?: string, database?: string): IMySqlConfig {
-        if (!this.mysqlconfig) {
-            this.mysqlconfig = new MySqlConfig(host, user, password, database);
+        if (!this._mysqlconfig) {
+            this._mysqlconfig = new MySqlConfig(host, user, password, database);
         }
-        return this.mysqlconfig;
+        return this._mysqlconfig;
     }
 
 

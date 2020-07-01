@@ -1,22 +1,4 @@
 import * as DAL from '../DAL/dbHelper';
-import { de, tr } from 'date-fns/locale';
-import * as cPay_Util from '../Util';
-
-
-export class CayConfigBLL {
-    static readonly tablename = "t_cPay_config";
-    static dal: DAL.DbHelper = DAL.DbHelper.instance;
-    constructor() {
-
-    }
-
-    static async GetConfig(facid: string): Promise<any> {
-        console.log(`GetConfig-${facid}`);
-        let record = await this.dal.select(this.tablename, [], " facid=:facid ", { facid: facid });
-        console.log(record);
-        return record;
-    }
-}
 
 class BaseBLL {
     public static BuildParameters(params: string, orderRes: any): any {
@@ -48,7 +30,6 @@ export class CpayOrderBLL extends BaseBLL {
 
     static readonly tablename = "t_cPay_order";
     static readonly tablename_order_detail = "t_cPay_order_detail";
-    static dal: DAL.DbHelper = DAL.DbHelper.instance;
     constructor() {
         super();
     }
@@ -62,7 +43,7 @@ export class CpayOrderBLL extends BaseBLL {
         ], res;
 
         let { columns, params_data } = this.BuildOrderParameters(params_columns, order, facid);
-        res = await this.dal.insert(this.tablename, columns, params_columns, params_data);
+        res = await DAL.DbHelper.instance.insert(this.tablename, columns, params_columns, params_data);
         this.IncreasedOrderDetail(order, facid);
         return res.affectedRows > 0;
 
@@ -75,58 +56,36 @@ export class CpayOrderBLL extends BaseBLL {
             ':receipt', ':scene_info', ':return_code', ':return_msg', ':result_code', ':err_code', ':err_code_des'], res;
 
         let { columns, params_data } = this.BuildOrderParameters(params_columns, order, facid);
-        res = await this.dal.insert(this.tablename_order_detail, columns, params_columns, params_data);
+        res = await DAL.DbHelper.instance.insert(this.tablename_order_detail, columns, params_columns, params_data);
         return res.affectedRows > 0;
     }
 
     static async UpdateOrder(out_trade_no: string, orderRes: any): Promise<boolean> {
-
         let columns = ` return_code=:return_code,result_code=:result_code,err_code=:err_code,err_code_des=:err_code_des `,
             condition = ` out_trade_no=:out_trade_no `, params: any = {};
-        // params.out_trade_no = out_trade_no;
-        // params.return_code = orderRes.return_code ? orderRes.return_code : '';
-        // params.result_code = orderRes.result_code ? orderRes.result_code : '';
-        // params.err_code = orderRes.err_code ? orderRes.err_code : '';
-        // params.err_code_des = orderRes.err_code_des ? orderRes.err_code_des : '';
         orderRes.out_trade_no = out_trade_no;
         params = this.BuildParameters(`${columns},${condition},`, orderRes);
-        let res_order = await this.dal.update(this.tablename, columns, condition, params);
+        let res_order = await DAL.DbHelper.instance.update(this.tablename, columns, condition, params);
         return res_order.affectedRows > 0;
     }
 
     static async UpdateOrderDetail(out_trade_no: string, orderRes: any): Promise<boolean> {
-
         let columns = ` transaction_id=:transaction_id,device_info=:device_info,detail=:detail,limit_pay=:limit_pay,openid=:openid,receipt=:receipt,scene_info=:scene_info,return_code=:return_code,return_msg=:return_msg,result_code=:result_code,err_code=:err_code,err_code_des=:err_code_des `,
             condition = ` out_trade_no=:out_trade_no `, params: any = {};
-        // params.out_trade_no = out_trade_no;
-        // params.return_code = orderRes.return_code ? orderRes.return_code : '';
-        // params.result_code = orderRes.result_code ? orderRes.result_code : '';
-        // params.err_code = orderRes.err_code ? orderRes.err_code : '';
-        // params.err_code_des = orderRes.err_code_des ? orderRes.err_code_des : '';
         orderRes.out_trade_no = out_trade_no;
         params = this.BuildParameters(`${columns},${condition},`, orderRes);
-        let res_order = await this.dal.update(this.tablename_order_detail, columns, condition, params);
+        let res_order = await DAL.DbHelper.instance.update(this.tablename_order_detail, columns, condition, params);
         return res_order.affectedRows > 0;
     }
 
     static async WxPayCallBack(orderRes: any, facid: string): Promise<boolean> {
-
         let columns = ` return_code=:return_code,result_code=:result_code,err_code=:err_code,err_code_des=:err_code_des,transaction_id=:transaction_id,openid=:openid `,
             condition = ` out_trade_no=:out_trade_no `, params: any = {};
-        // params.out_trade_no = orderRes.out_trade_no;
-        // params.return_code = orderRes.return_code ? orderRes.return_code : '';
-        // params.result_code = orderRes.result_code ? orderRes.result_code : '';
-        // params.err_code = orderRes.err_code ? orderRes.err_code : '';
-        // params.err_code_des = orderRes.err_code_des ? orderRes.err_code_des : '';
-        // params.transaction_id = orderRes.transaction_id ? orderRes.transaction_id : '';
-        // params.openid = orderRes.openid ? orderRes.openid : '';
         params = this.BuildParameters(`${columns},${condition},`, orderRes);
-        let res_order = await this.dal.update(this.tablename, columns, condition, params);
+        let res_order = await DAL.DbHelper.instance.update(this.tablename, columns, condition, params);
         this.UpdateOrderDetail(orderRes.out_trade_no, orderRes);
         return res_order.affectedRows > 0;
     }
-
-
 
 }
 
@@ -134,7 +93,6 @@ export class CpayOrderBLL extends BaseBLL {
 export class CpayLogsBLL extends BaseBLL {
 
     static readonly tablename = "t_cpay_logs";
-    static dal: DAL.DbHelper = DAL.DbHelper.instance;
     constructor() {
         super();
     }
@@ -144,7 +102,7 @@ export class CpayLogsBLL extends BaseBLL {
         let params_columns: string[] = [':out_trade_no', ':req', ':response', ':uri', ':times'], res;
 
         let { columns, params_data } = this.BuildOrderParameters(params_columns, inputRes);
-        res = await this.dal.insert(this.tablename, columns, params_columns, params_data);
+        res = await DAL.DbHelper.instance.insert(this.tablename, columns, params_columns, params_data);
         return res.affectedRows > 0;
 
     }

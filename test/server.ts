@@ -19,11 +19,11 @@ weixin.NotifyUrl = "http://xulayen.imwork.net:13561/notice";
 weixin.SSlCertPath = `E:\\6certs\\test.txt`;
 weixin.SSlCertPassword = "123";
 weixin.Ip = "10.20.26.19";
-weixin.Facid="00000";
+weixin.Facid = "00000";
 
 new cPay.Config.WeixinPayConfig(weixin);
 new cPay.Config.RedisConfig("10.20.31.11", "6379", 10);
-
+new cPay.Config.MySqlConfig("192.168.101.30", "root","abc123.", "cPay");
 
 
 app.get('/auth', async function (req: any, res: any, next: any) {
@@ -62,7 +62,7 @@ app.post('/h5pay', async function (req: any, res: any, next: any) {
     h5pay.orderInfo = orderinfo;
     //out_trade_no
 
-    let res_order = await h5pay.UnifiedOrder(new Date().getTime().toString(), scene,"http://baidu.com/");
+    let res_order = await h5pay.UnifiedOrder(new Date().getTime().toString(), scene, "http://baidu.com/");
     console.log(res_order);
 
     res.send(res_order);
@@ -70,7 +70,7 @@ app.post('/h5pay', async function (req: any, res: any, next: any) {
 
 app.post('/jspay', async function (req: any, res: any, next: any) {
 
-    let ojsapipay = new cPay.JsApiPay(req, res, next),openid=req.body.openid;
+    let ojsapipay = new cPay.JsApiPay(req, res, next), openid = req.body.openid;
     ojsapipay.orderInfo = new cPay.Model.OrderInfo("test", "test", "test", "test", 100);
     let res_order = await ojsapipay.UnifiedOrder(openid);
     console.log(res_order);
@@ -83,7 +83,7 @@ app.post('/jspay', async function (req: any, res: any, next: any) {
 
 app.post('/native/prepay', async function (req: any, res: any, next: any) {
     let nativepay = new cPay.NativePay();
-    nativepay.orderInfo =new cPay.Model.OrderInfo();
+    nativepay.orderInfo = new cPay.Model.OrderInfo();
     nativepay.orderInfo.body = "商品描述";
     nativepay.orderInfo.total_fee = 1;
     nativepay.orderInfo.attach = "附件信息";
@@ -136,14 +136,14 @@ app.post('/apppay', async function (req: any, res: any, next: any) {
 });
 
 app.post('/micropay', async function (req: any, res: any, next: any) {
-    let microPay = new cPay.MicroPay(),auth_code=req.body.auth_code;
+    let microPay = new cPay.MicroPay(), auth_code = req.body.auth_code;
     microPay.orderInfo = new cPay.Model.OrderInfo();
     microPay.orderInfo.body = "99999999";
     microPay.orderInfo.total_fee = 1;
     microPay.orderInfo.attach = "56565656565";
     microPay.orderInfo.detail = "bb";
     microPay.orderInfo.goods_tag = "aa";
-    let data = await microPay.Scan(new Date().getTime().toString(),auth_code);
+    let data = await microPay.Scan(new Date().getTime().toString(), auth_code);
     console.log(data);
     res.send(data);
 });
@@ -154,9 +154,9 @@ app.post('/micropay', async function (req: any, res: any, next: any) {
 app.post('/orderquery', async function (req: any, res: any, next: any) {
 
     let paydata = new cPay.Model.WxPayData(), orderinfo,
-    ordernumber=req.body.ordernumber;
+        ordernumber = req.body.ordernumber;
     paydata.SetValue("out_trade_no", ordernumber);
-    
+
     try {
         orderinfo = await cPay.BaseApi.OrderQuery(paydata);
 
