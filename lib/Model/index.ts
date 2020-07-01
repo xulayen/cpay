@@ -240,9 +240,23 @@ export class WeixinConfig {
     Redirect_uri: string;
 }
 
+/**
+ * h5场景信息
+ */
 export class SceneInfo {
+    /**
+     * 场景类型
+     */
     type: string;
+    
+    /**
+     * WAP网站URL地址
+     */
     wap_url: string;
+
+    /**
+     * WAP 网站名
+     */
     wap_name: string;
 
     constructor(type: string, wap_url: string, wap_name: string) {
