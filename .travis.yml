@@ -28,7 +28,7 @@ after_script:
   - |
     # Upload coverage to coveralls
     npm install --save-dev coveralls@2.10.0
-    coveralls < ./coverage/lcov.info
+    cat coverage/lcov.info | node_modules/coveralls/bin/coveralls.js
 after_success:
   - slather
   - bash <(curl -s https://codecov.io/bash) #-f Example/cobertura.xml -X coveragepy -X gcov -X xcode -t
