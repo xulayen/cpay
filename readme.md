@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/xulayen/cpay.svg?branch=master)](https://travis-ci.org/xulayen/cpay)
+
 # 微信/支付宝支付 For Typescript Express
 
 | 功能        | 微信    |  支付宝  |
