@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/xulayen/cpay.svg?branch=master)](https://travis-ci.org/xulayen/cpay)
 [![GitHub license](https://img.shields.io/github/license/xulayen/cpay)](https://github.com/xulayen/cpay/blob/master/LICENSE)
-[![codecov Status](https://codecov.io/gh/xulayen/cpay)](https://codecov.io/gh/xulayen/cpay)
+[![codecov](https://codecov.io/gh/xulayen/cpay/branch/master/graph/badge.svg)](https://codecov.io/gh/xulayen/cpay)
 
 # 微信/支付宝支付 For Typescript Express
 
