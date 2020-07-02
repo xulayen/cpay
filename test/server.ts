@@ -10,10 +10,10 @@ app.use(xmlparser());
 
 
 let weixin = new cPay.Model.WeixinConfig();
-weixin.AppID = '';
-weixin.AppSecret = '';
-weixin.Key = '';
-weixin.MchID = '';
+weixin.AppID = 'wx6e8dfa0d32f32337';
+weixin.AppSecret = '17615bea97ed1952ac2e14ebe289626f';
+weixin.Key = 'CCNHDBURTHGFEQWEDNJHYGDYEWZP9527';
+weixin.MchID = '1499013532';
 weixin.Redirect_uri = 'http://127.0.0.1:8888/auth';
 weixin.NotifyUrl = "http://xulayen.imwork.net:13561/notice";
 weixin.SSlCertPath = `E:\\6certs\\test.txt`;

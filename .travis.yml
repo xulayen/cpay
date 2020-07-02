@@ -1,0 +1,34 @@
+language: node_js
+node_js:
+  - "12.13.0"
+matrix:
+  include:
+    - node_js: "9"
+      env: "NVM_NODEJS_ORG_MIRROR=https://nodejs.org/download/nightly"
+    - node_js: "10"
+      env: "NVM_NODEJS_ORG_MIRROR=https://nodejs.org/download/nightly"
+  allow_failures:
+    # Allow the nightly installs to fail
+    - env: "NVM_NODEJS_ORG_MIRROR=https://nodejs.org/download/nightly"
+sudo: false
+cache:
+  directories:
+    - node_modules
+before_install:
+  - |
+    npm i
+script:
+  # Run test script
+  #- npm run test
+  # Run linting
+  - npm run build
+
+after_script:
+  - |
+    # Upload coverage to coveralls
+    npm install --save-dev coveralls@2.10.0
+    coveralls < ./coverage/lcov.info
+after_success:
+  - slather
+  - bash <(curl -s https://codecov.io/bash) #-f Example/cobertura.xml -X coveragepy -X gcov -X xcode -t
+  - sleep 3
