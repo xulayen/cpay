@@ -7,7 +7,7 @@
 
 # testing
 /coverage
-/test
+/test/server.ts
 
 # production
 /dist
