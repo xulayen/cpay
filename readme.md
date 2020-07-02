@@ -69,7 +69,7 @@ new cPay.Config.RedisConfig("Redis地址", "端口", "库编号");
 
 ### MySql配置
 
-[建库建表脚本](./lib/dal/db.sql)
+[建库建表脚本](./lib/DAL/db.sql)
 
 ``` js
 // 启用配置对象，实例化即可启用
