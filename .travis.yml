@@ -17,11 +17,14 @@ cache:
 before_install:
   - |
     npm i
+    npm install codecov -g
 script:
   # Run test script
   #- npm run test
   # Run linting
   - npm run build
+  - npm run test
+  - codecov -f coverage/*.json
 
 after_script:
   - |
