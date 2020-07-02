@@ -12,17 +12,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NativePay = void 0;
 const cPay = require("../wxPayApi");
 const cPay_Config = require("../Config");
+const cPay_Model = require("../Model");
 const date_fns_1 = require("date-fns");
 const constant_1 = require("../Config/constant");
 const cPay_Util = require("../Util");
+const basePay_1 = require("./basePay");
 //export namespace cPay_NativePay {
-const WxPayData = cPay.WxPayData;
+const WxPayData = cPay_Model.WxPayData;
 const WxPayApi = cPay.WxPayApi;
 const Util = cPay_Util.Util;
-class NativePay {
+/**
+ * 扫码支付
+ * @export
+ * @class NativePay
+ */
+class NativePay extends basePay_1.BasePay {
     constructor() {
+        super();
         this.config = cPay_Config.Config.GetWxPayConfig();
     }
+    /**
+     * 扫码模式1，默认5分钟过期 ✔
+     *
+     * @param {string} productId 产品编号
+     * @returns {string} 二维码
+     * @memberof NativePay
+     */
     GetPrePayUrl(productId) {
         console.log("Native pay mode 1 url is producing...");
         let data = new WxPayData();
@@ -31,13 +46,18 @@ class NativePay {
         data.SetValue("time_stamp", WxPayApi.GenerateTimeStamp()); //时间戳
         data.SetValue("nonce_str", WxPayApi.GenerateNonceStr()); //随机字符串
         data.SetValue("product_id", productId); //商品ID
-        data.SetValue("sign", data.MakeSign()); //签名
+        data.SetValue("sign", data.MakeSign(WxPayData.SIGN_TYPE_MD5)); //签名，扫码模式1只能用MD5加密
         let str = Util.ToUrlParams(data.GetValues()); //转换为URL串
         let url = `${constant_1.default.WEIXIN_wxpay_bizpayurl}${str}`;
         console.log("生成扫码支付模式1 : " + url);
         return url;
     }
-    GetPayUrl(productId) {
+    /**
+     * 扫码支付 √
+     * @param productId 产品ID
+     * @param options 其他可选参数如{key:value}
+     */
+    GetPayUrl(productId, options) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("Native pay mode 2 url is producing...");
             let data = new WxPayData(), url = "";
@@ -50,13 +70,16 @@ class NativePay {
             data.SetValue("goods_tag", this.orderInfo.goods_tag); //商品标记
             data.SetValue("trade_type", constant_1.default.WEIXIN_trade_type_NATIVE); //交易类型
             data.SetValue("product_id", productId); //商品ID
+            for (let key in options) {
+                data.SetValue(key, options[key]);
+            }
             let result = yield WxPayApi.UnifiedOrder(data); //调用统一下单接口
             if (result.IsSet("code_url")) {
                 url = result.GetValue("code_url").toString(); //获得统一下单接口返回的二维码链接
                 console.log("Get native pay mode 2 url : " + url);
+                return url;
             }
-            console.log("生成扫码支付模式2 : " + url);
-            return url;
+            return result.IsSet("return_msg") && result.GetValue("return_msg");
         });
     }
 }

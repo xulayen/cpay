@@ -14,6 +14,7 @@ class DbHelper {
     }
 
     constructor() {
+        var _this=this;
         this.connection = mysql.createConnection({
             host: cPay_Config.Config.GetMySqlConfig().host,
             user: cPay_Config.Config.GetMySqlConfig().user,
@@ -21,7 +22,7 @@ class DbHelper {
             database: cPay_Config.Config.GetMySqlConfig().database
         });
 
-        this.connection.connect(function (err: any) {
+        this.connection.connect(async function (err: any) {
             if (err) {
                 console.warn('error connecting: ' + err.message);
                 return;
@@ -37,6 +38,9 @@ class DbHelper {
                 return txt;
             }.bind(this));
         };
+
+
+
 
     }
 

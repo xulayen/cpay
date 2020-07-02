@@ -45,7 +45,7 @@ export class CpayOrderBLL extends BaseBLL {
         let { columns, params_data } = this.BuildOrderParameters(params_columns, order, facid);
         res = await DAL.DbHelper.instance.insert(this.tablename, columns, params_columns, params_data);
         this.IncreasedOrderDetail(order, facid);
-        return res.affectedRows > 0;
+        return res&&res.affectedRows > 0;
 
     }
 
@@ -57,7 +57,7 @@ export class CpayOrderBLL extends BaseBLL {
 
         let { columns, params_data } = this.BuildOrderParameters(params_columns, order, facid);
         res = await DAL.DbHelper.instance.insert(this.tablename_order_detail, columns, params_columns, params_data);
-        return res.affectedRows > 0;
+        return res&&res.affectedRows > 0;
     }
 
     static async UpdateOrder(out_trade_no: string, orderRes: any): Promise<boolean> {
@@ -66,7 +66,7 @@ export class CpayOrderBLL extends BaseBLL {
         orderRes.out_trade_no = out_trade_no;
         params = this.BuildParameters(`${columns},${condition},`, orderRes);
         let res_order = await DAL.DbHelper.instance.update(this.tablename, columns, condition, params);
-        return res_order.affectedRows > 0;
+        return res_order&&res_order.affectedRows > 0;
     }
 
     static async UpdateOrderDetail(out_trade_no: string, orderRes: any): Promise<boolean> {
@@ -75,7 +75,7 @@ export class CpayOrderBLL extends BaseBLL {
         orderRes.out_trade_no = out_trade_no;
         params = this.BuildParameters(`${columns},${condition},`, orderRes);
         let res_order = await DAL.DbHelper.instance.update(this.tablename_order_detail, columns, condition, params);
-        return res_order.affectedRows > 0;
+        return res_order&&res_order.affectedRows > 0;
     }
 
     static async WxPayCallBack(orderRes: any, facid: string): Promise<boolean> {
@@ -84,7 +84,7 @@ export class CpayOrderBLL extends BaseBLL {
         params = this.BuildParameters(`${columns},${condition},`, orderRes);
         let res_order = await DAL.DbHelper.instance.update(this.tablename, columns, condition, params);
         this.UpdateOrderDetail(orderRes.out_trade_no, orderRes);
-        return res_order.affectedRows > 0;
+        return res_order&&res_order.affectedRows > 0;
     }
 
 }
@@ -103,7 +103,7 @@ export class CpayLogsBLL extends BaseBLL {
 
         let { columns, params_data } = this.BuildOrderParameters(params_columns, inputRes);
         res = await DAL.DbHelper.instance.insert(this.tablename, columns, params_columns, params_data);
-        return res.affectedRows > 0;
+        return res&&res.affectedRows > 0;
 
     }
 

@@ -51,8 +51,9 @@ export class NativePay extends BasePay {
     /**
      * 扫码支付 √
      * @param productId 产品ID
+     * @param options 其他可选参数如{key:value}
      */
-    async GetPayUrl(productId: string): Promise<string> {
+    async GetPayUrl(productId: string,options?: any): Promise<string> {
         console.log("Native pay mode 2 url is producing...");
         let data = new WxPayData(), url = "";
         data.SetValue("body", this.orderInfo.body);//商品描述
@@ -64,6 +65,9 @@ export class NativePay extends BasePay {
         data.SetValue("goods_tag", this.orderInfo.goods_tag);//商品标记
         data.SetValue("trade_type", Constant.WEIXIN_trade_type_NATIVE);//交易类型
         data.SetValue("product_id", productId);//商品ID
+        for (let key in options) {
+            data.SetValue(key, options[key]);
+        }
         let result = await WxPayApi.UnifiedOrder(data);//调用统一下单接口
         if (result.IsSet("code_url")) {
             url = result.GetValue("code_url").toString();//获得统一下单接口返回的二维码链接

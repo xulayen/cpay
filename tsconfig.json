@@ -8,10 +8,9 @@
         "sourceMap": false,
         "outDir": "dist",
         "baseUrl": "."
-
-
     },
     "include": [
+        "./test/server.ts",
         "./lib/**/*"
     ],
     "exclude": [

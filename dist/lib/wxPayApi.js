@@ -9,128 +9,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WxPayApi = exports.WxPayData = void 0;
+exports.WxPayApi = void 0;
 const cPay_Config = require("./Config");
 const cPay_Util = require("./Util");
 const date_fns_1 = require("date-fns");
 const cPay_Exception = require("./Exception/wxPayException");
 const constant_1 = require("./Config/constant");
+const Model = require("./Model");
+const BLL = require("./BLL/cPayBLL");
 const Util = cPay_Util.Util;
-var xml2js = require("xml2js");
-var cryptojs = require("crypto-js");
-var MD5 = require('crypto-js/md5');
-//export namespace cPay {
 const WxPayConfig = cPay_Config.Config;
 const WxPayException = cPay_Exception.WxPayException;
-class WxPayData {
-    constructor() {
-        this.m_values = new Map();
-    }
-    SetValue(key, value) {
-        this.m_values.set(key, value);
-    }
-    GetValue(key) {
-        return this.m_values.get(key);
-    }
-    IsSet(key) {
-        return this.m_values.has(key);
-    }
-    ToXml() {
-        if (this.m_values.size === 0) {
-            throw new Error("WxPayData数据为空!");
-        }
-        let xml = "<xml>";
-        this.m_values.forEach(function (value, key) {
-            if (value == null) {
-                throw new Error("WxPayData内部含有值为null的字段!");
-            }
-            if (!isNaN(value)) {
-                xml += "<" + key + ">" + value + "</" + key + ">";
-            }
-            else if (Object.prototype.toString.call(value) == "[object String]") {
-                xml += "<" + key + ">" + "<![CDATA[" + value + "]]></" + key + ">";
-            }
-            else //除了string和int类型不能含有其他数据类型
-             {
-                throw new Error("WxPayData字段数据类型错误!");
-            }
-        });
-        xml += "</xml>";
-        return xml;
-    }
-    FromXml(xml) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!xml) {
-                throw new Error("将空的xml串转换为WxPayData不合法!");
-            }
-            let xmlNode = yield xml2js.parseStringPromise(xml);
-            for (let key in xmlNode.xml) {
-                //获取xml的键值对到WxPayData内部的数据中
-                let value = xmlNode.xml[key].join('');
-                this.m_values.set(key, value);
-            }
-            return this.m_values;
-        });
-    }
-    MakeSign(signType = WxPayData.SIGN_TYPE_HMAC_SHA256) {
-        //转url格式
-        let str = this.ToUrl();
-        //在string后加入API KEY
-        str += "&key=" + WxPayConfig.GetWxPayConfig().GetKey();
-        if (signType === WxPayData.SIGN_TYPE_MD5) {
-            return this.md5(str, WxPayConfig.GetWxPayConfig().GetKey());
-        }
-        else if (signType === WxPayData.SIGN_TYPE_HMAC_SHA256) {
-            return this.CalcHMACSHA256Hash(str, WxPayConfig.GetWxPayConfig().GetKey());
-        }
-        else {
-            throw new Error("sign_type 不合法");
-        }
-    }
-    ToUrl() {
-        let buff = '', array_values = Array.from(this.m_values), i = 0;
-        this.m_values = new Map(array_values.sort());
-        let size = this.m_values.size;
-        this.m_values.forEach(function (value, key) {
-            i++;
-            if (!value) {
-                throw new Error("WxPayData内部含有值为null的字段!");
-            }
-            if (key != "sign" && value != "") {
-                buff += key + "=" + value;
-            }
-            if (size !== i) {
-                buff += "&";
-            }
-        });
-        buff = buff.trim();
-        return buff;
-    }
-    ToJson() {
-        let obj = Object.create(null);
-        this.m_values.forEach(function (value, key) {
-            obj[key] = value;
-        });
-        return obj;
-    }
-    CalcHMACSHA256Hash(plaintext, salt) {
-        let pass = cryptojs.HmacSHA256(plaintext, salt);
-        var hashInBase64 = cryptojs.enc.Base64.stringify(pass);
-        console.log(plaintext, salt, pass.toString().toLocaleUpperCase());
-        let pass_uppercase = pass.toString().toLocaleUpperCase();
-        return pass_uppercase;
-    }
-    GetValues() {
-        return this.m_values;
-    }
-    md5(plaintext, salt) {
-        return MD5(plaintext + salt);
-    }
-}
-exports.WxPayData = WxPayData;
-WxPayData.SIGN_TYPE_MD5 = "MD5";
-WxPayData.SIGN_TYPE_HMAC_SHA256 = "HMAC-SHA256";
-class WxPayApi {
+class BaseApi {
+    /**
+     * 随机生成时间戳
+     *
+     * @static
+     * @returns {string}
+     * @memberof BaseApi
+     */
     static GenerateTimeStamp() {
         return (new Date().getTime() + Math.ceil(Math.random() * 1000)) + "";
     }
@@ -141,19 +38,41 @@ class WxPayApi {
     static GenerateNonceStr() {
         return (new Date().getTime() + Math.ceil(Math.random() * 1000)) + "";
     }
+    /**
+     * 随机生成商户订单号
+     *
+     * @static
+     * @returns {string} 订单号
+     * @memberof BaseApi
+     */
     static GenerateOutTradeNo() {
-        return `${WxPayConfig.GetWxPayConfig().GetMchID()}${date_fns_1.format(new Date(), 'yyyyMMddHHmmss'), Math.ceil(Math.random() * 1000)}`;
+        return `${date_fns_1.format(new Date(), 'yyyyMMddHHmmss')}${Math.ceil(Math.random() * 1000)}`;
     }
+    static Log(input, output, uri, times = 0) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let out_trade_no = input.GetValue("out_trade_no").toString(), req_input = {
+                out_trade_no: out_trade_no,
+                req: input.ToXml(),
+                response: output,
+                uri: uri,
+                times: times
+            };
+            yield BLL.CpayLogsBLL.InsertLogs(req_input);
+        });
+    }
+}
+class WxPayApi extends BaseApi {
     /**
      *
      * 统一下单
      * @static
-     * @param {WxPayData} inputObj
-     * @returns {Promise<cPay.WxPayData>}
+     * @param {Model.WxPayData} inputObj
+     * @returns {Promise<cPay.Model.WxPayData>}
      * @memberof WxPayApi
      */
     static UnifiedOrder(inputObj) {
         return __awaiter(this, void 0, void 0, function* () {
+            //Util.redisClient.set("111111","88888888888888888888888888888888888888888");
             let url = constant_1.default.WEIXIN_wxpay_unifiedorder;
             //检测必填参数
             if (!inputObj.IsSet("out_trade_no")) {
@@ -183,10 +102,12 @@ class WxPayApi {
             inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID()); //商户号
             inputObj.SetValue("spbill_create_ip", WxPayConfig.GetWxPayConfig().GetIp()); //终端ip	  	    
             inputObj.SetValue("nonce_str", this.GenerateNonceStr()); //随机字符串
-            inputObj.SetValue("sign_type", WxPayData.SIGN_TYPE_HMAC_SHA256); //签名类型
+            inputObj.SetValue("sign_type", Model.WxPayData.SIGN_TYPE_HMAC_SHA256); //签名类型
             //签名
             inputObj.SetValue("sign", inputObj.MakeSign());
             let xml = inputObj.ToXml();
+            //异步执行插入
+            BLL.CpayOrderBLL.IncreasedOrder(inputObj.ToJson(), WxPayConfig.GetWxPayConfig().GetFacID());
             console.log("WxPayApi", "统一下单 request : " + xml);
             let res = yield Util.setMethodWithUri({
                 url: url,
@@ -197,8 +118,11 @@ class WxPayApi {
                 }
             });
             console.log("WxPayApi", "统一下单 response : " + res);
-            let result = new WxPayData();
-            result.FromXml(res);
+            this.Log(inputObj, res, url);
+            let result = new Model.WxPayData();
+            yield result.FromXml(res);
+            //异步执行修改
+            BLL.CpayOrderBLL.UpdateOrder(inputObj.GetValue("out_trade_no"), result.ToJson());
             return result;
         });
     }
@@ -206,21 +130,21 @@ class WxPayApi {
      *
      * 查询订单
      * @static
-     * @param {WxPayData} inputObj
-     * @returns {Promise<cPay.WxPayData>}
+     * @param {Model.WxPayData} inputObj
+     * @returns {Promise<cPay.Model.WxPayData>}
      * @memberof WxPayApi
      */
     static OrderQuery(inputObj) {
         return __awaiter(this, void 0, void 0, function* () {
-            let url = constant_1.default.WEIXIN_wxpay_orderquery;
+            let url = constant_1.default.WEIXIN_wxpay_orderquery, response_data = new Model.ResponseData();
             //检测必填参数
             if (!inputObj.IsSet("out_trade_no") && !inputObj.IsSet("transaction_id")) {
                 throw new WxPayException("订单查询接口中，out_trade_no、transaction_id至少填一个！");
             }
-            inputObj.SetValue("appid", WxPayConfig.GetWxPayConfig().GetAppID()); //公众账号ID
+            inputObj.SetValue("app id", WxPayConfig.GetWxPayConfig().GetAppID()); //公众账号ID
             inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID()); //商户号
             inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr()); //随机字符串
-            inputObj.SetValue("sign_type", WxPayData.SIGN_TYPE_HMAC_SHA256); //签名类型
+            inputObj.SetValue("sign_type", Model.WxPayData.SIGN_TYPE_HMAC_SHA256); //签名类型
             inputObj.SetValue("sign", inputObj.MakeSign()); //签名
             let xml = inputObj.ToXml();
             console.log(`查询订单-request: \n${xml}`);
@@ -233,22 +157,28 @@ class WxPayApi {
                 }
             });
             console.log(`查询订单-response: \n${res}`);
+            this.Log(inputObj, res, url);
             //将xml格式的数据转化为对象以返回
-            let result = new WxPayData();
-            result.FromXml(res);
-            return result;
+            let result = new Model.WxPayData();
+            yield result.FromXml(res);
+            response_data.data = result;
+            response_data.return_code = result.m_values.get("return_code");
+            response_data.msg = result.m_values.get("return_msg");
+            response_data.result_code = result.m_values.get("result_code");
+            response_data.err_code = result.m_values.get("err_code");
+            return response_data;
         });
     }
     /**
      * 关闭订单
      * @static
-     * @param {WxPayData} inputObj
-     * @returns {Promise<cPay.WxPayData>}
+     * @param {Model.WxPayData} inputObj
+     * @returns {Promise<cPay.Model.WxPayData>}
      * @memberof WxPayApi
      */
     static CloseOrder(inputObj) {
         return __awaiter(this, void 0, void 0, function* () {
-            let url = constant_1.default.WEIXIN_wxpay_closeorder;
+            let url = constant_1.default.WEIXIN_wxpay_closeorder, response_data = new Model.ResponseData();
             //检测必填参数
             if (!inputObj.IsSet("out_trade_no")) {
                 throw new WxPayException("关闭订单接口中，out_trade_no必填！");
@@ -256,7 +186,7 @@ class WxPayApi {
             inputObj.SetValue("appid", WxPayConfig.GetWxPayConfig().GetAppID()); //公众账号ID
             inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID()); //商户号
             inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr()); //随机字符串		
-            inputObj.SetValue("sign_type", WxPayData.SIGN_TYPE_HMAC_SHA256); //签名类型
+            inputObj.SetValue("sign_type", Model.WxPayData.SIGN_TYPE_HMAC_SHA256); //签名类型
             inputObj.SetValue("sign", inputObj.MakeSign()); //签名
             let xml = inputObj.ToXml();
             console.log(`关闭订单-request: \n${xml}`);
@@ -269,22 +199,28 @@ class WxPayApi {
                 }
             });
             console.log(`关闭订单-response: \n${res}`);
-            let result = new WxPayData();
-            result.FromXml(res);
-            return result;
+            this.Log(inputObj, res, url);
+            let result = new Model.WxPayData();
+            yield result.FromXml(res);
+            response_data.data = result;
+            response_data.return_code = result.m_values.get("return_code");
+            response_data.msg = result.m_values.get("return_msg");
+            response_data.result_code = result.m_values.get("result_code");
+            response_data.err_code = result.m_values.get("err_code");
+            return response_data;
         });
     }
     /**
      * 申请退款
      *
      * @static
-     * @param {WxPayData} inputObj
-     * @returns {Promise<cPay.WxPayData>}
+     * @param {Model.WxPayData} inputObj
+     * @returns {Promise<cPay.Model.WxPayData>}
      * @memberof WxPayApi
      */
     static Refund(inputObj) {
         return __awaiter(this, void 0, void 0, function* () {
-            let url = constant_1.default.WEIXIN_wxpay_refund;
+            let url = constant_1.default.WEIXIN_wxpay_refund, response_data = new Model.ResponseData();
             //检测必填参数
             if (!inputObj.IsSet("out_trade_no") && !inputObj.IsSet("transaction_id")) {
                 throw new WxPayException("退款申请接口中，out_trade_no、transaction_id至少填一个！");
@@ -304,7 +240,7 @@ class WxPayApi {
             inputObj.SetValue("appid", WxPayConfig.GetWxPayConfig().GetAppID()); //公众账号ID
             inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID()); //商户号
             inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr()); //随机字符串
-            inputObj.SetValue("sign_type", WxPayData.SIGN_TYPE_HMAC_SHA256); //签名类型
+            inputObj.SetValue("sign_type", Model.WxPayData.SIGN_TYPE_HMAC_SHA256); //签名类型
             inputObj.SetValue("sign", inputObj.MakeSign()); //签名
             let xml = inputObj.ToXml();
             console.log(`申请退款-request: \n${xml}`);
@@ -319,21 +255,27 @@ class WxPayApi {
                 password: WxPayConfig.GetWxPayConfig().GetSSlCertPassword()
             });
             console.log(`申请退款-response: \n${res}`);
-            let result = new WxPayData();
-            result.FromXml(res);
-            return result;
+            this.Log(inputObj, res, url);
+            let result = new Model.WxPayData();
+            yield result.FromXml(res);
+            response_data.data = result;
+            response_data.return_code = result.m_values.get("return_code");
+            response_data.msg = result.m_values.get("return_msg");
+            response_data.result_code = result.m_values.get("result_code");
+            response_data.err_code = result.m_values.get("err_code");
+            return response_data;
         });
     }
     /**
     * 查询退款
     * @static
-    * @param {cPay.WxPayData} inputObj
-    * @returns {Promise<cPay.WxPayData>}
+    * @param {cPay.Model.WxPayData} inputObj
+    * @returns {Promise<cPay.Model.WxPayData>}
     * @memberof WxPayApi
     */
     static RefundQuery(inputObj) {
         return __awaiter(this, void 0, void 0, function* () {
-            let url = constant_1.default.WEIXIN_wxpay_refundquery;
+            let url = constant_1.default.WEIXIN_wxpay_refundquery, response_data = new Model.ResponseData();
             //检测必填参数
             if (!inputObj.IsSet("out_refund_no") && !inputObj.IsSet("out_trade_no") &&
                 !inputObj.IsSet("transaction_id") && !inputObj.IsSet("refund_id")) {
@@ -342,7 +284,7 @@ class WxPayApi {
             inputObj.SetValue("appid", WxPayConfig.GetWxPayConfig().GetAppID()); //公众账号ID
             inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID()); //商户号
             inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr()); //随机字符串
-            inputObj.SetValue("sign_type", WxPayData.SIGN_TYPE_HMAC_SHA256); //签名类型
+            inputObj.SetValue("sign_type", Model.WxPayData.SIGN_TYPE_HMAC_SHA256); //签名类型
             inputObj.SetValue("sign", inputObj.MakeSign()); //签名
             let xml = inputObj.ToXml();
             console.log(`查询退款-request: \n${xml}`);
@@ -355,14 +297,24 @@ class WxPayApi {
                 }
             });
             console.log(`查询退款-response: \n${res}`);
-            let result = new WxPayData();
-            result.FromXml(res);
-            return result;
+            this.Log(inputObj, res, url);
+            let result = new Model.WxPayData();
+            yield result.FromXml(res);
+            response_data.data = result;
+            response_data.return_code = result.m_values.get("return_code");
+            response_data.msg = result.m_values.get("return_msg");
+            response_data.result_code = result.m_values.get("result_code");
+            response_data.err_code = result.m_values.get("err_code");
+            return response_data;
         });
     }
+    /**
+     * 短链接生成
+     * @param inputObj 入参
+     */
     static ShortUrl(inputObj) {
         return __awaiter(this, void 0, void 0, function* () {
-            let url = constant_1.default.WEIXIN_wxpay_shorturl;
+            let url = constant_1.default.WEIXIN_wxpay_shorturl, response_data = new Model.ResponseData();
             //检测必填参数
             if (!inputObj.IsSet("long_url")) {
                 throw new WxPayException("需要转换的URL，签名用原串，传输需URL encode！");
@@ -370,7 +322,7 @@ class WxPayApi {
             inputObj.SetValue("appid", WxPayConfig.GetWxPayConfig().GetAppID()); //公众账号ID
             inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID()); //商户号
             inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr()); //随机字符串	
-            inputObj.SetValue("sign_type", WxPayData.SIGN_TYPE_HMAC_SHA256); //签名类型
+            inputObj.SetValue("sign_type", Model.WxPayData.SIGN_TYPE_HMAC_SHA256); //签名类型
             inputObj.SetValue("sign", inputObj.MakeSign()); //签名
             let xml = inputObj.ToXml();
             console.log(`短链接-request: \n${xml}`);
@@ -383,10 +335,111 @@ class WxPayApi {
                 }
             });
             console.log(`短链接-response: \n${res}`);
-            let result = new WxPayData();
-            result.FromXml(res);
-            return result;
+            this.Log(inputObj, res, url);
+            let result = new Model.WxPayData();
+            yield result.FromXml(res);
+            response_data.data = result;
+            response_data.return_code = result.m_values.get("return_code");
+            response_data.msg = result.m_values.get("return_msg");
+            response_data.result_code = result.m_values.get("result_code");
+            response_data.err_code = result.m_values.get("err_code");
+            return response_data;
         });
+    }
+    /**
+     * 付款码支付
+     *
+     * @static
+     * @param {Model.WxPayData} inputObj 入参
+     * @returns {Promise<Model.ResponseData>}
+     * @memberof WxPayApi
+     */
+    static Micropay(inputObj) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let url = constant_1.default.WEIXIN_wxpay_micropay, response_data = new Model.ResponseData();
+            //检测必填参数
+            if (!inputObj.IsSet("body")) {
+                throw new WxPayException("提交被扫支付API接口中，缺少必填参数body！");
+            }
+            else if (!inputObj.IsSet("out_trade_no")) {
+                throw new WxPayException("提交被扫支付API接口中，缺少必填参数out_trade_no！");
+            }
+            else if (!inputObj.IsSet("total_fee")) {
+                throw new WxPayException("提交被扫支付API接口中，缺少必填参数total_fee！");
+            }
+            else if (!inputObj.IsSet("auth_code")) {
+                throw new WxPayException("提交被扫支付API接口中，缺少必填参数auth_code！");
+            }
+            inputObj.SetValue("spbill_create_ip", WxPayConfig.GetWxPayConfig().GetIp()); //终端ip
+            inputObj.SetValue("appid", WxPayConfig.GetWxPayConfig().GetAppID()); //公众账号ID
+            inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID()); //商户号
+            inputObj.SetValue("nonce_str", BaseApi.GenerateNonceStr()); //随机字符串
+            inputObj.SetValue("sign_type", Model.WxPayData.SIGN_TYPE_HMAC_SHA256); //签名类型
+            inputObj.SetValue("sign", inputObj.MakeSign()); //签名
+            let xml = inputObj.ToXml();
+            console.log(`付款码支付-request: \n${xml}`);
+            let res = yield Util.setMethodWithUri({
+                url: url,
+                method: 'post',
+                data: xml,
+                headers: {
+                    'content-type': 'text/xml'
+                }
+            });
+            console.log(`付款码支付-response: \n${res}`);
+            this.Log(inputObj, res, url);
+            let result = new Model.WxPayData();
+            yield result.FromXml(res);
+            response_data = this.Flatten(result);
+            return response_data;
+        });
+    }
+    /**
+    *
+    * 撤销订单API接口
+    * @param WxPayData inputObj 提交给撤销订单API接口的参数，out_trade_no和transaction_id必填一个
+    * @throws WxPayException
+    * @return 成功时返回API调用结果，其他抛异常
+    */
+    static Reverse(inputObj) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let url = constant_1.default.WEIXIN_wxpay_reverse, response_data = new Model.ResponseData();
+            //检测必填参数
+            if (!inputObj.IsSet("out_trade_no") && !inputObj.IsSet("transaction_id")) {
+                throw new WxPayException("撤销订单API接口中，参数out_trade_no和transaction_id必须填写一个！");
+            }
+            inputObj.SetValue("appid", WxPayConfig.GetWxPayConfig().GetAppID()); //公众账号ID
+            inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID()); //商户号
+            inputObj.SetValue("nonce_str", BaseApi.GenerateNonceStr()); //随机字符串
+            inputObj.SetValue("sign_type", Model.WxPayData.SIGN_TYPE_HMAC_SHA256); //签名类型
+            inputObj.SetValue("sign", inputObj.MakeSign()); //签名
+            let xml = inputObj.ToXml();
+            console.log(`撤销订单-request: \n${xml}`);
+            let res = yield Util.setMethodWithUri({
+                url: url,
+                method: 'post',
+                data: xml,
+                headers: {
+                    'content-type': 'text/xml'
+                },
+                cert: WxPayConfig.GetWxPayConfig().GetSSlCertPath(),
+                password: WxPayConfig.GetWxPayConfig().GetSSlCertPassword()
+            });
+            console.log(`撤销订单-response: \n${res}`);
+            let result = new Model.WxPayData();
+            yield result.FromXml(res);
+            response_data = this.Flatten(result);
+            return response_data;
+        });
+    }
+    static Flatten(input) {
+        let target = new Model.ResponseData();
+        target.data = input;
+        target.return_code = input.GetValue("return_code");
+        target.msg = input.GetValue("return_msg");
+        target.result_code = input.GetValue("result_code");
+        target.err_code = input.GetValue("err_code");
+        return target;
     }
 }
 exports.WxPayApi = WxPayApi;

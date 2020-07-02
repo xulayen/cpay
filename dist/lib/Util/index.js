@@ -101,14 +101,27 @@ class Util {
         let buff = "";
         map.forEach(function (value, key) {
             if (!value) {
-                throw new Error("WxPayData内部含有值为null的字段!");
+                throw new Error(`WxPayData内部含有值为null的字段:${key}!`);
             }
             if (value != "") {
                 buff += key + "=" + value + "&";
             }
         });
-        buff = buff.trim();
+        buff = buff.trim().substr(0, buff.length - 1);
+        ;
         return buff;
+    }
+    static IsString(input) {
+        return Object.prototype.toString.call(input) === '[object String]';
+    }
+    static IsObject(input) {
+        return Object.prototype.toString.call(input) === '[object Object]';
+    }
+    static sleep(milliSeconds) {
+        var StartTime = new Date().getTime();
+        let i = 0;
+        while (new Date().getTime() < StartTime + milliSeconds)
+            ;
     }
 }
 exports.Util = Util;

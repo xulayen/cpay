@@ -4,6 +4,22 @@ class Constant {
 }
 exports.default = Constant;
 /**
+ * https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_10&index=1
+ * 付款码支付
+ * @static
+ * @type {string}
+ * @memberof Constant
+ */
+Constant.WEIXIN_wxpay_micropay = 'https://api.mch.weixin.qq.com/pay/micropay';
+/**
+ * https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_11&index=3
+ * 撤销订单
+ * @static
+ * @type {string}
+ * @memberof Constant
+ */
+Constant.WEIXIN_wxpay_reverse = 'https://api.mch.weixin.qq.com/secapi/pay/reverse';
+/**
  * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=6_4
  * 扫码支付模式1接口
  * @static
@@ -22,7 +38,7 @@ Constant.WEIXIN_wxpay_bizpayurl = 'weixin://wxpay/bizpayurl?';
 Constant.WEIXIN_wxpay_unifiedorder = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 /**
  * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_2
- * 2、查询订单
+ * 查询订单
  * @static
  * @type {string}
  * @memberof Constant
@@ -117,3 +133,10 @@ Constant.WEIXIN_trade_type_NATIVE = "NATIVE";
  * @memberof Constant
  */
 Constant.WEIXIN_trade_type_APP = "APP";
+/**
+* 交易类型-H5支付
+* @static
+* @type {string}
+* @memberof Constant
+*/
+Constant.WEIXIN_trade_type_MWEB = "MWEB";

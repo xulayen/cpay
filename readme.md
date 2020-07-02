@@ -1,4 +1,4 @@
-# 微信/支付宝支付 To Express
+# 微信/支付宝支付 For Typescript Express
 
 | 功能        | 微信    |  支付宝  |
 | --------   | -----:   | :----: |
@@ -9,6 +9,12 @@
 | 小程序支付        | ✔      |   ✖    |
 | APP支付        | ✔      |   ✖    |
 | 刷脸支付        | ✖      |   ✖    |
+| 支付结果通知        | ✔      |   ✖    |
+| 查询订单       | ✔      |   ✖    |
+| 撤销订单        | ✔      |   ✖    |
+| 申请退款        | ✔      |   ✖    |
+| 查询退款        | ✔      |   ✖    |
+| 短链接生成        | ✔      |   ✖    |
 
 ## 安装
 
@@ -63,15 +69,18 @@ new cPay.Config.RedisConfig("Redis地址", "端口", "库编号");
 
 ### MySql配置
 
+[建库建表脚本](./lib/dal/db.sql)
+
 ``` js
 // 启用配置对象，实例化即可启用
 new cPay.Config.MySqlConfig("数据库实例地址", "登录帐号","密码", "cPay");
+
 ```
 
 
 ## API
 
-### 微信
+### 微信支付
 
 #### 付款码支付
 
@@ -85,7 +94,7 @@ microPay.orderInfo.total_fee = "总金额，数字类型，单位分";
 microPay.orderInfo.attach = "附加数据";
 microPay.orderInfo.detail = "商品详情";
 microPay.orderInfo.goods_tag = "商品标记";
-let data = await microPay.Scan("商户订单号", "用户付款码");
+let data = await microPay.Scan("商户订单号", "用户付款码","其他可选参数，JSON对象");
 ```
 
 #### 扫码支付，模式1
@@ -115,7 +124,7 @@ nativepay.orderInfo.attach = "附加数据";
 nativepay.orderInfo.detail = "商品详情";
 nativepay.orderInfo.goods_tag = "商品标记";
 // 扫码模式2 API
-let url = await nativepay.GetPayUrl("商品ID");
+let url = await nativepay.GetPayUrl("商品ID","其他可选参数，JSON对象");
 ```
 
 #### H5支付
@@ -131,7 +140,7 @@ h5pay.orderInfo.attach = "附加数据";
 h5pay.orderInfo.detail = "商品详情";
 h5pay.orderInfo.goods_tag = "商品标记";
 // H5支付统一下单API
-let res_order = await h5pay.UnifiedOrder("商户订单号", scene, "应用回调地址");
+let res_order = await h5pay.UnifiedOrder("商户订单号", scene, "应用回调地址","其他可选参数，JSON对象");
 ```
 
 #### JSAPI支付
@@ -143,7 +152,7 @@ app.post('/jspay', async function (req: any, res: any, next: any) {
     let ojsapipay = new cPay.JsApiPay(req, res, next);
     ojsapipay.orderInfo = new cPay.Model.OrderInfo("商品描述", "商品描述", "附加数据", "商品标记", "总金额，数字类型，单位分");
     // JSAPI统一下单API
-    let res_order = await ojsapipay.UnifiedOrder("微信用户openid");
+    let res_order = await ojsapipay.UnifiedOrder("微信用户openid","其他可选参数，JSON对象");
     // 获取前端支付参数
     let paramter = ojsapipay.GetJsApiPayParameters();
     res.send(paramter);
@@ -174,3 +183,136 @@ if (typeof WeixinJSBridge == "undefined"){
 }
 
 ```
+
+#### 小程序支付
+
+``` js
+// 服务端
+app.post('/wxapay', async function (req: any, res: any, next: any) {
+    // 使用小程序支付API
+    let wxaPay = new cPay.WxaPay();
+    wxaPay.orderInfo = new cPay.Model.OrderInfo();
+    wxaPay.orderInfo.body = "商品描述";
+    wxaPay.orderInfo.total_fee = "总金额，数字类型，单位分";
+    wxaPay.orderInfo.attach = "附加数据";
+    wxaPay.orderInfo.detail = "商品详情";
+    wxaPay.orderInfo.goods_tag = "商品标记";
+    let data = await wxaPay.UnifiedOrder("商户订单号", "微信用户openid","其他可选参数，JSON对象");
+    let parameters = wxaPay.GetWxaApiPayParameters();
+    res.send(parameters);
+});
+
+// 客户端
+wx.requestPayment(
+{
+    ...parameters,
+    'success':function(res){},
+    'fail':function(res){},
+    'complete':function(res){}
+})
+
+```
+
+#### APP支付
+
+``` js
+
+// 服务端
+app.post('/wxapay', async function (req: any, res: any, next: any) {
+    // 使用APP支付API
+    let appPay = new cPay.AppPay();
+    appPay.orderInfo = new cPay.Model.OrderInfo();
+    appPay.orderInfo.body = "商品描述";
+    appPay.orderInfo.total_fee = "总金额，数字类型，单位分";
+    appPay.orderInfo.attach = "附加数据";
+    appPay.orderInfo.detail = "商品详情";
+    appPay.orderInfo.goods_tag = "商品标记";
+    let data = await appPay.UnifiedOrder("商户订单号","其他可选参数，JSON对象"),
+        parameters = appPay.GetAppApiPayParameters();
+    res.send(parameters);
+});
+
+```
+
+### 微信支付结果通知
+
+#### 通用支付结果推送地址
+
+``` js
+
+app.post('/notice', async function (req: any, res: any, next: any) {
+    let notify = new cPay.Notify.CommonlyNotify(req, res, next);
+    await notify.ProcessNotify();
+});
+
+```
+
+#### 扫码支付模式1支付结果推送地址
+
+``` js
+
+app.post('/notice/native', async function (req: any, res: any, next: any) {
+    let notify = new cPay.Notify.NativeNotify(req, res, next);
+    await notify.ProcessNotify();
+});
+
+```
+
+### 微信支付基础API
+
+#### 查询订单
+
+``` js
+
+let paydata = new cPay.Model.WxPayData(), orderinfo;
+paydata.SetValue("out_trade_no", "商户订单号");
+orderinfo = await cPay.BaseApi.OrderQuery(paydata);
+
+```
+
+#### 撤销订单
+
+``` js
+
+let paydata = new cPay.Model.WxPayData(), orderinfo;
+paydata.SetValue("out_trade_no", "商户订单号");
+orderinfo = await cPay.BaseApi.CloseOrder(paydata);
+
+```
+
+#### 申请退款
+
+``` js
+
+let paydata = new cPay.Model.WxPayData(), orderinfo;
+paydata.SetValue("out_refund_no", "商户退款单号");
+paydata.SetValue("out_trade_no", "商户订单号");
+paydata.SetValue("refund_fee", "退款金额：订单总金额，单位为分，只能为整数");
+paydata.SetValue("op_user_id", "操作员");
+paydata.SetValue("total_fee", "订单金额：订单总金额，单位为分，只能为整数");
+orderinfo = await cPay.BaseApi.Refund(paydata);
+
+```
+
+#### 查询退款
+
+``` js
+
+let paydata = new cPay.Model.WxPayData(), orderinfo;
+paydata.SetValue("out_refund_no", "商户退款单号");
+orderinfo = await cPay.BaseApi.RefundQuery(paydata);
+
+```
+
+#### 短链接生成
+
+``` js
+
+let paydata = new cPay.Model.WxPayData(), orderinfo;
+paydata.SetValue("long_url", "需要转换的URL，传输需URL encode");
+orderinfo = await cPay.BaseApi.ShortUrl(paydata);
+
+```
+
+
+

@@ -13,15 +13,24 @@ exports.JsApiPay = void 0;
 const cPay = require("../wxPayApi");
 const cPay_Config = require("../Config");
 const cPay_Exception = require("../Exception/wxPayException");
+const cPay_Model = require("../Model");
 const date_fns_1 = require("date-fns");
 const constant_1 = require("../Config/constant");
 const cPay_Util = require("../Util");
-const WxPayData = cPay.WxPayData;
+const basePay_1 = require("./basePay");
+const WxPayData = cPay_Model.WxPayData;
 const WxPayApi = cPay.WxPayApi;
 const Util = cPay_Util.Util;
 const WxPayException = cPay_Exception.WxPayException;
-class JsApiPay {
+/**
+ * JSAPI支付
+ *
+ * @export
+ * @class JsApiPay
+ */
+class JsApiPay extends basePay_1.BasePay {
     constructor(request, response, next) {
+        super();
         this.request = request;
         this.response = response;
         this.next = next;
@@ -49,39 +58,58 @@ class JsApiPay {
             }
         });
     }
-    UnifiedOrder(orderInfo, openid) {
+    /**
+     * JSAPI统一下单 √
+     *
+     * @param {string} openid 用户微信号
+     * @param {*} [options] 可选参数对象如{key:value}
+     * @returns {Promise<cPay_Model.ResponseData>}
+     * @memberof JsApiPay
+     */
+    UnifiedOrder(openid, options) {
         return __awaiter(this, void 0, void 0, function* () {
             //统一下单
-            let data = new WxPayData();
-            data.SetValue("body", orderInfo.body);
-            data.SetValue("attach", orderInfo.attach);
-            data.SetValue("out_trade_no", WxPayApi.GenerateOutTradeNo());
-            data.SetValue("total_fee", orderInfo.total_fee);
-            data.SetValue("time_start", date_fns_1.format(new Date(), "yyyyMMddHHmmss"));
-            data.SetValue("time_expire", date_fns_1.format(date_fns_1.addMinutes(new Date(), 10), "yyyyMMddHHmmss"));
-            data.SetValue("goods_tag", orderInfo.goods_tag);
-            data.SetValue("trade_type", constant_1.default.WEIXIN_trade_type_JSAPI);
-            data.SetValue("openid", openid);
-            let result = yield WxPayApi.UnifiedOrder(data);
+            let req = new WxPayData(), response_data = new cPay_Model.ResponseData();
+            req.SetValue("body", this.orderInfo.body);
+            req.SetValue("attach", this.orderInfo.attach);
+            req.SetValue("out_trade_no", WxPayApi.GenerateOutTradeNo());
+            req.SetValue("total_fee", this.orderInfo.total_fee);
+            req.SetValue("time_start", date_fns_1.format(new Date(), "yyyyMMddHHmmss"));
+            req.SetValue("time_expire", date_fns_1.format(date_fns_1.addMinutes(new Date(), 10), "yyyyMMddHHmmss"));
+            req.SetValue("goods_tag", this.orderInfo.goods_tag);
+            req.SetValue("trade_type", constant_1.default.WEIXIN_trade_type_JSAPI);
+            req.SetValue("openid", openid);
+            for (let key in options) {
+                req.SetValue(key, options[key]);
+            }
+            let result = yield WxPayApi.UnifiedOrder(req);
             if (!result.IsSet("appid") || !result.IsSet("prepay_id") || result.GetValue("prepay_id").toString() == "") {
                 console.log("UnifiedOrder response error!");
                 throw new WxPayException("UnifiedOrder response error!");
             }
-            this._unifiedOrderResult = result;
-            return result;
+            this.UnifiedOrderResult = result;
+            response_data.data = result;
+            response_data.return_code = result.m_values.get("return_code");
+            response_data.msg = result.m_values.get("return_msg");
+            response_data.result_code = result.m_values.get("result_code");
+            return response_data;
         });
     }
+    /**
+     * 下单成功后，获取微信支付相关参数 √
+     */
     GetJsApiPayParameters() {
         console.log("JsApiPay::GetJsApiParam is processing...");
         let jsApiParam = new WxPayData();
-        jsApiParam.SetValue("appId", this._unifiedOrderResult.GetValue("appid"));
+        jsApiParam.SetValue("appId", this.UnifiedOrderResult.GetValue("appid"));
         jsApiParam.SetValue("timeStamp", WxPayApi.GenerateTimeStamp());
         jsApiParam.SetValue("nonceStr", WxPayApi.GenerateNonceStr());
-        jsApiParam.SetValue("package", "prepay_id=" + this._unifiedOrderResult.GetValue("prepay_id"));
+        jsApiParam.SetValue("package", "prepay_id=" + this.UnifiedOrderResult.GetValue("prepay_id"));
         jsApiParam.SetValue("signType", WxPayData.SIGN_TYPE_HMAC_SHA256);
         jsApiParam.SetValue("paySign", jsApiParam.MakeSign());
         let param = jsApiParam.ToJson();
-        console.log('JsApiPay::GetJsApiParam - ' + param);
+        console.log('JsApiPay::GetJsApiParam - ');
+        console.log(param);
         return param;
     }
     GetOpenidAndAccessTokenFromCode(code, uri) {
