@@ -254,6 +254,7 @@ app.get('/index', function (req: any, res: any) {
     res.render('index', { title: 'users member' });
 });
 
+//http://xulayen.imwork.net:13561/h5pay
 app.get('/h5pay', async function (req: any, res: any) {
 
     let h5pay = new cPay.H5Pay(),
@@ -262,12 +263,16 @@ app.get('/h5pay', async function (req: any, res: any) {
     orderinfo.body = "1111111";
     orderinfo.total_fee = 1;
     h5pay.orderInfo = orderinfo;
-    let res_order = await h5pay.UnifiedOrder(new Date().getTime().toString(), scene, "http://xulayen.imwork.net:13561/index");
+    let res_order = await h5pay.UnifiedOrder(new Date().getTime().toString(), scene, "http://xulayen.imwork.net:13561/success");
     console.log(res_order);
 
     let url = res_order.data.GetValue("mweb_url");
     //res.render('h5pay', res_order);
     res.redirect(url);
+});
+
+app.get('/success', function (req: any, res: any) {
+    res.render('success', { title: '成功' });
 });
 
 //http://xulayen.imwork.net:13561/jspay?openid=oi4qm1cAO4em3nUtBgOsOORvJhOk
@@ -285,7 +290,7 @@ app.listen(8888, function (err: any) {
     if (err) {
         console.error('err:', err);
     } else {
-        var _content = `===> api server is running at at http://10.20.26.19:8888`;
+        var _content = `===> api server is running at at http://192.168.1.116:8888`;
         console.info(_content);
     }
 });
