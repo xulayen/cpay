@@ -23,7 +23,7 @@ script:
   #- npm run test
   # Run linting
   - npm run build
-  #- npm run test
+  - npm run test
   - codecov -f ./coverage/coverage-final.json
 
 after_script:

@@ -151,6 +151,7 @@ export class WxPayApi extends BaseApi {
         inputObj.SetValue("sign", inputObj.MakeSign());//签名
         let xml = inputObj.ToXml();
 
+
         console.log(`查询订单-request: \n${xml}`);
         let res = await Util.setMethodWithUri({
             url: url,
@@ -173,7 +174,6 @@ export class WxPayApi extends BaseApi {
         response_data.result_code = result.m_values.get("result_code");
         response_data.err_code = result.m_values.get("err_code");
         return response_data;
-
     }
 
     /**

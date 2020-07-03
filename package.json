@@ -15,7 +15,10 @@
   },
   "keywords": [
     "wechat",
-    "pay"
+    "pay",
+    "alipay",
+    "微信公众平台",
+    "微信开放平台"
   ],
   "author": "xulayen",
   "license": "ISC",
@@ -44,6 +47,7 @@
     "chai": "^4.2.0",
     "codecov": "^3.7.0",
     "coveralls": "^3.1.0",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-xml-bodyparser": "^0.3.0",
     "istanbul": "^0.4.5",
