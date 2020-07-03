@@ -30,6 +30,8 @@ describe('Array', function () {
   });
 });
 
+
+
 describe('微信支付', function () {
   describe('#H5支付', function () {
     it('返回SUCCESS', async function () {
@@ -174,6 +176,19 @@ describe('微信支付', function () {
       paydata.SetValue("long_url", "weixin://wxpay/bizpayurl?appid=wx6e8dfa0d32f32337&mch_id=1499013532&nonce_str=1593747033402&product_id=111111&time_stamp=1593747033695&sign=8120fb8002de5ce49af213c5ca0d3b6c");
       res = await cPay.BaseApi.ShortUrl(paydata);
       assert.equal(res.return_code, "SUCCESS");
+    });
+  });
+});
+
+
+describe('Array', function () {
+  describe('#indexOf()', function () {
+    it('should return -1 when the value is not present', function () {
+      assert.equal([1, 2, 3].indexOf(4), -1);
+      setTimeout(function () {
+        process.exit();
+      }, 2000);
+
     });
   });
 });
