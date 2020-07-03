@@ -7,7 +7,6 @@
 
 # testing
 /.vscode
-/test
 
 # production
 /dist

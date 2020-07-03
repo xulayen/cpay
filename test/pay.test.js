@@ -1,4 +1,4 @@
-var cPay = require('../dist/lib').default;
+var cPay = require('../dist').default;
 var Config = require('../dist/test/config').default;
 const assert = require('assert');
 
