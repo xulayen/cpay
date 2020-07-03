@@ -3,7 +3,9 @@ import Config from './config';
 const Express = require('express'),
     bodyParser = require('body-parser'),
     app = new Express(),
-    xmlparser = require('express-xml-bodyparser');
+    xmlparser = require('express-xml-bodyparser'),
+    path = require('path'),
+    ejs = require('ejs');
 
 app.use(bodyParser.json({ limit: "500000kb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -29,7 +31,7 @@ new cPay.Config.MySqlConfig(Config.mySql.host, Config.mySql.user, Config.mySql.p
 
 app.get('/auth', async function (req: any, res: any, next: any) {
     let ojsapipay = new cPay.JsApiPay(req, res, next);
-    await ojsapipay.GetWeixinUserInfo('http://baidu.com', false);
+    await ojsapipay.GetWeixinUserInfo('http://xulayen.imwork.net:13561/', false);
     console.log(ojsapipay.WeixinUserInfo);
 });
 
@@ -241,6 +243,43 @@ app.post('/ShortUrl', async function (req: any, res: any, next: any) {
     res.send(orderinfo);
 
 });
+
+
+app.set('views', path.join(__dirname, ".", 'web'));
+app.engine('.html', ejs.__express);
+app.set('view engine', 'html');
+app.use(Express.static(path.join(__dirname, 'web/public')));
+
+app.get('/index', function (req: any, res: any) {
+    res.render('index', { title: 'users member' });
+});
+
+app.get('/h5pay', async function (req: any, res: any) {
+
+    let h5pay = new cPay.H5Pay(),
+        scene = new cPay.Model.SceneInfo("11", "22", "444"),
+        orderinfo = new cPay.Model.OrderInfo();
+    orderinfo.body = "1111111";
+    orderinfo.total_fee = 1;
+    h5pay.orderInfo = orderinfo;
+    let res_order = await h5pay.UnifiedOrder(new Date().getTime().toString(), scene, "http://xulayen.imwork.net:13561/index");
+    console.log(res_order);
+
+    let url = res_order.data.GetValue("mweb_url");
+    //res.render('h5pay', res_order);
+    res.redirect(url);
+});
+
+//http://xulayen.imwork.net:13561/jspay?openid=oi4qm1cAO4em3nUtBgOsOORvJhOk
+app.get('/jspay', async function (req: any, res: any, next: any) {
+    let ojsapipay = new cPay.JsApiPay(req, res, next), openid = req.query.openid;
+    ojsapipay.orderInfo = new cPay.Model.OrderInfo("test", "test", "test", "test", 1);
+    let res_order = await ojsapipay.UnifiedOrder(openid);
+    console.log(res_order);
+    let paramter = ojsapipay.GetJsApiPayParameters();
+    res.render('jspay', { data: paramter });
+});
+
 
 app.listen(8888, function (err: any) {
     if (err) {
