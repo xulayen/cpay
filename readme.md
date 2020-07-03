@@ -4,21 +4,23 @@
 
 # 微信/支付宝支付 For Typescript Express
 
-| 功能        | 微信    |  支付宝  |
-| --------   | -----:   | :----: |
-| 付款码支付        | ✔      |   ✖    |
-| 扫码支付        | ✔      |   ✖    |
-| H5支付        | ✔    |   ✖    |
-| JSAPI支付        | ✔      |   ✖    |
-| 小程序支付        | ✔      |   ✖    |
-| APP支付        | ✔      |   ✖    |
-| 刷脸支付        | ✖      |   ✖    |
-| 支付结果通知        | ✔      |   ✖    |
-| 查询订单       | ✔      |   ✖    |
-| 撤销订单        | ✔      |   ✖    |
-| 申请退款        | ✔      |   ✖    |
-| 查询退款        | ✔      |   ✖    |
-| 短链接生成        | ✔      |   ✖    |
+| 功能        | 微信（基于公众号）    |  微信（基于开放平台）    | 支付宝  |
+| --------   | -----:   | :----: | :----: |
+| 付款码支付        | ✔      |   ✖    |   ✖    |
+| 扫码支付        | ✔      |   ✖    |   ✖    |
+| H5支付        | ✔    |   ✖    |   ✖    |
+| JSAPI支付        | ✔      |   ✖    |   ✖    |
+| 小程序支付        | ✔      |   ✖    |   ✖    |
+| APP支付        | ✔      |   ✖    |   ✖    |
+| 刷脸支付        | ✖      |   ✖    |   ✖    |
+| 支付结果通知        | ✔      |   ✖    |   ✖    |
+| 查询订单       | ✔      |   ✖    |   ✖    |
+| 撤销订单        | ✔      |   ✖    |   ✖    |
+| 申请退款        | ✔      |   ✖    |   ✖    |
+| 查询退款        | ✔      |   ✖    |   ✖    |
+| 短链接生成        | ✔      |   ✖    |   ✖    |
+| 公众号获取openid        | ✔      |   ✖    |   ✖    |
+
 
 ## 安装
 
@@ -73,7 +75,7 @@ new cPay.Config.RedisConfig("Redis地址", "端口", "库编号");
 
 ### MySql配置
 
-[建库建表脚本](./test/db/db.sql)
+[建库建表脚本](./test/doc/db.sql)
 
 ``` js
 // 启用配置对象，实例化即可启用
@@ -317,6 +319,27 @@ paydata.SetValue("long_url", "需要转换的URL，传输需URL encode");
 orderinfo = await cPay.BaseApi.ShortUrl(paydata);
 
 ```
+
+#### 公众号获取openid
+
+``` js
+
+app.get('/auth', async function (req: any, res: any, next: any) {
+    let ojsapipay = new cPay.JsApiPay(req, res, next);
+    await ojsapipay.GetWeixinUserInfo('网页应用回调地址', "是否是静默授权，Boolean类型");
+    // 打印微信用户信息
+    console.log(ojsapipay.WeixinUserInfo);
+});
+
+
+```
+
+## 作者
+- [徐大腿](http://xulayen.com/)
+
+## 打赏
+![avatar](./test/doc/wxqrcode.jpg) 
+
 
 
 

@@ -14,33 +14,36 @@ class DbHelper {
     }
 
     constructor() {
-        var _this=this;
-        this.connection = mysql.createConnection({
-            host: cPay_Config.Config.GetMySqlConfig().host,
-            user: cPay_Config.Config.GetMySqlConfig().user,
-            password: cPay_Config.Config.GetMySqlConfig().password,
-            database: cPay_Config.Config.GetMySqlConfig().database
-        });
+        var _this = this, mysqlconfig = cPay_Config.Config.GetMySqlConfig();
 
-        this.connection.connect(async function (err: any) {
-            if (err) {
-                console.warn('error connecting: ' + err.message);
-                return;
-            }
-        });
+        if (mysqlconfig && mysqlconfig.host && mysqlconfig.user && mysqlconfig.password && mysqlconfig.database) {
 
-        this.connection.config.queryFormat = (query: any, values: any) => {
-            if (!values) return query;
-            return query.replace(/\:(\w+)/g, function (txt: any, key: any) {
-                if (values.hasOwnProperty(key)) {
-                    return mysql.escape(values[key]);
+            this.connection = mysql.createConnection({
+                host: mysqlconfig.host,
+                user: mysqlconfig.user,
+                password: mysqlconfig.password,
+                database: mysqlconfig.database
+            });
+
+            this.connection.connect(async function (err: any) {
+                if (err) {
+                    console.warn('error connecting: ' + err.message);
+                    return;
                 }
-                return txt;
-            }.bind(this));
-        };
+            });
+
+            this.connection.config.queryFormat = (query: any, values: any) => {
+                if (!values) return query;
+                return query.replace(/\:(\w+)/g, function (txt: any, key: any) {
+                    if (values.hasOwnProperty(key)) {
+                        return mysql.escape(values[key]);
+                    }
+                    return txt;
+                }.bind(this));
+            };
 
 
-
+        }
 
     }
 
@@ -54,7 +57,7 @@ class DbHelper {
     async select(tablename: string, columns?: [], condition?: string, params?: {}): Promise<any> {
         let sql = `select ${columns.length > 0 ? columns.join(',') : "*"} from ${tablename} x where ${condition.trim() ? condition : "1=1"}`,
             res = await new Promise((resolve, reject) => {
-                this.connection.query(sql, params, function (error: any, results: any, fields: any) {
+                this.connection && this.connection.query(sql, params, function (error: any, results: any, fields: any) {
                     if (error) {
                         reject(error);
                     };
@@ -76,7 +79,7 @@ class DbHelper {
     async insert(tablename: string, columns: string[], params_columns: string[], params: {}): Promise<any> {
         let sql = `insert into ${tablename} (${columns.join(',')}) values ( ${params_columns.join(',')} )`,
             res = await new Promise((resolve, reject) => {
-                this.connection.query(sql, params, function (error: any, results: any, fields: any) {
+                this.connection && this.connection.query(sql, params, function (error: any, results: any, fields: any) {
                     if (error) {
                         reject(error);
                     };
@@ -99,7 +102,7 @@ class DbHelper {
     async update(tablename: string, columns: string, condition: string, params: {}): Promise<any> {
         let sql = `update ${tablename} set ${columns} where ${condition}`,
             res = await new Promise((resolve, reject) => {
-                this.connection.query(sql, params, function (error: any, results: any, fields: any) {
+                this.connection && this.connection.query(sql, params, function (error: any, results: any, fields: any) {
                     if (error) {
                         reject(error);
                     };
@@ -121,7 +124,7 @@ class DbHelper {
     async delete(tablename: string, condition: string, params?: {}): Promise<any> {
         let sql = `delete from ${tablename} where ${condition.trim() ? condition : "1=1"}`,
             res = await new Promise((resolve, reject) => {
-                this.connection.query(sql, params, function (error: any, results: any, fields: any) {
+                this.connection && this.connection.query(sql, params, function (error: any, results: any, fields: any) {
                     if (error) {
                         reject(error);
                     };
@@ -142,7 +145,7 @@ class DbHelper {
     async execute(sql: string, params?: {}): Promise<any> {
 
         let res = await new Promise((resolve, reject) => {
-            this.connection.query(sql, params, function (error: any, results: any, fields: any) {
+            this.connection && this.connection.query(sql, params, function (error: any, results: any, fields: any) {
                 if (error) {
                     reject(error);
                 };

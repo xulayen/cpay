@@ -144,7 +144,7 @@ export class WxPayApi extends BaseApi {
             throw new WxPayException("订单查询接口中，out_trade_no、transaction_id至少填一个！");
         }
 
-        inputObj.SetValue( "app id", WxPayConfig.GetWxPayConfig().GetAppID());//公众账号ID
+        inputObj.SetValue("appid", WxPayConfig.GetWxPayConfig().GetAppID());//公众账号ID
         inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID());//商户号
         inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr());//随机字符串
         inputObj.SetValue("sign_type", Model.WxPayData.SIGN_TYPE_HMAC_SHA256);//签名类型
@@ -399,7 +399,7 @@ export class WxPayApi extends BaseApi {
         });
         console.log(`付款码支付-response: \n${res}`);
         this.Log(inputObj, res, url);
-        
+
         let result = new Model.WxPayData();
         await result.FromXml(res);
         response_data = this.Flatten(result);
