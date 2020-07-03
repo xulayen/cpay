@@ -1,4 +1,4 @@
-import cPay from '../lib';
+import cPay from '../index';
 import Config from './config';
 const Express = require('express'),
     bodyParser = require('body-parser'),

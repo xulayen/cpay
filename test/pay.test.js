@@ -181,16 +181,16 @@ describe('微信支付', function () {
 });
 
 
-// describe('Array', function () {
-//   describe('#indexOf()', function () {
-//     it('should return -1 when the value is not present', function () {
-//       assert.equal([1, 2, 3].indexOf(4), -1);
-//       setTimeout(function () {
-//         process.exit();
-//       }, 2000);
+describe('Array', function () {
+  describe('#indexOf()', function () {
+    it('should return -1 when the value is not present', function () {
+      assert.equal([1, 2, 3].indexOf(4), -1);
+      setTimeout(function () {
+        process.exit(0);
+      }, 5000);
 
-//     });
-//   });
-// });
+    });
+  });
+});
 
 
