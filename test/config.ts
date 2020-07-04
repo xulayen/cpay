@@ -12,7 +12,10 @@ export default {
         SSlCertPath: process.env.SSlCertPath,
         SSlCertPassword: process.env.SSlCertPassword,
         Ip: process.env.Ip,
-        Facid: process.env.Facid
+        Facid: process.env.Facid,
+        openAppid:process.env.openAppid,
+        openAppsecrect:process.env.openAppSecrect
+        
     },
     redis: {
         host: process.env.redis_host,

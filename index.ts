@@ -9,6 +9,7 @@ import { MicroPay } from './lib/WechatPay/microPay';
 import * as Config from './lib/Config';
 import * as Notify from './lib/Notice';
 import { WxPayApi } from './lib/WxPayApi';
+import { ComponentLogin } from './lib/WechatOpen/componentLogin';
 
 const cPay = {
 
@@ -21,6 +22,7 @@ const cPay = {
     Model,
     Config,
     Notify,
+    ComponentLogin,
     BaseApi: WxPayApi
 
 }

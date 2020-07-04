@@ -236,6 +236,8 @@ export class WeixinConfig {
         this.ReportLevel = "";
         this.LogLevel = "";
         this.Redirect_uri = "";
+        this.OpenAppid="";
+        this.OpenAppsecret="";
     }
     Facid: string;
     AppID: string;
@@ -250,6 +252,8 @@ export class WeixinConfig {
     ReportLevel: string;
     LogLevel: string;
     Redirect_uri: string;
+    OpenAppid:string;
+    OpenAppsecret:string;
 }
 
 /**

@@ -1,6 +1,6 @@
 export default class Constant {
-   
-    
+
+
     /**
      * https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_10&index=1
      * 付款码支付
@@ -17,7 +17,7 @@ export default class Constant {
      * @type {string}
      * @memberof Constant
      */
-    public static WEIXIN_wxpay_reverse:string='https://api.mch.weixin.qq.com/secapi/pay/reverse';
+    public static WEIXIN_wxpay_reverse: string = 'https://api.mch.weixin.qq.com/secapi/pay/reverse';
 
     /**
      * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=6_4
@@ -151,12 +151,27 @@ export default class Constant {
      */
     public static WEIXIN_trade_type_APP: string = "APP";
 
-        /**
-     * 交易类型-H5支付
-     * @static
-     * @type {string}
-     * @memberof Constant
-     */
+    /**
+ * 交易类型-H5支付
+ * @static
+ * @type {string}
+ * @memberof Constant
+ */
     public static WEIXIN_trade_type_MWEB: string = "MWEB";
 
+
+    /**
+     * 微信开放平台获取令牌
+     */
+    public static WEIXIN_OPEN_component_token: string = "https://api.weixin.qq.com/cgi-bin/component/api_component_token";
+
+    /**
+     * 微信开放平台获取预授权码
+     */
+    public static WEIXIN_OPEN_create_preauthcode: string = "https://api.weixin.qq.com/cgi-bin/component/api_create_preauthcode";
+
+    /**
+     * 公众号撒吗授权入驻开放平台
+     */
+    public static WEIXIN_OPEN_componentloginpage: string = "https://mp.weixin.qq.com/cgi-bin/componentloginpage?";
 }

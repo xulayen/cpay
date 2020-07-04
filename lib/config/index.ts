@@ -65,6 +65,13 @@ export interface IWxConfig {
     //=======【公众号回调地址】===================================
     GetRedirect_uri(): string;
 
+
+    //获取开放平台Appid
+    GetOpenAppid(): string;
+
+    //获取开放平台appsecret
+    GetOpenAppsecret(): string;
+
 }
 
 export interface IRedisConfig {
@@ -88,6 +95,7 @@ export class WeixinPayConfig implements IWxConfig {
         this.CustomerWeixinConfig = CustomerWeixinConfig;
         Config.wxconfig = this;
     }
+
     CustomerWeixinConfig: Model.WeixinConfig;
 
     GetFacID(): string {
@@ -130,6 +138,12 @@ export class WeixinPayConfig implements IWxConfig {
     GetLogLevel(): string {
         return this.CustomerWeixinConfig && this.CustomerWeixinConfig.LogLevel || "";
     }
+    GetOpenAppid(): string {
+        return this.CustomerWeixinConfig && this.CustomerWeixinConfig.OpenAppid || "";
+    }
+    GetOpenAppsecret(): string {
+        return this.CustomerWeixinConfig && this.CustomerWeixinConfig.OpenAppsecret || "";
+    }
 
 }
 
@@ -146,7 +160,7 @@ export class RedisConfig implements IRedisConfig {
         Config.redisconfig = this;
     }
     Host: string;
-    Port: string ;
+    Port: string;
     DB: number;
     Auth: string;
 }
@@ -165,10 +179,10 @@ export class MySqlConfig implements IMySqlConfig {
         Config.mysqlconfig = this;
     }
 
-    host: string ;
+    host: string;
     user: string;
-    password: string ;
-    database: string ;
+    password: string;
+    database: string;
 
 }
 

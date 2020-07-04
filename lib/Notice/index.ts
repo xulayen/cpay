@@ -4,6 +4,8 @@ import { format, addMinutes } from 'date-fns';
 import Constant from '../Config/constant';
 import * as  cPay_Model from '../Model';
 import * as BLL from '../BLL/cPayBLL';
+import * as cPay_Util from '../Util';
+import BaseNotify from './baseNotify';
 
 //export namespace cPay_Notice {
 
@@ -16,16 +18,11 @@ const WxPayApi = cPay.WxPayApi;
  * 主要负责接收微信支付后台发送过来的数据，对数据进行签名验证
  * 子类在此类基础上进行派生并重写自己的回调处理过程
  */
-class Notify {
+class Notify extends BaseNotify {
 
-    protected request: any;
-    protected response: any;
-    protected next: any;
     config = cPay_Config.Config.GetWxPayConfig();
     constructor(request: any, response: any, next: any) {
-        this.request = request;
-        this.response = response;
-        this.next = next;
+        super(request, response, next);
     }
 
     public async ProcessNotify(): Promise<void> {
@@ -195,6 +192,35 @@ export class NativeNotify extends Notify {
         product.total_fee = 1;
         return product;
 
+    }
+
+}
+
+
+export class WxOpenPlatformAccept extends Notify {
+
+    constructor(request?: any, response?: any, next?: any) {
+        super(request, response, next);
+    }
+
+    private readonly REDIS_KEY_TICKET = 'cpay:wxopen:ticket'
+    private redis: cPay_Util.RedisClient = cPay_Util.Util.redisClient;
+
+    private _Ticket: Promise<string>;
+    public async Ticket(): Promise<string> {
+        if (!this._Ticket) {
+            this._Ticket = await this.redis.get(this.REDIS_KEY_TICKET);
+        }
+        return this._Ticket;
+    }
+
+    public async ProcessNotify(): Promise<void> {
+        let notifyData = await this.GetNotifyData(), vt, ticket;
+        vt = notifyData.GetValue('ComponentVerifyTicket');
+        // 此处对Ticket数据进行解密
+        ticket = vt;
+        this._Ticket = ticket;
+        this.redis.set(this.REDIS_KEY_TICKET, ticket);
     }
 
 }

@@ -23,6 +23,8 @@ weixin.SSlCertPath = Config.weixin.SSlCertPath;
 weixin.SSlCertPassword = Config.weixin.SSlCertPassword;
 weixin.Ip = Config.weixin.Ip;
 weixin.Facid = Config.weixin.Facid;
+weixin.OpenAppid = Config.weixin.openAppid;
+weixin.OpenAppsecret = Config.weixin.openAppsecrect;
 
 new cPay.Config.WeixinPayConfig(weixin);
 new cPay.Config.RedisConfig(Config.redis.host, Config.redis.port, Config.redis.db);
@@ -254,6 +256,16 @@ app.get('/index', function (req: any, res: any) {
     res.render('index', { title: 'users member' });
 });
 
+app.post('/weixinopen/accept', function (req: any, res: any) {
+
+    console.log('接受微信推送的验证票据：');
+    console.log(req.body);
+    res.send('success');
+    return;
+});
+
+
+
 //http://xulayen.imwork.net:13561/h5pay
 app.get('/h5pay', async function (req: any, res: any) {
 
@@ -286,6 +298,18 @@ app.get('/jspay', async function (req: any, res: any, next: any) {
 });
 
 
+
+app.get('/openauth', async function (req: any, res: any, next: any) {
+    let openauth = new cPay.ComponentLogin(req, res, next);
+    await openauth.AuthLogin('http://xulayen.imwork.net:13561/openauth/callback');
+});
+
+app.get('/openauth/callback', function (req: any, res: any, next: any) {
+    let openauth = new cPay.ComponentLogin(req, res, next);
+    openauth.AuthLoginCallBack();
+});
+
+
 app.listen(8888, function (err: any) {
     if (err) {
         console.error('err:', err);
@@ -294,3 +318,5 @@ app.listen(8888, function (err: any) {
         console.info(_content);
     }
 });
+
+
