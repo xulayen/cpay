@@ -6,6 +6,7 @@ import * as  cPay_Model from '../Model';
 import * as BLL from '../BLL/cPayBLL';
 import * as cPay_Util from '../Util';
 import BaseNotify from './baseNotify';
+import { RedisKeyEnum } from '../Config/redisKey';
 
 //export namespace cPay_Notice {
 
@@ -203,13 +204,12 @@ export class WxOpenPlatformAccept extends Notify {
         super(request, response, next);
     }
 
-    private readonly REDIS_KEY_TICKET = 'cpay:wxopen:ticket'
     private redis: cPay_Util.RedisClient = cPay_Util.Util.redisClient;
 
     private _Ticket: Promise<string>;
     public async Ticket(): Promise<string> {
         if (!this._Ticket) {
-            this._Ticket = await this.redis.get(this.REDIS_KEY_TICKET);
+            this._Ticket = await this.redis.get(RedisKeyEnum.redis_key_ticket);
         }
         return this._Ticket;
     }
@@ -220,7 +220,7 @@ export class WxOpenPlatformAccept extends Notify {
         // 此处对Ticket数据进行解密
         ticket = vt;
         this._Ticket = ticket;
-        this.redis.set(this.REDIS_KEY_TICKET, ticket);
+        this.redis.set(RedisKeyEnum.redis_key_ticket, ticket);
     }
 
 }

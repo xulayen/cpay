@@ -4,6 +4,7 @@ import Constant from '../Config/constant';
 import * as  cPay_Model from '../Model';
 import * as  cPay_Config from '../Config';
 import * as  cPay_Util from '../Util';
+import { RedisKeyEnum } from '../Config/redisKey';
 const WxPayData = cPay_Model.WxPayData;
 
 /***
@@ -23,7 +24,6 @@ export class ComponentLogin {
     private response: any;
     private next: any;
     private config: cPay_Config.IWxConfig;
-    private readonly redis_key_auth_code = "cpay:wxopen:auth_code";
     constructor(request: any, response: any, next: any) {
         this.request = request;
         this.response = response;
@@ -54,7 +54,7 @@ export class ComponentLogin {
         let auth_code = this.request.query.auth_code,
             expires_in = this.request.query.expires_in;
         // 存入数据
-        cPay_Util.Util.redisClient.set(this.redis_key_auth_code, auth_code, expires_in - 100);
+        cPay_Util.Util.redisClient.set(RedisKeyEnum.redis_key_auth_code, auth_code, expires_in - 100);
     }
 
 

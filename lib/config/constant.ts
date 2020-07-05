@@ -174,4 +174,14 @@ export default class Constant {
      * 公众号撒吗授权入驻开放平台
      */
     public static WEIXIN_OPEN_componentloginpage: string = "https://mp.weixin.qq.com/cgi-bin/componentloginpage?";
+
+    /**
+     * 使用授权码获取授权信息
+     */
+    public static readonly WEIXIN_OPEN_query_auth: string = "https://api.weixin.qq.com/cgi-bin/component/api_query_auth";
+
+    /**
+     * 刷新token
+     */
+    public static readonly WEIXIN_OPEN_refresh_authorizer_token:string="https://api.weixin.qq.com/cgi-bin/component/api_authorizer_token";
 }
