@@ -1,4 +1,4 @@
-import * as  cPay from '../WxPayApi';
+import * as  cPay from '../wxPayApi';
 import * as  cPay_Config from '../Config';
 import { format, addMinutes } from 'date-fns';
 import Constant from '../Config/constant';

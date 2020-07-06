@@ -1,0 +1,24 @@
+﻿{
+    "name": "cpay", //启动app名称
+    "cwd": "/mnt/cpay/",
+    "script": "./test/server.js",
+    "log_date_format": "YYYY-MM-DD HH:mm Z",
+    "error_file": "/mnt/cpay/pgyer-node-middle.log",
+    "out_file": "/mnt/cpay/pgyer-node-middle.log",
+    "pid_file": "/mnt/cpay/node-geo-api.pid",
+    "instances": "max", //or 0 => 'max'
+    "watch": true,
+    "watch": [  // 监控变化的目录，一旦变化，自动重启
+    	"./test"
+     ],
+    "ignore_watch": [
+        "node_modules",
+      	"upload",
+      	"tmp",
+      	"pm2",
+      	"DOC"
+    ],    
+    "merge_logs": true,
+    "autorestart": true, // enable/disable automatic restart when an app crashes or exits
+    "vizion": false, // enable/disable vizion features (versioning control)
+}
