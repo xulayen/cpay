@@ -5,6 +5,7 @@ import * as  cPay_Model from '../Model';
 import * as  cPay_Config from '../Config';
 import * as  cPay_Util from '../Util';
 import { RedisKeyEnum } from '../Config/redisKey';
+import { CpayOpenBLL } from 'lib/BLL/cPayBLL';
 const WxPayData = cPay_Model.WxPayData;
 
 /***
@@ -43,8 +44,8 @@ export class ComponentLogin {
         data.SetValue("redirect_uri", redirect_uri);
         let res_url = `${url}${data.ToUrl()}`;
         console.log("Will Redirect to URL : " + res_url);
-        this.response.redirect(res_url);
-        return;
+        OpenApi.WxOpenApi.ProcessingFailure();
+        return res_url;
     }
 
     /**
@@ -55,6 +56,7 @@ export class ComponentLogin {
             expires_in = this.request.query.expires_in;
         // 存入数据
         cPay_Util.Util.redisClient.set(RedisKeyEnum.redis_key_auth_code, auth_code, expires_in - 100);
+        OpenApi.WxOpenApi.GetAuthorizer_access_token();
     }
 
 

@@ -7,8 +7,7 @@ const Express = require('express'),
     xmlparser = require('express-xml-bodyparser'),
     path = require('path'),
     ejs = require('ejs'),
-    cryptojs = require("crypto-js"),
-    Base64 = require('js-base64').Base64;
+    crypto = require("crypto");
 
 app.use(bodyParser.json({ limit: "500000kb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -28,6 +27,7 @@ weixin.Ip = Config.weixin.Ip;
 weixin.Facid = Config.weixin.Facid;
 weixin.OpenAppid = Config.weixin.openAppid;
 weixin.OpenAppsecret = Config.weixin.openAppsecrect;
+weixin.OpenAesKey = Config.weixin.openAesKey;
 
 new cPay.Config.WeixinPayConfig(weixin);
 new cPay.Config.RedisConfig(Config.redis.host, Config.redis.port, Config.redis.db);
@@ -300,7 +300,8 @@ app.get('/jspay', async function (req: any, res: any, next: any) {
     res.render('jspay', { data: paramter });
 });
 
-app.get('/ticket', async function (req: any, res: any, next: any) {
+
+app.post('/accept/ticket', async function (req: any, res: any, next: any) {
 
     /*****
      * 
@@ -308,48 +309,10 @@ app.get('/ticket', async function (req: any, res: any, next: any) {
      * 
      */
 
-    let message = req.query.t,text=`PzQzcHNK5/21taYCHrAaWsRo9F3UMIm5MtJdgXeijFopsdGWqVQ2UddGkvhpqApt4wv309JIA1Dkg4ZxPxQEQLoR8FOVgix6JT01H8E5jj0MERPz5jwoVSHDSTGJTsaJz1P0StsVwpRVTItUWq6FYYPTdd+txKyylhIQ9lcyyAMm1Pm79M4/FJ2zfzhziaqqKm5KRX8vrOFWMs35CxhxeO6ELi5wQgTbo4w44+/bYYCxmqcv0Jqr43UlWKXb6s4P5nD5GViCADVC/kEQjb/JOv2focGLYvWIOpNG7SRPYe4k5W/JNKuIStnUWoBQZXhDZocovTSO9OyuWv1u11hgIQjf0UCLKTL1pSM7dqFESk2ByEync+VtcjMr0lAp73HyObmzKtnYhPaDeWHnMKU6NZRByWi8mdqRcWGKPozFOFPGx5QEm1Kx/OMWMnW9rd9yUQEJX8VPOXAymxp5a9o0QQ==`;
-
-    console.log('平台编号：');
-    console.log(req.query.a);
-
-    console.log('加密字段：');
-    console.log(req.query.t);
-
-
-    let key=new Buffer('7deb81f3efec4182aeeb436314632ac28av5fre7ace' + '=', 'base64').toString('binary');
-
-
-    var decipher, plain_text;
-    try {
-          decipher = cryptojs.Decipheriv("CBC", key, this.key.slice(0, 16));
-          // 使用BASE64对密文进行解码，然后AES-CBC解密
-          decipher.setAutoPadding(false);
-          plain_text = decipher.update(text, 'base64', 'utf8') + decipher.final('utf8');
-    } catch (e) {
-          console.log(e.stack);
-    }
-    var pad = plain_text.charCodeAt(plain_text.length - 1);
-    plain_text = plain_text.slice(20, -pad);
-
-
-
-    // debugger;
-    // let AESKey = cryptojs.enc.Utf8.parse(k),
-    //     iv = cryptojs.enc.Utf8.parse(k);
-    //     debugger;
-    // let bytes = cryptojs.AES.decrypt(`PzQzcHNK5/21taYCHrAaWsRo9F3UMIm5MtJdgXeijFopsdGWqVQ2UddGkvhpqApt4wv309JIA1Dkg4ZxPxQEQLoR8FOVgix6JT01H8E5jj0MERPz5jwoVSHDSTGJTsaJz1P0StsVwpRVTItUWq6FYYPTdd+txKyylhIQ9lcyyAMm1Pm79M4/FJ2zfzhziaqqKm5KRX8vrOFWMs35CxhxeO6ELi5wQgTbo4w44+/bYYCxmqcv0Jqr43UlWKXb6s4P5nD5GViCADVC/kEQjb/JOv2focGLYvWIOpNG7SRPYe4k5W/JNKuIStnUWoBQZXhDZocovTSO9OyuWv1u11hgIQjf0UCLKTL1pSM7dqFESk2ByEync+VtcjMr0lAp73HyObmzKtnYhPaDeWHnMKU6NZRByWi8mdqRcWGKPozFOFPGx5QEm1Kx/OMWMnW9rd9yUQEJX8VPOXAymxp5a9o0QQ==`, AESKey, {
-    //     mode: "CBC",
-    //     padding: "Pkcs7",
-    //     iv: iv
-    // });
-    // debugger;
-    // var xml_res = bytes.toString(cryptojs.enc.Utf8);
-    // debugger;
-
-    // cPay.Util.redisClient.set("cpay:wxopen:ticket", xml_res);
-
-    return;
+    let accept = new cPay.Notify.WxOpenPlatformAccept(req, res, next);
+    accept.ProcessNotify();
+    console.log('商户接收票据：');
+    console.log(await accept.Ticket());
 
 });
 
@@ -357,27 +320,28 @@ app.post('/ticket', async function (req: any, res: any, next: any) {
 
     console.log('开放平台推送票据：');
     console.log(JSON.stringify(req.body.xml));
-
-    let encrypt = req.body.xml.encrypt.join(''),
-        appid = req.body.xml.appid.join('');
-
     cPay.Util.setMethodWithUri({
-        url: `http://xulayen.imwork.net:13561/ticket?t=${encrypt}&a=${appid}`,
-        method: 'get'
+        url: `http://xulayen.imwork.net:13561/accept/ticket`,
+        method: 'post',
+        json: true,
+        data: req.body
     });
 
     res.send(`success`);
 
 });
 
+//http://wxauth.xulayen.com:8888/openauth
 app.get('/openauth', async function (req: any, res: any, next: any) {
     let openauth = new cPay.ComponentLogin(req, res, next);
-    await openauth.AuthLogin('http://xulayen.imwork.net:13561/openauth/callback');
+    let url = await openauth.AuthLogin('http://wxauth.xulayen.com:8888/openauth/callback');
+    res.render('openauth', { data: url });
 });
 
 app.get('/openauth/callback', function (req: any, res: any, next: any) {
     let openauth = new cPay.ComponentLogin(req, res, next);
     openauth.AuthLoginCallBack();
+    res.render('success');
 });
 
 

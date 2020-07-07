@@ -41,7 +41,7 @@ class Notify extends BaseNotify {
     }
 
     protected async GetNotifyData(): Promise<cPay_Model.WxPayData> {
-
+        
         let builder = this.request.body, data = new WxPayData();
         try {
             await data.FromXml(builder);
@@ -206,7 +206,7 @@ export class WxOpenPlatformAccept extends Notify {
 
     private redis: cPay_Util.RedisClient = cPay_Util.Util.redisClient;
 
-    private _Ticket: Promise<string>;
+    private _Ticket: string;
     public async Ticket(): Promise<string> {
         if (!this._Ticket) {
             this._Ticket = await this.redis.get(RedisKeyEnum.redis_key_ticket);
@@ -215,10 +215,13 @@ export class WxOpenPlatformAccept extends Notify {
     }
 
     public async ProcessNotify(): Promise<void> {
-        let notifyData = await this.GetNotifyData(), vt, ticket;
-        vt = notifyData.GetValue('ComponentVerifyTicket');
+        let notifyData = await this.GetNotifyData(), vt, ticket, xml;
+        vt = notifyData.GetValue('encrypt');
         // 此处对Ticket数据进行解密
-        ticket = vt;
+        xml = cPay_Util.Util._decode(vt);
+        let data = new WxPayData();
+        await data.FromXml(xml);
+        ticket = data.GetValue("ComponentVerifyTicket");
         this._Ticket = ticket;
         this.redis.set(RedisKeyEnum.redis_key_ticket, ticket);
     }

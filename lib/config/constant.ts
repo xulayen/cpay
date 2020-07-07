@@ -168,7 +168,7 @@ export default class Constant {
     /**
      * 微信开放平台获取预授权码
      */
-    public static WEIXIN_OPEN_create_preauthcode: string = "https://api.weixin.qq.com/cgi-bin/component/api_create_preauthcode";
+    public static WEIXIN_OPEN_create_preauthcode: string = "https://api.weixin.qq.com/cgi-bin/component/api_create_preauthcode?component_access_token={0}";
 
     /**
      * 公众号撒吗授权入驻开放平台
@@ -178,10 +178,10 @@ export default class Constant {
     /**
      * 使用授权码获取授权信息
      */
-    public static readonly WEIXIN_OPEN_query_auth: string = "https://api.weixin.qq.com/cgi-bin/component/api_query_auth";
+    public static readonly WEIXIN_OPEN_query_auth: string = "https://api.weixin.qq.com/cgi-bin/component/api_query_auth?component_access_token={0}";
 
     /**
      * 刷新token
      */
-    public static readonly WEIXIN_OPEN_refresh_authorizer_token:string="https://api.weixin.qq.com/cgi-bin/component/api_authorizer_token";
+    public static readonly WEIXIN_OPEN_refresh_authorizer_token:string="https://api.weixin.qq.com/cgi-bin/component/api_authorizer_token?component_access_token={0}";
 }

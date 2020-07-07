@@ -238,6 +238,7 @@ export class WeixinConfig {
         this.Redirect_uri = "";
         this.OpenAppid="";
         this.OpenAppsecret="";
+        this.OpenAesKey="";
     }
     Facid: string;
     AppID: string;
@@ -254,6 +255,7 @@ export class WeixinConfig {
     Redirect_uri: string;
     OpenAppid:string;
     OpenAppsecret:string;
+    OpenAesKey:string;
 }
 
 /**

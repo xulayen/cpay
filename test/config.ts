@@ -14,7 +14,8 @@ export default {
         Ip: process.env.Ip,
         Facid: process.env.Facid,
         openAppid:process.env.openAppid,
-        openAppsecrect:process.env.openAppSecrect
+        openAppsecrect:process.env.openAppSecrect,
+        openAesKey:process.env.openAesKey
         
     },
     redis: {

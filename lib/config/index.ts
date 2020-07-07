@@ -72,6 +72,9 @@ export interface IWxConfig {
     //获取开放平台appsecret
     GetOpenAppsecret(): string;
 
+    //获取开放平台消息加解密AesKey
+    GetOpenAesKey(): string;
+
 }
 
 export interface IRedisConfig {
@@ -91,12 +94,17 @@ export interface IMySqlConfig {
 export class WeixinPayConfig implements IWxConfig {
 
 
+
     constructor(CustomerWeixinConfig?: Model.WeixinConfig) {
         this.CustomerWeixinConfig = CustomerWeixinConfig;
         Config.wxconfig = this;
     }
 
     CustomerWeixinConfig: Model.WeixinConfig;
+
+    GetOpenAesKey(): string {
+        return this.CustomerWeixinConfig && this.CustomerWeixinConfig.OpenAesKey || "";
+    }
 
     GetFacID(): string {
         return this.CustomerWeixinConfig && this.CustomerWeixinConfig.Facid || "";
