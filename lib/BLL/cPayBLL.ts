@@ -111,11 +111,10 @@ export class CpayLogsBLL extends BaseBLL {
 
 class OpenAuth { appid: string; access_token: string; refresh_token: string; expires_in: number; expires_time: string; }
 
-
 export class CpayOpenBLL extends BaseBLL {
 
     static readonly tablename = "t_cpay_open_authorization";
-
+    static readonly tablename_AUTH_INFO = "t_cpay_open_authorization_info";
     constructor() {
         super();
     }
@@ -125,6 +124,18 @@ export class CpayOpenBLL extends BaseBLL {
         let { columns, params_data } = this.BuildParametersPlus(params_columns, inputRes);
         res = await DAL.DbHelper.instance.insert(this.tablename, columns, params_columns, params_data);
         return res && res.affectedRows > 0;
+    }
+
+    public static async InsertOpenAuthInfo(inputRes: any): Promise<boolean> {
+        let params_columns: string[] = [':appid', ':component_appid', ':nick_name', ':head_img', ':service_type_info', ':verify_type_info', ':user_name', ':principal_name', ':signature', ':alias', ':business_info', ':qrcode_url', ':miniprograminfo'], res;
+        let { columns, params_data } = this.BuildParametersPlus(params_columns, inputRes);
+        res = await DAL.DbHelper.instance.insert(this.tablename_AUTH_INFO, columns, params_columns, params_data);
+        return res && res.affectedRows > 0;
+    }
+
+    public static async AppidHasAuth(appid: string): Promise<boolean> {
+        let res = await DAL.DbHelper.instance.select(this.tablename, [], " appid=:appid ", { appid: appid });
+        return res && res.length > 0;
     }
 
     /**
@@ -140,11 +151,12 @@ export class CpayOpenBLL extends BaseBLL {
     }
 
     public static async UpdateWillExpireToken(inputRes: OpenAuth): Promise<Boolean> {
-
+        console.log('开始更新：');
         let columns = ` access_token=:access_token,expires_in=:expires_in,refresh_token=:refresh_token,expires_time=:expires_time `,
             condition = ` appid=:appid `, params: any = {};
         params = this.BuildParameters(`${columns},${condition},`, inputRes);
         let res_order = await DAL.DbHelper.instance.update(this.tablename, columns, condition, params);
+        console.log('更新完成：' + res_order.affectedRows);
         return res_order.affectedRows > 0;
 
     }

@@ -8,6 +8,8 @@ import { RedisKeyEnum } from '../Config/redisKey';
 import { CpayOpenBLL } from 'lib/BLL/cPayBLL';
 const WxPayData = cPay_Model.WxPayData;
 
+OpenApi.WxOpenApi.ProcessingFailure();
+
 /***
  * wx9a1a29d63b33cd3d
  * 登录授权的发起页域名wxauth.xulayen.com
@@ -42,9 +44,9 @@ export class ComponentLogin {
         data.SetValue("component_appid", this.config.GetOpenAppid());
         data.SetValue("pre_auth_code", auth_code);
         data.SetValue("redirect_uri", redirect_uri);
+        // data.SetValue("biz_appid", 'wxc46c96addcb23ab9');
         let res_url = `${url}${data.ToUrl()}`;
         console.log("Will Redirect to URL : " + res_url);
-        OpenApi.WxOpenApi.ProcessingFailure();
         return res_url;
     }
 

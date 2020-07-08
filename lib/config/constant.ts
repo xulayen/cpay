@@ -183,5 +183,10 @@ export default class Constant {
     /**
      * 刷新token
      */
-    public static readonly WEIXIN_OPEN_refresh_authorizer_token:string="https://api.weixin.qq.com/cgi-bin/component/api_authorizer_token?component_access_token={0}";
+    public static readonly WEIXIN_OPEN_refresh_authorizer_token: string = "https://api.weixin.qq.com/cgi-bin/component/api_authorizer_token?component_access_token={0}";
+
+    /**
+     * 获取基础信息
+     */
+    public static readonly WEIXIN_OPEN_get_authorizer_info: string = "https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_info?component_access_token={0}";
 }

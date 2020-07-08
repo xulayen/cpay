@@ -103,7 +103,7 @@ export class WxOpenApi {
     /**
      * 使用授权码获取授权信息
      */
-    public static async GetAuthorizer_access_token(): Promise<string> {
+    public static async GetAuthorizer_access_token(): Promise<void> {
         let Config: cPay_Config.IWxConfig = cPay_Config.Config.GetWxPayConfig();
         let access_token = await this.GetComponent_access_token(),
             url = cPay_Util.Util.format(Constant.WEIXIN_OPEN_query_auth, access_token),
@@ -117,12 +117,6 @@ export class WxOpenApi {
             throw new cPay_Exception.WxOpenPlatformException("授权码不存在");
         }
 
-        let authorizer_access_token = await cPay_Util.Util.redisClient.get(RedisKeyEnum.redis_key_authorizer_access_token);
-
-        if (authorizer_access_token) {
-            return authorizer_access_token;
-        }
-
         let res = await cPay_Util.Util.setMethodWithUri({
             url: url,
             method: 'post',
@@ -134,7 +128,8 @@ export class WxOpenApi {
             }
         });
 
-        console.log(res);
+        console.log('GetAuthorizer_access_token')
+        console.log(res)
 
         if (!res.authorization_info) {
             return res;
@@ -154,12 +149,61 @@ export class WxOpenApi {
             expires_time: format(addSeconds(new Date(), res.expires_in), "yyyy-MM-dd HH:mm:ss")
         };
 
+        if (await BLL.CpayOpenBLL.AppidHasAuth(input.appid)) {
+            //已授权
+            return;
+        }
+
 
         BLL.CpayOpenBLL.InsertOpenAuth(input);
         this.UpdateRedisToken(input);
-
-        return obj_res.authorizer_access_token;
+        this.GetAuthorizer_InfoAndInsert(input.appid);
     }
+
+    public static async GetAuthorizer_InfoAndInsert(appid: string) {
+
+        let component_access_token = await this.GetComponent_access_token(),
+            url = cPay_Util.Util.format(Constant.WEIXIN_OPEN_get_authorizer_info, component_access_token),
+            Config: cPay_Config.IWxConfig = cPay_Config.Config.GetWxPayConfig();
+
+        let res = await cPay_Util.Util.setMethodWithUri({
+            url: url,
+            method: 'post',
+            json: true,
+            data: {
+                component_appid: Config.GetOpenAppid(),
+                component_access_token: component_access_token,
+                authorizer_appid: appid
+            }
+        });
+        
+        console.log('GetAuthorizer_info')
+        console.log(res);
+
+        res=res.authorizer_info;
+
+        let input = {
+            appid: appid,
+            component_appid: Config.GetOpenAppid(),
+            nick_name: res && res.nick_name || '',
+            head_img: res.head_img || '',
+            service_type_info: res && res.service_type_info.id || '',
+            verify_type_info: res && res.verify_type_info.id || '',
+            user_name: res && res.user_name || '',
+            principal_name: res && res.principal_name || '',
+            alias: res && res.alias || '',
+            business_info: res && JSON.stringify(res.business_info) || '',
+            qrcode_url: res && res.qrcode_url || '',
+            miniprograminfo: res && res.miniprograminfo || '',
+            signature:res && res.signature || ''
+        };
+
+
+        BLL.CpayOpenBLL.InsertOpenAuthInfo(input);
+
+    }
+
+
 
     private static UpdateRedisToken(input: any) {
         cPay_Util.Util.redisClient.set(cPay_Util.Util.format(RedisKeyEnum.redis_key_authorizer_access_token, input.appid), input.access_token, input.expires_in - 1000);
@@ -174,17 +218,18 @@ export class WxOpenApi {
      * @memberof WxOpenApi
      */
     public static async ProcessingFailure(): Promise<void> {
-
         if (this.start) {
             return;
         }
         this.start = !this.start;
-
+        console.log('开始轮询');
 
         setInterval(async () => {
 
-            console.log('15分钟执行一次！');
+            console.log('5分钟轮询Token是否将要过期！');
             let res = await BLL.CpayOpenBLL.SelectWillExpireToken();
+
+            console.log("有" + res.length + "条需要更新Token！");
 
             for (let i = 0; i < res.length; i++) {
                 let current = res[i];
@@ -192,14 +237,16 @@ export class WxOpenApi {
             }
 
 
-
-        }, 1000 * 60 * 15)
+        }, 1000 * 60 * 5)
 
     }
 
+
+
+
     private static async RefeshAuthorizer_access_token(current: any): Promise<void> {
         let Config: cPay_Config.IWxConfig = cPay_Config.Config.GetWxPayConfig();
-        let component_access_token = await cPay_Util.Util.redisClient.get(RedisKeyEnum.redis_key_component_access_token);
+        let component_access_token = await this.GetComponent_access_token();
         let url = cPay_Util.Util.format(Constant.WEIXIN_OPEN_refresh_authorizer_token, component_access_token);
         let res = await cPay_Util.Util.setMethodWithUri({
             url: url,
@@ -212,6 +259,8 @@ export class WxOpenApi {
                 authorizer_refresh_token: current.refresh_token
             }
         });
+
+        console.log(res);
 
         if (!res.authorizer_access_token || !res.authorizer_refresh_token) {
             return;

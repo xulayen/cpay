@@ -355,3 +355,8 @@ app.listen(8888, function (err: any) {
 });
 
 
+
+//开放平台获取code
+//https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx97e377b7691b236a&redirect_uri=http://wxauth.xulayen.com:8888/auth&response_type=code&scope=snsapi_base&state=STATE&component_appid=wx9a1a29d63b33cd3d#wechat_redirect
+
+//https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxc46c96addcb23ab9&redirect_uri=http://wxauth.xulayen.com:8888/auth&response_type=code&scope=snsapi_userinfo&state=STATE&component_appid=wx9a1a29d63b33cd3d#wechat_redirect
