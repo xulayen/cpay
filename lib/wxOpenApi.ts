@@ -149,14 +149,15 @@ export class WxOpenApi {
             expires_time: format(addSeconds(new Date(), res.expires_in), "yyyy-MM-dd HH:mm:ss")
         };
 
+        this.UpdateRedisToken(input);
+
         if (await BLL.CpayOpenBLL.AppidHasAuth(input.appid)) {
-            //已授权
+            //已授权的公众号再次扫描，需要更新Token和刷新Token
+            BLL.CpayOpenBLL.UpdateWillExpireToken(input);
             return;
         }
 
-
         BLL.CpayOpenBLL.InsertOpenAuth(input);
-        this.UpdateRedisToken(input);
         this.GetAuthorizer_InfoAndInsert(input.appid);
     }
 
