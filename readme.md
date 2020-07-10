@@ -20,7 +20,7 @@
 | 申请退款        | ✔      |   ✖    |   ✖    |
 | 查询退款        | ✔      |   ✖    |   ✖    |
 | 短链接生成        | ✔      |   ✖    |   ✖    |
-| 公众号获取openid        | ✔      |   ✖    |   ✖    |
+| 网页授权        | ✔      |   ✔    |   ✖    |
 
 
 ## 安装
@@ -321,7 +321,7 @@ orderinfo = await cPay.BaseApi.ShortUrl(paydata);
 
 ```
 
-#### 公众号获取openid
+#### 公众号发起网页授权
 
 ``` js
 
@@ -329,6 +329,46 @@ app.get('/auth', async function (req: any, res: any, next: any) {
     let ojsapipay = new cPay.JsApiPay(req, res, next);
     await ojsapipay.GetWeixinUserInfo('网页应用回调地址', "是否是静默授权，Boolean类型");
     // 打印微信用户信息
+    console.log(ojsapipay.WeixinUserInfo);
+});
+
+
+```
+
+
+## 微信开放平台
+
+### 开放平台代替公众号发起网页授权
+
+- 方式一：回调地址如果为当前路由地址
+
+``` js
+
+weixin.Redirect_uri="http://开放平台设置的域名/open/getwxinfo";
+app.get('/open/getwxinfo', async function (req: any, res: any, next: any) {
+    let ojsapipay = new cPay.AccountWebsiteAuth(req, res, next);
+    let wxinfo = await ojsapipay.GetWeixinUserInfo("wx97e377b7691b236a");
+    console.log(wxinfo);
+    console.log(ojsapipay.WeixinUserInfo);
+});
+
+
+```
+
+- 方式二：回调地址和发起请求地址不一样
+
+``` js
+
+weixin.Redirect_uri="http://开放平台设置的域名/wechat/authorize-code";
+app.get('/open/getwxinfo', async function (req: any, res: any, next: any) {
+    let ojsapipay = new cPay.AccountWebsiteAuth(req, res, next);
+    let wxinfo = await ojsapipay.GetWeixinUserInfo("wx97e377b7691b236a");
+});
+
+app.get('/wechat/authorize-code', async function (req: any, res: any, next: any) {
+   let ojsapipay = new cPay.AccountWebsiteAuth(req, res, next);
+    let wxinfo = await ojsapipay.GetWeixinUserInfoFromCode("wx97e377b7691b236a");
+    console.log(wxinfo);
     console.log(ojsapipay.WeixinUserInfo);
 });
 

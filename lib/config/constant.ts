@@ -109,6 +109,15 @@ export default class Constant {
     public static WEIXIN_auth2_access_token: string = "https://api.weixin.qq.com/sns/oauth2/access_token?";
 
     /**
+     * https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/Official_Accounts/official_account_website_authorization.html
+     * 根据code获取token、openID
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static WEIXIN_auth2_open_access_token:string="https://api.weixin.qq.com/sns/oauth2/component/access_token";
+
+    /**
      * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
      * 刷新Token
      * @static

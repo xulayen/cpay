@@ -284,3 +284,19 @@ export class SceneInfo {
 
     }
 }
+
+export class WeixinUserInfo {
+    constructor() {
+
+    }
+    public openid: string;
+    public nickname: string;
+    public sex: string;
+    public province: string;
+    public city: string;
+    public country: string;
+    public headimgurl: string;
+    public privilege: string[];
+    public unionid: string;
+}
+

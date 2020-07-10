@@ -120,7 +120,7 @@ export class CpayOpenBLL extends BaseBLL {
     }
 
     public static async InsertOpenAuth(inputRes: OpenAuth): Promise<boolean> {
-        let params_columns: string[] = [':appid', ':access_token', ':expires_in', ':refresh_token', ':expires_time'], res;
+        let params_columns: string[] = [':appid', ':access_token', ':expires_in', ':refresh_token', ':expires_time',":component_appid"], res;
         let { columns, params_data } = this.BuildParametersPlus(params_columns, inputRes);
         res = await DAL.DbHelper.instance.insert(this.tablename, columns, params_columns, params_data);
         return res && res.affectedRows > 0;
@@ -152,9 +152,9 @@ export class CpayOpenBLL extends BaseBLL {
 
     public static async UpdateWillExpireToken(inputRes: OpenAuth): Promise<Boolean> {
         console.log('开始更新：');
-        let columns = ` access_token=:access_token,expires_in=:expires_in,refresh_token=:refresh_token,expires_time=:expires_time `,
-            condition = ` appid=:appid `, params: any = {};
-        params = this.BuildParameters(`${columns},${condition},`, inputRes);
+        let columns = ` access_token=:access_token,expires_in=:expires_in,refresh_token=:refresh_token,expires_time=:expires_time, appid=:appid, component_appid=:component_appid  `,
+            condition = ` appid=:appid and component_appid=:component_appid `, params: any = {};
+        params = this.BuildParameters(`${columns},`, inputRes);
         let res_order = await DAL.DbHelper.instance.update(this.tablename, columns, condition, params);
         console.log('更新完成：' + res_order.affectedRows);
         return res_order.affectedRows > 0;

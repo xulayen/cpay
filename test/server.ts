@@ -40,6 +40,21 @@ app.get('/auth', async function (req: any, res: any, next: any) {
     console.log(ojsapipay.WeixinUserInfo);
 });
 
+app.get('/open/getwxinfo', async function (req: any, res: any, next: any) {
+    let ojsapipay = new cPay.AccountWebsiteAuth(req, res, next);
+    let wxinfo = await ojsapipay.GetWeixinUserInfo("wx97e377b7691b236a");
+    console.log(wxinfo);
+    console.log(ojsapipay.WeixinUserInfo);
+});
+
+app.get('/wechat/authorize-code', async function (req: any, res: any, next: any) {
+    let ojsapipay = new cPay.AccountWebsiteAuth(req, res, next);
+    let wxinfo = await ojsapipay.GetWeixinUserInfoFromCode("wx97e377b7691b236a");
+    console.log(wxinfo);
+    console.log(ojsapipay.WeixinUserInfo);
+});
+
+
 
 app.post('/notice', async function (req: any, res: any, next: any) {
     console.log('推送-通知：notice');

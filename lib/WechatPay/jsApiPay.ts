@@ -28,7 +28,7 @@ export class JsApiPay extends BasePay {
     private response: any;
     private next: any;
     private config: any;
-    public WeixinUserInfo: WeixinUserInfo;
+    public WeixinUserInfo: cPay_Model.WeixinUserInfo;
     constructor(request: any, response: any, next: any) {
         super();
         this.request = request;
@@ -158,7 +158,7 @@ export class JsApiPay extends BasePay {
             if (res.errcode && res.errcode > 0) {
                 return false;
             } else {
-                this.WeixinUserInfo = new WeixinUserInfo();
+                this.WeixinUserInfo = new cPay_Model.WeixinUserInfo();
                 this.WeixinUserInfo = res;
             }
             return true;
@@ -167,17 +167,3 @@ export class JsApiPay extends BasePay {
 }
 
 
-class WeixinUserInfo {
-    constructor() {
-
-    }
-    public openid: string;
-    public nickname: string;
-    public sex: string;
-    public province: string;
-    public city: string;
-    public country: string;
-    public headimgurl: string;
-    public privilege: string[];
-    public unionid: string;
-}

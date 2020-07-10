@@ -146,7 +146,8 @@ export class WxOpenApi {
             access_token: obj_res.authorizer_access_token,
             refresh_token: obj_res.authorizer_refresh_token,
             expires_in: res.expires_in,
-            expires_time: format(addSeconds(new Date(), res.expires_in), "yyyy-MM-dd HH:mm:ss")
+            expires_time: format(addSeconds(new Date(), res.expires_in), "yyyy-MM-dd HH:mm:ss"),
+            component_appid: Config.GetOpenAppid()
         };
 
         this.UpdateRedisToken(input);
@@ -177,11 +178,11 @@ export class WxOpenApi {
                 authorizer_appid: appid
             }
         });
-        
+
         console.log('GetAuthorizer_info')
         console.log(res);
 
-        res=res.authorizer_info;
+        res = res.authorizer_info;
 
         let input = {
             appid: appid,
@@ -196,7 +197,7 @@ export class WxOpenApi {
             business_info: res && JSON.stringify(res.business_info) || '',
             qrcode_url: res && res.qrcode_url || '',
             miniprograminfo: res && res.miniprograminfo || '',
-            signature:res && res.signature || ''
+            signature: res && res.signature || ''
         };
 
 
@@ -272,12 +273,13 @@ export class WxOpenApi {
             refresh_token: res.authorizer_refresh_token,
             expires_in: res.expires_in,
             appid: current.appid,
-            expires_time: format(addSeconds(new Date(), res.expires_in), "yyyy-MM-dd HH:mm:ss")
+            expires_time: format(addSeconds(new Date(), res.expires_in), "yyyy-MM-dd HH:mm:ss"),
+            component_appid: Config.GetOpenAppid(),
         };
 
         //在这里更新数据库
 
-        BLL.CpayOpenBLL.UpdateWillExpireToken(input)
+        BLL.CpayOpenBLL.UpdateWillExpireToken(input);
 
         this.UpdateRedisToken(input);
 
