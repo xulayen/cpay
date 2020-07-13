@@ -79,3 +79,48 @@ CREATE TABLE `t_cpay_order_detail` (
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- 开放平台涉及的Token数据表------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS cpay.`t_cpay_open_authorization`;
+use cpay;
+CREATE TABLE `t_cpay_open_authorization` (
+`appid`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`component_appid`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '开放平台APPID' ,
+`access_token`  varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'token' ,
+`expires_in`  int(100) NULL DEFAULT NULL COMMENT '失效时间' ,
+`refresh_token`  varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '刷新token' ,
+`create_time`  datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间' ,
+`expires_time`  datetime NULL DEFAULT NULL COMMENT '失效时间' ,
+`update_time`  datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间' ,
+PRIMARY KEY (`appid`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;
+
+
+DROP TABLE IF EXISTS cpay.`t_cpay_open_authorization_info`;
+use cpay;
+CREATE TABLE `t_cpay_open_authorization_info` (
+`appid`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '授权方APPID' ,
+`component_appid`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '开放平台ID' ,
+`nick_name`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '昵称' ,
+`head_img`  varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '头像' ,
+`service_type_info`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '公众号类型 0订阅号 1由历史老帐号升级后的订阅号  2服务号' ,
+`verify_type_info`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '公众号认证类型 -1未认证  0微信认证  1新浪微博认证  2腾讯微博认证  3已资质认证通过但还未通过名称认证  4已资质认证通过、还未通过名称认证，但通过了新浪微博认证  5已资质认证通过、还未通过名称认证，但通过了腾讯微博认证' ,
+`user_name`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '原始 ID' ,
+`principal_name`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '主体名称' ,
+`signature`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '小程序使用，帐号介绍' ,
+`alias`  varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '公众号所设置的微信号，可能为空' ,
+`business_info`  varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '用以了解功能的开通状况（0代表未开通，1代表已开通）' ,
+`qrcode_url`  varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '二维码图片的 URL，开发者最好自行也进行保存' ,
+`miniprograminfo`  varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '小程序配置，根据这个字段判断是否为小程序类型授权' ,
+PRIMARY KEY (`appid`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;
+
+ALTER TABLE t_cpay_open_authorization MODIFY COLUMN update_time datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间' ;
