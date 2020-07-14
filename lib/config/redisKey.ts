@@ -24,11 +24,16 @@ export enum RedisKeyEnum {
     /**
      * 接口调用令牌
      */
-    redis_key_authorizer_access_token = "cpay:wxopen:{0}:authorizer_access_token",
+    redis_key_authorizer_access_token = "cpay:wxopen:{0}:{1}:authorizer_access_token",
 
     /**
      * 接口刷新令牌
      */
-    redis_key_refresh_authorizer_access_token = "cpay:wxopen:{0}:refresh_authorizer_access_token"
+    redis_key_refresh_authorizer_access_token = "cpay:wxopen:{0}:{1}:refresh_authorizer_access_token",
+
+    /**
+     * JSSDK ticket
+     */
+    redis_key_JSSDK_TICKET = "cpay:wxopen:{0}:{1}:JSSDK_TICKET"
 
 }

@@ -7,20 +7,21 @@
 
 | 功能        | 微信（基于公众号）    |  微信（基于开放平台）    | 支付宝  |
 | --------   | -----:   | :----: | :----: |
-| 付款码支付        | ✔      |   ✖    |   ✖    |
-| 扫码支付        | ✔      |   ✖    |   ✖    |
-| H5支付        | ✔    |   ✖    |   ✖    |
-| JSAPI支付        | ✔      |   ✖    |   ✖    |
-| 小程序支付        | ✔      |   ✖    |   ✖    |
-| APP支付        | ✔      |   ✖    |   ✖    |
-| 刷脸支付        | ✖      |   ✖    |   ✖    |
-| 支付结果通知        | ✔      |   ✖    |   ✖    |
-| 查询订单       | ✔      |   ✖    |   ✖    |
-| 撤销订单        | ✔      |   ✖    |   ✖    |
-| 申请退款        | ✔      |   ✖    |   ✖    |
-| 查询退款        | ✔      |   ✖    |   ✖    |
-| 短链接生成        | ✔      |   ✖    |   ✖    |
+| 付款码支付        | ✔      |   微信开放平台不支持    |   ✖    |
+| 扫码支付        | ✔      |   微信开放平台不支持    |   ✖    |
+| H5支付        | ✔    |   微信开放平台不支持    |   ✖    |
+| JSAPI支付        | ✔      |   微信开放平台不支持    |   ✖    |
+| 小程序支付        | ✔      |   微信开放平台不支持    |   ✖    |
+| APP支付        | ✔      |   微信开放平台不支持    |   ✖    |
+| 刷脸支付        | ✖      |   微信开放平台不支持    |   ✖    |
+| 支付结果通知        | ✔      |   微信开放平台不支持    |   ✖    |
+| 查询订单       | ✔      |   微信开放平台不支持    |   ✖    |
+| 撤销订单        | ✔      |   微信开放平台不支持    |   ✖    |
+| 申请退款        | ✔      |   微信开放平台不支持    |   ✖    |
+| 查询退款        | ✔      |   微信开放平台不支持    |   ✖    |
+| 短链接生成        | ✔      |   微信开放平台不支持    |   ✖    |
 | 网页授权        | ✔      |   ✔    |   ✖    |
+| JSSDK        |   ✖   |   ✔    |   ✖    |
 
 
 ## 安装
@@ -372,6 +373,65 @@ app.get('/wechat/authorize-code', async function (req: any, res: any, next: any)
     console.log(ojsapipay.WeixinUserInfo);
 });
 
+
+```
+
+### 开放平台代替公众号使用JSSDK
+
+> 在申请第三方平台时填写的网页开发域名，将作为旗下授权公众号的 JS SDK 安全域名（详情见“接入前必读”-“申请资料说明”）
+> 最多可设置三个，用“;”隔开
+
+``` js
+// 服务端
+app.get('/jssdk', async function (req: any, res: any, next: any) {
+    let jssdk = new cPay.JssdkSign();
+    let data = await jssdk.GetJSSDK('公众号APPID','当前需要使用JSSDK的页面地址');
+    // 输出参数到模版jssdk
+    res.render('jssdk', { data: data });
+});
+
+```
+
+*关于JSSDK基于Jquery常用方法封装组件，请到*[*NPM包微信JSSDK*](https://www.npmjs.com/package/jquery_wechat_sdk)*查看。注意！此组件不在维护，如有需要自行下载修改源码！*
+
+``` js
+// 客户端
+<script src="http://res2.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+
+<script>
+    wx.config({
+        debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        appId: '<%= data.appid%>', // 必填，公众号的唯一标识
+        timestamp: '<%= data.timestamp %>', // 必填，生成签名的时间戳
+        nonceStr: '<%= data.noncestr%>', // 必填，生成签名的随机串
+        signature: '<%= data.signature%>',// 必填，签名
+        jsApiList: ["scanQRCode"] // 必填，需要使用的JS接口列表
+    });
+
+    wx.ready(function () {
+        // config信息验证后会执行ready方法，所有接口调用都必须在config接口获得结果之后，config是一个客户端的异步操作，所以如果需要在页面加载时就调用相关接口，则须把相关接口放在ready函数中调用来确保正确执行。对于用户触发时才调用的接口，则可以直接调用，不需要放在ready函数中。
+        console.log('OK');
+    });
+    wx.error(function (res) {
+        // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+        console.log('error');
+    });
+
+    function Scan() {
+        wx.scanQRCode({
+            needResult: 0, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+            scanType: ["qrCode", "barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+            success: function (res) {
+                var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
+                console.log(result);
+            }
+        });
+    }
+</script>
+
+<button onclick="Scan()" style="width: 150px; height: 40px; background-color: beige;">
+    扫一扫
+</button>
 
 ```
 

@@ -197,6 +197,13 @@ export class WxPayData {
         return pass_uppercase;
     }
 
+    SHA1(plaintext?: string) {
+        if(!plaintext){
+            plaintext = this.ToUrl();
+        }
+        return cryptojs.SHA1(plaintext).toString();
+    }
+
     GetValues() {
         return this.m_values;
     }
@@ -236,9 +243,9 @@ export class WeixinConfig {
         this.ReportLevel = "";
         this.LogLevel = "";
         this.Redirect_uri = "";
-        this.OpenAppid="";
-        this.OpenAppsecret="";
-        this.OpenAesKey="";
+        this.OpenAppid = "";
+        this.OpenAppsecret = "";
+        this.OpenAesKey = "";
     }
     Facid: string;
     AppID: string;
@@ -253,9 +260,9 @@ export class WeixinConfig {
     ReportLevel: string;
     LogLevel: string;
     Redirect_uri: string;
-    OpenAppid:string;
-    OpenAppsecret:string;
-    OpenAesKey:string;
+    OpenAppid: string;
+    OpenAppsecret: string;
+    OpenAesKey: string;
 }
 
 /**

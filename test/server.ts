@@ -359,12 +359,20 @@ app.get('/openauth/callback', function (req: any, res: any, next: any) {
     res.render('success');
 });
 
+//http://public.xulayen.com:8888/jssdk
+app.get('/jssdk', async function (req: any, res: any, next: any) {
+    let jssdk = new cPay.JssdkSign();
+    let data = await jssdk.GetJSSDK('wx97e377b7691b236a','http://public.xulayen.com/jssdk');
+    res.render('jssdk', { data: data });
+});
 
-app.listen(8888, function (err: any) {
+
+
+app.listen(80, function (err: any) {
     if (err) {
         console.error('err:', err);
     } else {
-        var _content = `===> api server is running at at http://127.0.0.1:8888`;
+        var _content = `===> api server is running at at http://127.0.0.1:80`;
         console.info(_content);
     }
 });

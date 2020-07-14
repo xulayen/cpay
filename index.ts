@@ -11,6 +11,7 @@ import * as Notify from './lib/Notice';
 import { WxPayApi } from './lib/wxPayApi';
 import { ComponentLogin } from './lib/WechatOpen/componentLogin';
 import { AccountWebsiteAuth } from './lib/WechatOpen/accountWebsiteAuth';
+import { JssdkSign } from './lib/WechatOpen/jssdkSign';
 import { Util } from './lib/Util';
 
 const cPay = {
@@ -26,6 +27,7 @@ const cPay = {
     Notify,
     ComponentLogin,
     AccountWebsiteAuth,
+    JssdkSign,
     BaseApi: WxPayApi,
     Util
 
