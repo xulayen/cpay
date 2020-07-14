@@ -115,7 +115,7 @@ export default class Constant {
      * @type {string}
      * @memberof Constant
      */
-    public static WEIXIN_auth2_open_access_token:string="https://api.weixin.qq.com/sns/oauth2/component/access_token";
+    public static WEIXIN_auth2_open_access_token: string = "https://api.weixin.qq.com/sns/oauth2/component/access_token";
 
     /**
      * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
@@ -198,4 +198,13 @@ export default class Constant {
      * 获取基础信息
      */
     public static readonly WEIXIN_OPEN_get_authorizer_info: string = "https://api.weixin.qq.com/cgi-bin/component/api_get_authorizer_info?component_access_token={0}";
+
+    /**
+     * 获取JSSDK 所需ticket
+     *
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static readonly WEIXIN_OPEN_GET_JSsdk_ticket: string = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token={0}&type=jsapi";
 }

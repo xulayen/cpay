@@ -208,8 +208,9 @@ export class WxOpenApi {
 
 
     private static UpdateRedisToken(input: any) {
-        cPay_Util.Util.redisClient.set(cPay_Util.Util.format(RedisKeyEnum.redis_key_authorizer_access_token, input.appid), input.access_token, input.expires_in - 1000);
-        cPay_Util.Util.redisClient.set(cPay_Util.Util.format(RedisKeyEnum.redis_key_refresh_authorizer_access_token, input.appid), input.refresh_token, 60 * 60 * 24 * 30);
+        let Config: cPay_Config.IWxConfig = cPay_Config.Config.GetWxPayConfig();
+        cPay_Util.Util.redisClient.set(cPay_Util.Util.format(RedisKeyEnum.redis_key_authorizer_access_token, Config.GetOpenAppid(), input.appid), input.access_token, input.expires_in - 1000);
+        cPay_Util.Util.redisClient.set(cPay_Util.Util.format(RedisKeyEnum.redis_key_refresh_authorizer_access_token, Config.GetOpenAppid(), input.appid), input.refresh_token, 60 * 60 * 24 * 30);
     }
 
     private static start: boolean = false;
