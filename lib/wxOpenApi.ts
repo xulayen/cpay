@@ -245,7 +245,7 @@ export class WxOpenApi {
 
 
 
-
+    
     private static async RefeshAuthorizer_access_token(current: any): Promise<void> {
         let Config: cPay_Config.IWxConfig = cPay_Config.Config.GetWxPayConfig();
         let component_access_token = await this.GetComponent_access_token();
