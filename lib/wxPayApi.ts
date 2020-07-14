@@ -130,6 +130,68 @@ export class WxPayApi extends BaseApi {
     }
 
     /**
+     * 发送红包
+     *
+     * @static
+     * @param {Model.WxPayData} inputObj
+     * @returns {Promise<Model.ResponseData>}
+     * @memberof WxPayApi
+     */
+    static async SendRedPack(inputObj: Model.WxPayData): Promise<Model.ResponseData> {
+        let url = Constant.WEIXIN_wxpay_sendredpack, response_data = new Model.ResponseData();
+        //检测必填参数
+        if (!inputObj.IsSet("send_name")) {
+            throw new WxPayException("发放红包接口接口必填参数send_name！");
+        }
+        else if (!inputObj.IsSet("re_openid")) {
+            throw new WxPayException("发放红包接口接口必填参数re_openid！");
+        }
+        else if (!inputObj.IsSet("total_amount")) {
+            throw new WxPayException("发放红包接口接口必填参数total_amount！");
+        }
+        else if (!inputObj.IsSet("total_num")) {
+            throw new WxPayException("发放红包接口接口必填参数total_num！");
+        }
+        else if (!inputObj.IsSet("wishing")) {
+            throw new WxPayException("发放红包接口接口必填参数wishing！");
+        }
+        else if (!inputObj.IsSet("act_name")) {
+            throw new WxPayException("发放红包接口接口必填参数act_name！");
+        }
+        else if (!inputObj.IsSet("remark")) {
+            throw new WxPayException("发放红包接口接口必填参数remark！");
+        }
+
+        inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr());
+        inputObj.SetValue("mch_billno", WxPayApi.GenerateOutTradeNo());
+        inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID());
+        inputObj.SetValue("wxappid", WxPayConfig.GetWxPayConfig().GetAppID());
+        inputObj.SetValue("client_ip", WxPayConfig.GetWxPayConfig().GetIp());
+
+        inputObj.SetValue("sign", inputObj.MakeSign());
+        let xml = inputObj.ToXml();
+
+        console.log("WxPayApi", "红包发放 request : " + xml);
+        let res = await Util.setMethodWithUri({
+            url: url,
+            method: 'post',
+            data: xml,
+            headers: {
+                'content-type': 'text/xml'
+            },
+            cert: WxPayConfig.GetWxPayConfig().GetSSlCertPath(),
+            password: WxPayConfig.GetWxPayConfig().GetSSlCertPassword()
+        });
+        console.log("WxPayApi", "红包发放 response : " + res);
+        this.Log(inputObj, res, url);
+
+        let result = new Model.WxPayData();
+        await result.FromXml(res);
+        response_data = this.Flatten(result);
+        return response_data;
+    }
+
+    /**
      *
      * 查询订单
      * @static

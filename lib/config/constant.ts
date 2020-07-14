@@ -50,6 +50,16 @@ export default class Constant {
 
 
     /**
+     *
+     * https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_4&index=3
+     * 发放红包
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static readonly WEIXIN_wxpay_sendredpack: string = "https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack";
+
+    /**
      * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_3
      * 关闭订单
      * 
