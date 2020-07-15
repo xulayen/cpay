@@ -5,7 +5,7 @@
 
 # 微信/支付宝支付 For Typescript Express
 
-| 功能        | 微信（基于公众号）    |  微信（基于开放平台）    | 支付宝  |
+| 功能        | 微信（基于公众/商户号）    |  微信（基于开放平台）    | 支付宝  |
 | --------   | -----:   | :----: | :----: |
 | 付款码支付        | ✔      |   微信开放平台不支持    |   ✖    |
 | 扫码支付        | ✔      |   微信开放平台不支持    |   ✖    |
@@ -22,6 +22,7 @@
 | 短链接生成        | ✔      |   微信开放平台不支持    |   ✖    |
 | 网页授权        | ✔      |   ✔    |   ✖    |
 | JSSDK        |   ✖   |   ✔    |   ✖    |
+| 红包        |   ✔   |   微信开放平台不支持    |   ✖    |
 
 
 ## 安装
@@ -238,6 +239,25 @@ app.post('/wxapay', async function (req: any, res: any, next: any) {
     let data = await appPay.UnifiedOrder("商户订单号","其他可选参数，JSON对象"),
         parameters = appPay.GetAppApiPayParameters();
     res.send(parameters);
+});
+
+```
+
+#### 微信现金红包
+
+``` js
+
+app.get('/sendredpack', async function (req: any, res: any, next: any) {
+    let redpack = new cPay.SendRedpack(), 
+        redinfo = new cPay.Model.RedPackInfo();
+    redinfo.act_name = "活动名称";
+    redinfo.openid = "微信OPENID";
+    redinfo.remark = "备注";
+    redinfo.send_name = "商户名称";
+    redinfo.total_amount = "金额，单位：分";
+    redinfo.scene_id = "场景类型，举例：cPay.Model.RedPackSceneEnum.Draw";
+    redinfo.wishing = "祝福语，如：感谢您参加猜灯谜活动，祝您元宵节快乐！";
+    let data = await redpack.Send(redinfo);
 });
 
 ```

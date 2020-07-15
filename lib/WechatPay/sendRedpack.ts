@@ -26,23 +26,31 @@ export class SendRedpack extends BasePay {
     }
 
 
-    public async Send(): Promise<cPay_Model.ResponseData> {
-
-        let req = new cPay_Model.WxPayData(), response_data = new cPay_Model.ResponseData();
-        
-
-
-        req.SetValue("send_name", "中商网络");
-        req.SetValue("re_openid", "oAU3pjt3cCaaqCm4jjVuB2kjuaXo");
-        req.SetValue("total_amount", 1);
+    /**
+     * 发送红包
+     * @param {cPay_Model.RedPackInfo} redpack 红包对象
+     * @param {*} [options] 可选参数对象如{key:value}
+     * @returns {Promise<cPay_Model.ResponseData>}
+     * @memberof SendRedpack
+     */
+    public async Send(redpack: cPay_Model.RedPackInfo, options?: any): Promise<cPay_Model.ResponseData> {
+        let req = new cPay_Model.WxPayData(),
+            response_data = new cPay_Model.ResponseData();
+        req.SetValue("send_name", redpack.send_name);
+        req.SetValue("re_openid", redpack.openid);
+        req.SetValue("total_amount", redpack.total_amount);
         req.SetValue("total_num", 1);
-        req.SetValue("wishing", "恭喜发财！！！");
-        req.SetValue("act_name", "红包活动！");
-        req.SetValue("remark", "测试");
-
-
+        req.SetValue("wishing", redpack.wishing);
+        req.SetValue("act_name", redpack.act_name);
+        req.SetValue("remark", redpack.remark);
+        if (redpack.scene_id) {
+            req.SetValue("scene_id", redpack.scene_id);
+        }
+        for (let key in options) {
+            req.SetValue(key, options[key]);
+        }
+        response_data = await WxPayApi.SendRedPack(req);
         return response_data;
-
     }
 
 

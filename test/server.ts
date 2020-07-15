@@ -362,11 +362,26 @@ app.get('/openauth/callback', function (req: any, res: any, next: any) {
 //http://public.xulayen.com:8888/jssdk
 app.get('/jssdk', async function (req: any, res: any, next: any) {
     let jssdk = new cPay.JssdkSign();
-    let data = await jssdk.GetJSSDK('wx97e377b7691b236a','http://public.xulayen.com/jssdk');
+    let data = await jssdk.GetJSSDK('wx97e377b7691b236a', 'http://public.xulayen.com/jssdk');
     res.render('jssdk', { data: data });
 });
 
 
+//http://public.xulayen.com:8888/sendredpack
+app.get('/sendredpack', async function (req: any, res: any, next: any) {
+    let redpack = new cPay.SendRedpack(), redinfo = new cPay.Model.RedPackInfo();
+    redinfo.act_name = "测试活动";
+    redinfo.openid = "oi4qm1cAO4em3nUtBgOsOORvJhOk";
+    redinfo.remark = "测试";
+    redinfo.send_name = "中商网络";
+    redinfo.total_amount = 100;
+    redinfo.scene_id = cPay.Model.RedPackSceneEnum.Draw;
+    redinfo.wishing = "感谢您参加猜灯谜活动，祝您元宵节快乐！";
+    let data = await redpack.Send(redinfo);
+    console.log(data);
+    res.send(data);
+    // res.render('redpack', { data: data });
+});
 
 app.listen(80, function (err: any) {
     if (err) {
@@ -376,6 +391,7 @@ app.listen(80, function (err: any) {
         console.info(_content);
     }
 });
+
 
 
 

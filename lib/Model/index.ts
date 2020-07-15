@@ -5,6 +5,7 @@ var xml2js = require("xml2js");
 var cryptojs = require("crypto-js");
 var MD5 = require('crypto-js/md5');
 
+
 export class OrderInfo {
     constructor(body?: string, detail?: string, attach?: string, goods_tag?: string, total_fee?: number) {
         this.body = body;
@@ -198,7 +199,7 @@ export class WxPayData {
     }
 
     SHA1(plaintext?: string) {
-        if(!plaintext){
+        if (!plaintext) {
             plaintext = this.ToUrl();
         }
         return cryptojs.SHA1(plaintext).toString();
@@ -306,4 +307,125 @@ export class WeixinUserInfo {
     public privilege: string[];
     public unionid: string;
 }
+
+
+export enum RedPackSceneEnum {
+
+    /**
+     * 商品促销
+     */
+    Promotion = "PRODUCT_1",
+
+    /**
+     * 抽奖
+     */
+    Draw = "PRODUCT_2",
+
+
+    /**
+     * 虚拟物品兑奖
+     */
+    VirtualGoodsCash = "PRODUCT_3",
+
+
+    /**
+     * 企业内部福利
+     */
+    InternalWelfareOfEnterprises = "PRODUCT_4",
+
+
+    /**
+     * 渠道分润
+     */
+    ChannelShare = "PRODUCT_5",
+
+
+    /**
+     * 保险回馈
+     */
+    InsuranceFeedback = "PRODUCT_6",
+
+
+    /**
+     * 彩票派奖
+     */
+    LotteryPrize = "PRODUCT_7",
+
+
+    /**
+     * 税务刮奖
+     */
+    TaxPrize = "PRODUCT_8"
+
+}
+
+export class RedPackInfo {
+    constructor() {
+
+    }
+
+    /**
+     * 发送方
+     * @type {string}
+     * @memberof RedPackInfo
+     */
+    public send_name: string;
+
+    /**
+     * openid
+     *
+     * @type {string}
+     * @memberof RedPackInfo
+     */
+    public openid: string;
+
+    /**
+     * 金额，单位：分
+     *
+     * @type {number}
+     * @memberof RedPackInfo
+     */
+    public total_amount: number;
+
+    /**
+     * 总数量
+     *
+     * @type {number}
+     * @memberof RedPackInfo
+     */
+    public total_num: number;
+    
+    /**
+     * 祝福语
+     *
+     * @type {string}
+     * @memberof RedPackInfo
+     */
+    public wishing: string;
+
+    /**
+     * 活动名称
+     *
+     * @type {string}
+     * @memberof RedPackInfo
+     */
+    public act_name: string;
+
+    /**
+     * 备注
+     *
+     * @type {string}
+     * @memberof RedPackInfo
+     */
+    public remark: string;
+
+    /**
+     * 
+     * 场景信息
+     * @type {RedPackSceneEnum}
+     * @memberof RedPackInfo
+     */
+    public scene_id: RedPackSceneEnum;
+}
+
 

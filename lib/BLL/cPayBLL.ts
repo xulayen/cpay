@@ -1,4 +1,5 @@
 import * as DAL from '../DAL/dbHelper';
+import * as Model from '../Model';
 
 class BaseBLL {
     public static BuildParameters(params: string, orderRes: any): any {
@@ -184,5 +185,54 @@ export class CpayOpenBLL extends BaseBLL {
 
     }
 
+
+}
+
+
+export class CpayRedPackBLL extends BaseBLL {
+
+    static readonly tablename: string = "t_cpay_redpack";
+    constructor() {
+        super();
+    }
+
+    /**
+     * 插入红包发放记录
+     * @static
+     * @param {string} out_trade_no 商户订单号
+     * @param {string} mch_id 企业商户号
+     * @param {string} appid 企业公众号appid
+     * @param {Model.RedPackInfo} input 红包入参
+     * @param {*} return_res 返回参数
+     * @returns
+     * @memberof CpayRedPackBLL
+     */
+    public static async InsertRedPackInfo(inputOrder: Model.WxPayData, return_res: Model.WxPayData) {
+        let order = inputOrder.ToJson(), outres = return_res.ToJson(), input = new Model.RedPackInfo();
+        input.act_name = order.act_name;
+        input.openid = order.re_openid;
+        input.remark = order.remark;
+        input.scene_id = order.scene_id;
+        input.send_name = order.send_name;
+        input.total_amount = order.total_amount;
+        input.total_num = order.total_num;
+        input.wishing = order.wishing;
+        let inputRes = {
+            out_trade_no: inputOrder && order.mch_billno,
+            mch_id: inputOrder && order.mch_id,
+            appid: inputOrder && order.wxappid,
+            ...input,
+            return_code: outres && outres.return_code,
+            return_msg: outres && outres.return_msg,
+            result_code: outres && outres.result_code,
+            err_code: outres && outres.err_code,
+            err_code_des: outres && outres.err_code_des,
+            transaction_id: outres && outres.send_listid
+        };
+        let params_columns: string[] = [':out_trade_no', ':transaction_id', ':mch_id', ':appid', ':send_name', ':openid', ':total_amount', ':total_num', ':wishing', ':act_name', ':scene_id', ':risk_info', ':return_code', ':return_msg', ':result_code', ':err_code', ':err_code_des'], res;
+        let { columns, params_data } = this.BuildParametersPlus(params_columns, inputRes);
+        res = await DAL.DbHelper.instance.insert(this.tablename, columns, params_columns, params_data);
+        return res && res.affectedRows > 0;
+    }
 
 }

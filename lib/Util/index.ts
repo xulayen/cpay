@@ -71,12 +71,16 @@ export class Util {
     }
 
     public static async setMethodWithUri(option: any) {
-        let certFile, cert;
+        let certFile, cert, keyFile;
         if (option.cert) {
-            certFile = path.resolve(option.cert);
+            certFile = path.resolve(option.cert + "\\apiclient_cert.pem");
+            keyFile = path.resolve(option.cert + "\\apiclient_key.pem");
             cert = {
-                cert: fs.readFileSync(certFile),
-                passphrase: option.password
+                agentOptions: {
+                    cert: fs.readFileSync(certFile),
+                    key: fs.readFileSync(keyFile),
+                    passphrase: option.password
+                }
             };
         };
         var __option = {

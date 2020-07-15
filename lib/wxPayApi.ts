@@ -5,6 +5,7 @@ import * as cPay_Exception from './Exception/wxPayException';
 import Constant from './Config/constant';
 import * as Model from './Model';
 import * as BLL from './BLL/cPayBLL';
+import cPay from 'index';
 
 const Util = cPay_Util.Util;
 const WxPayConfig = cPay_Config.Config;
@@ -43,10 +44,10 @@ class BaseApi {
     }
 
     public static async Log(input: Model.WxPayData, output: any, uri: string, times: number = 0): Promise<void> {
-        let out_trade_no = input.GetValue("out_trade_no").toString(), req_input = {
+        let out_trade_no = input.GetValue("out_trade_no").toString() || input.GetValue("mch_billno").toString(), req_input = {
             out_trade_no: out_trade_no,
             req: input.ToXml(),
-            response: output,
+            response: Util.IsObject(output) ? output.message : output,
             uri: uri,
             times: times
         };
@@ -168,7 +169,7 @@ export class WxPayApi extends BaseApi {
         inputObj.SetValue("wxappid", WxPayConfig.GetWxPayConfig().GetAppID());
         inputObj.SetValue("client_ip", WxPayConfig.GetWxPayConfig().GetIp());
 
-        inputObj.SetValue("sign", inputObj.MakeSign());
+        inputObj.SetValue("sign", inputObj.MakeSign(Model.WxPayData.SIGN_TYPE_MD5));
         let xml = inputObj.ToXml();
 
         console.log("WxPayApi", "红包发放 request : " + xml);
@@ -180,13 +181,15 @@ export class WxPayApi extends BaseApi {
                 'content-type': 'text/xml'
             },
             cert: WxPayConfig.GetWxPayConfig().GetSSlCertPath(),
-            password: WxPayConfig.GetWxPayConfig().GetSSlCertPassword()
         });
         console.log("WxPayApi", "红包发放 response : " + res);
         this.Log(inputObj, res, url);
 
         let result = new Model.WxPayData();
         await result.FromXml(res);
+
+        BLL.CpayRedPackBLL.InsertRedPackInfo(inputObj, result);
+
         response_data = this.Flatten(result);
         return response_data;
     }
