@@ -53,6 +53,28 @@ export class SendRedpack extends BasePay {
         return response_data;
     }
 
+    /**
+     * 企业零钱转账
+     * @param {string} openid 微信openid
+     * @param {number} amount 金额，单位：分
+     * @param {string} desc 描述
+     * @param {*} [options] 可选参数对象如{key:value}
+     * @returns
+     * @memberof SendRedpack
+     */
+    public async Transfer(openid: string, amount: number, desc: string, options?: any) {
+        let req = new cPay_Model.WxPayData(),
+            response_data = new cPay_Model.ResponseData();
+        req.SetValue("openid", openid);
+        req.SetValue("amount", amount);
+        req.SetValue("desc", desc);
+        for (let key in options) {
+            req.SetValue(key, options[key]);
+        }
+        response_data = await WxPayApi.Transfers(req);
+        return response_data;
+    }
+
 
 
 }

@@ -60,6 +60,16 @@ export default class Constant {
     public static readonly WEIXIN_wxpay_sendredpack: string = "https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack";
 
     /**
+     *
+     * https://pay.weixin.qq.com/wiki/doc/api/tools/mch_pay.php?chapter=14_2
+     * 企业零钱转账
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static readonly WEIXIN_wxpay_transfers: string = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
+
+    /**
      * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_3
      * 关闭订单
      * 

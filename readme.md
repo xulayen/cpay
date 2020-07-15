@@ -23,6 +23,7 @@
 | 网页授权        | ✔      |   ✔    |   ✖    |
 | JSSDK        |   ✖   |   ✔    |   ✖    |
 | 红包        |   ✔   |   微信开放平台不支持    |   ✖    |
+| 零钱转账        |   ✔   |   微信开放平台不支持    |   ✖    |
 
 
 ## 安装
@@ -258,6 +259,17 @@ app.get('/sendredpack', async function (req: any, res: any, next: any) {
     redinfo.scene_id = "场景类型，举例：cPay.Model.RedPackSceneEnum.Draw";
     redinfo.wishing = "祝福语，如：感谢您参加猜灯谜活动，祝您元宵节快乐！";
     let data = await redpack.Send(redinfo);
+});
+
+```
+
+#### 微信零钱转账
+
+``` js
+
+app.get('/transfer', async function (req: any, res: any, next: any) {
+    let redpack = new cPay.SendRedpack();
+    let data = await redpack.Transfer("微信用户OPENID","金额，单位：分","描述");
 });
 
 ```

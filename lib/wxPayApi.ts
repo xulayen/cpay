@@ -195,6 +195,59 @@ export class WxPayApi extends BaseApi {
     }
 
     /**
+     * 企业零钱转账
+     *
+     * @static
+     * @param {Model.WxPayData} inputObj
+     * @returns {Promise<Model.ResponseData>}
+     * @memberof WxPayApi
+     */
+    static async Transfers(inputObj: Model.WxPayData): Promise<Model.ResponseData> {
+        let url = Constant.WEIXIN_wxpay_transfers, response_data = new Model.ResponseData();
+        //检测必填参数
+        if (!inputObj.IsSet("openid")) {
+            throw new WxPayException("发放红包接口接口必填参数openid！");
+        }
+        else if (!inputObj.IsSet("amount")) {
+            throw new WxPayException("发放红包接口接口必填参数amount！");
+        }
+        else if (!inputObj.IsSet("desc")) {
+            throw new WxPayException("发放红包接口接口必填参数desc！");
+        }
+
+        inputObj.SetValue("check_name", "NO_CHECK");
+        inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr());
+        inputObj.SetValue("partner_trade_no", WxPayApi.GenerateOutTradeNo());
+        inputObj.SetValue("mchid", WxPayConfig.GetWxPayConfig().GetMchID());
+        inputObj.SetValue("mch_appid", WxPayConfig.GetWxPayConfig().GetAppID());
+        inputObj.SetValue("spbill_create_ip", WxPayConfig.GetWxPayConfig().GetIp());
+
+        inputObj.SetValue("sign", inputObj.MakeSign(Model.WxPayData.SIGN_TYPE_MD5));
+        let xml = inputObj.ToXml();
+
+        console.log("WxPayApi", "零钱转账 request : " + xml);
+        let res = await Util.setMethodWithUri({
+            url: url,
+            method: 'post',
+            data: xml,
+            headers: {
+                'content-type': 'text/xml'
+            },
+            cert: WxPayConfig.GetWxPayConfig().GetSSlCertPath(),
+        });
+        console.log("WxPayApi", "零钱转账 response : " + res);
+        this.Log(inputObj, res, url);
+
+        let result = new Model.WxPayData();
+        await result.FromXml(res);
+
+        BLL.CpayRedPackBLL.InsertRedPackInfo(inputObj, result, false);
+
+        response_data = this.Flatten(result);
+        return response_data;
+    }
+
+    /**
      *
      * 查询订单
      * @static

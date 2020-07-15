@@ -383,6 +383,15 @@ app.get('/sendredpack', async function (req: any, res: any, next: any) {
     // res.render('redpack', { data: data });
 });
 
+//http://public.xulayen.com:8888/transfer
+app.get('/transfer', async function (req: any, res: any, next: any) {
+    let redpack = new cPay.SendRedpack();
+    let data = await redpack.Transfer("oi4qm1cAO4em3nUtBgOsOORvJhOk",100,"测试");
+    console.log(data);
+    res.send(data);
+    // res.render('redpack', { data: data });
+});
+
 app.listen(80, function (err: any) {
     if (err) {
         console.error('err:', err);

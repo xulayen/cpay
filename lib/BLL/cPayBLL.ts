@@ -204,32 +204,50 @@ export class CpayRedPackBLL extends BaseBLL {
      * @param {string} appid 企业公众号appid
      * @param {Model.RedPackInfo} input 红包入参
      * @param {*} return_res 返回参数
+     * @param {boolean} redpack true：红包；false：零钱转账
      * @returns
      * @memberof CpayRedPackBLL
      */
-    public static async InsertRedPackInfo(inputOrder: Model.WxPayData, return_res: Model.WxPayData) {
+    public static async InsertRedPackInfo(inputOrder: Model.WxPayData, return_res: Model.WxPayData, redpack: boolean = true) {
         let order = inputOrder.ToJson(), outres = return_res.ToJson(), input = new Model.RedPackInfo();
-        input.act_name = order.act_name;
-        input.openid = order.re_openid;
-        input.remark = order.remark;
-        input.scene_id = order.scene_id;
-        input.send_name = order.send_name;
-        input.total_amount = order.total_amount;
-        input.total_num = order.total_num;
-        input.wishing = order.wishing;
+        if (order.act_name)
+            input.act_name = order.act_name;
+        if (order.re_openid)
+            input.openid = order.re_openid;
+        if (order.remark)
+            input.remark = order.remark;
+        if (order.scene_id)
+            input.scene_id = order.scene_id;
+        if (order.send_name)
+            input.send_name = order.send_name;
+        if (order.total_amount)
+            input.total_amount = order.total_amount;
+        if (order.total_num)
+            input.total_num = order.total_num;
+        if (order.wishing)
+            input.wishing = order.wishing;
+
+        if (order.openid)
+            input.openid = order.openid;
+        if (order.amount)
+            input.total_amount = order.amount;
+        if (order.desc)
+            input.remark = order.desc;
+
         let inputRes = {
-            out_trade_no: inputOrder && order.mch_billno,
-            mch_id: inputOrder && order.mch_id,
-            appid: inputOrder && order.wxappid,
+            out_trade_no: inputOrder && order.mch_billno || order.partner_trade_no,
+            mch_id: inputOrder && order.mch_id || order.mchid,
+            appid: inputOrder && order.wxappid || order.mch_appid,
             ...input,
             return_code: outres && outres.return_code,
             return_msg: outres && outres.return_msg,
             result_code: outres && outres.result_code,
             err_code: outres && outres.err_code,
             err_code_des: outres && outres.err_code_des,
-            transaction_id: outres && outres.send_listid
+            transaction_id: outres && outres.send_listid || outres.payment_no,
+            type: redpack ? "RedPack" : "Transfer"
         };
-        let params_columns: string[] = [':out_trade_no', ':transaction_id', ':mch_id', ':appid', ':send_name', ':openid', ':total_amount', ':total_num', ':wishing', ':act_name', ':scene_id', ':risk_info', ':return_code', ':return_msg', ':result_code', ':err_code', ':err_code_des'], res;
+        let params_columns: string[] = [':out_trade_no', ':transaction_id', ':mch_id', ':appid', ':send_name', ':openid', ':total_amount', ':total_num', ':wishing', ':act_name', ':scene_id', ':risk_info', ':return_code', ':return_msg', ':result_code', ':err_code', ':err_code_des', ':type'], res;
         let { columns, params_data } = this.BuildParametersPlus(params_columns, inputRes);
         res = await DAL.DbHelper.instance.insert(this.tablename, columns, params_columns, params_data);
         return res && res.affectedRows > 0;
