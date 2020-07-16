@@ -66,6 +66,9 @@ weixin.SSlCertPath = `证书路径`;
 weixin.SSlCertPassword = "证书密码";
 weixin.Ip = "服务器IP";
 weixin.Facid = "商户业务编号";
+weixin.OpenAppid = "开放平台APPID";
+weixin.OpenAppsecret = "开放平台密钥";
+weixin.OpenAesKey = "开放平台消息加解密KEY";
 // 启用配置对象，实例化即可启用
 new cPay.Config.WeixinPayConfig(weixin);
 ```
