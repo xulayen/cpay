@@ -4,6 +4,7 @@
 [![NPM Version](https://badgen.net/npm/v/jquery_wechat_sdk)](https://npmjs.org/package/cpay)
 
 # 微信/支付宝支付 For Typescript Express
+> 使用Typescript语法开发基于Express框架的支付组件
 
 | 功能        | 微信（基于公众/商户号）    |  微信（基于开放平台）    | 支付宝  |
 | --------   | -----:   | :----: | :----: |

@@ -1,7 +1,7 @@
 {
   "name": "cpay",
   "version": "0.0.1",
-  "description": "nodejs for wechat pay",
+  "description": "the payment component developed by Typescript is based on Express framework",
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpileOnly ./test/demo.ts",
