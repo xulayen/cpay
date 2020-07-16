@@ -100,6 +100,7 @@ PRIMARY KEY (`appid`)
 )
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;
+ALTER TABLE t_cpay_open_authorization MODIFY COLUMN update_time datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间' ;
 
 
 DROP TABLE IF EXISTS cpay.`t_cpay_open_authorization_info`;
@@ -123,4 +124,33 @@ PRIMARY KEY (`appid`)
 ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;
 
-ALTER TABLE t_cpay_open_authorization MODIFY COLUMN update_time datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间' ;
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------微信红包、零钱转账
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS cpay.`t_cpay_redpack`;
+use cpay;
+CREATE TABLE `t_cpay_redpack` (
+`out_trade_no`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '商户订单号' ,
+`transaction_id`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '微信订单号' ,
+`mch_id`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商户号' ,
+`appid`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '公众号appid' ,
+`send_name`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商户名称' ,
+`openid`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '用户openid' ,
+`total_amount`  int(10) NULL DEFAULT NULL COMMENT '付款金额 单位：分' ,
+`total_num`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '1' COMMENT '红包发放总人数' ,
+`wishing`  varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '红包祝福语' ,
+`act_name`  varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注' ,
+`scene_id`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '发放红包使用场景，红包金额大于200或者小于1元时必传\r\nPRODUCT_1:商品促销\r\nPRODUCT_2:抽奖\r\nPRODUCT_3:虚拟物品兑奖\r\nPRODUCT_4:企业内部福利\r\nPRODUCT_5:渠道分润\r\nPRODUCT_6:保险回馈\r\nPRODUCT_7:彩票派奖\r\nPRODUCT_8:税务刮奖' ,
+`risk_info`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '活动信息：posttime:用户操作的时间戳\r\nmobile:业务系统账号的手机号，国家代码-手机号。不需要+号\r\ndeviceid :mac 地址或者设备唯一标识 \r\nclientversion :用户操作的客户端版本\r\n把值为非空的信息用key=value进行拼接，再进行urlencode\r\nurlencode(posttime=xx& mobile =xx&deviceid=xx)' ,
+`type`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '类型，RedPack-现金红包 Transfer-零钱转账' ,
+`return_code`  varchar(16) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '返回状态码' ,
+`return_msg`  varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '返回信息' ,
+`result_code`  varchar(16) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '业务结果' ,
+`err_code`  varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '错误代码' ,
+`err_code_des`  varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '错误代码描述' ,
+`create_time`  datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间' ,
+`delete_flag`  varchar(1) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' COMMENT '删除标识 0未删除 1已删除' ,
+PRIMARY KEY (`out_trade_no`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci;
