@@ -6,6 +6,7 @@ import * as  cPay_Config from '../Config';
 import * as  cPay_Util from '../Util';
 import { RedisKeyEnum } from '../Config/redisKey';
 import { CpayOpenBLL } from 'lib/BLL/cPayBLL';
+import { BaseRequest } from '../base';
 const WxPayData = cPay_Model.WxPayData;
 
 OpenApi.WxOpenApi.ProcessingFailure();
@@ -21,16 +22,11 @@ OpenApi.WxOpenApi.ProcessingFailure();
  * 
  * 
  */
-export class ComponentLogin {
+export class ComponentLogin extends BaseRequest {
 
-    private request: any;
-    private response: any;
-    private next: any;
     private config: cPay_Config.IWxConfig;
     constructor(request: any, response: any, next: any) {
-        this.request = request;
-        this.response = response;
-        this.next = next;
+        super(request,response,next);
         this.config = cPay_Config.Config.GetWxPayConfig();
     }
 

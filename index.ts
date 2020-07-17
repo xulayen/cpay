@@ -14,6 +14,8 @@ import { ComponentLogin } from './lib/WechatOpen/componentLogin';
 import { AccountWebsiteAuth } from './lib/WechatOpen/accountWebsiteAuth';
 import { JssdkSign } from './lib/WechatOpen/jssdkSign';
 
+import * as AliPay from './lib/AliPay';
+
 import { Util } from './lib/Util';
 
 const cPay = {
@@ -32,6 +34,7 @@ const cPay = {
     AccountWebsiteAuth,
     JssdkSign,
     BaseApi: WxPayApi,
+    AliPay,
     Util
 
 }

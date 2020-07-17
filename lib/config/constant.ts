@@ -227,4 +227,21 @@ export default class Constant {
      * @memberof Constant
      */
     public static readonly WEIXIN_OPEN_GET_JSsdk_ticket: string = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token={0}&type=jsapi";
+
+    /**
+     * 支付宝网关
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static readonly ALIPAY_OPENAPI: string = "https://openapi.alipay.com/gateway.do?";
+
+    /**
+     * 统一收单交易支付接口（条码支付）
+     *
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static readonly ALIPAY_OPENAPI_method_trade_pay: string = "alipay.trade.pay";
 }

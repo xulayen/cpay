@@ -386,10 +386,20 @@ app.get('/sendredpack', async function (req: any, res: any, next: any) {
 //http://public.xulayen.com:8888/transfer
 app.get('/transfer', async function (req: any, res: any, next: any) {
     let redpack = new cPay.SendRedpack();
-    let data = await redpack.Transfer("oi4qm1cAO4em3nUtBgOsOORvJhOk",100,"测试");
+    let data = await redpack.Transfer("oi4qm1cAO4em3nUtBgOsOORvJhOk", 100, "测试");
     console.log(data);
     res.send(data);
     // res.render('redpack', { data: data });
+});
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//--AliPay--------------------------------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//http://public.xulayen.com/aliPay/MicroPay
+app.get('/aliPay/MicroPay', async function (req: any, res: any, next: any) {
+    let redpack = new cPay.AliPay.MicroPay();
+    let data = await redpack.UnifiedOrder(new Date().getTime() + '', "wave_code", "282828282222222222222222", "测试");
+    res.render('ali_MicroPay', { data: data });
 });
 
 app.listen(80, function (err: any) {

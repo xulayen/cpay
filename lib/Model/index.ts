@@ -4,7 +4,9 @@ import { WxPayException } from '../Exception/wxPayException';
 var xml2js = require("xml2js");
 var cryptojs = require("crypto-js");
 var MD5 = require('crypto-js/md5');
-
+const crypto = require("crypto");
+const iconv = require('iconv-lite');
+const fs = require('fs');
 
 export class OrderInfo {
     constructor(body?: string, detail?: string, attach?: string, goods_tag?: string, total_fee?: number) {
@@ -52,6 +54,7 @@ const WxPayConfig = cPay_Config.Config;
 export class WxPayData {
     public static SIGN_TYPE_MD5: string = "MD5";
     public static SIGN_TYPE_HMAC_SHA256: string = "HMAC-SHA256";
+    public static SIGN_TYPE_RSA2: string = "RSA-SHA256";
     public m_values = new Map();
 
     constructor() { }
@@ -155,12 +158,64 @@ export class WxPayData {
 
             return this.CalcHMACSHA256Hash(str, WxPayConfig.GetWxPayConfig().GetKey());
 
+        } else if (signType === WxPayData.SIGN_TYPE_RSA2) {
+            let privateKey = `-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAh35EkpL8b6GMkP5vStRmEhRgjRdte9WifViZu6R1wjR2W+aQ+vuAnHaJY1Js9JyDnNuGDwT+7yJWGc6+ig9JPG6iOp3bBzdRcuRCIl/64cJgyqJX5XB6cY9aGG5SUnQK0YsOZ8Ikc9sdTlKw7/wsdK5P7ADD9YpashIUpsAdxYunedTubwJ/CqjOwi/ckcQnPvlLWxZ4uleFhMxQPWR+Xl0d6vZrR+BgcULYwxjAssRvH7vX7nsjj5U0fUnZjfIjpQvasgUQLlIDPch/GCOMPojQm4TYfIgbljfDRWCgrrAoEA6BKdGz/2thv3n5055xSDvNxsiobppeGxIdfAnxuQIDAQABAoIBAE2Ov53POWSE6ruMiRQiZJLwyxu4T1lVPn/VmZpJV4blFOMiJdck48esKpSJ+AhFFylQl3o9d9hWpUZ8i6DngxpukbpP5bJJvfuwIRMgMbHM3C7hosKZEd2zGvVlIQZFmnO7z3EhNlCDGlFdEB8vEBtyNBl5jrIckjHgG6Yfzmrm4oB85uOrmRuyGKqbd/QINeo2TqQzqX4tw0ban162MCZ+ioPSp9LI/ra9yeder/sfdEj2ZN5+AViEfzMPhr8AoaFJ5VNdV6pZDBWSG8PAfUrbpJS8PyCXqdlLnURd6NbLBO5AtYLT48Sd8uKkTATMFqgUe2rUWU9YoC7KwxVLSwECgYEAwfEJcj1flRSh1CWA1sRdhZjFbfY2ym3Ht/aaa+2jAlqJhUMxeqz2Pa5hySnG19H3Fur8SL4Yj1sDofiP1CKPKwzkGu1fSCKQgG+Dt7Ix7+/oP7hwMc5XbkN7j9uwFkHhfVS/QJsGodh+j6a+p7ys1NKX46g+dZ9VBsQt9D9x9HECgYEAstldTqHV0QfQ++rfnsZz7NkfZnk1InJYWpeV55P5A2MdI8hy5xib+cqBTO0aOrNbezl+RG56hN/zXSgoyqWEyX6tX/LsmFjyCoiC3ohuYCnvMoHDWXd0j3RMwlZbDbdeW4I1MwWa8XKJyt9mq3bnYPO6hPoWRPbBcqPOaBmf1ckCgYAeMYNx+KIX2JV1LL2JMhsJQIaEHw/apgqw1kCmSuHU7Pl5+MMMQT84zRxGMC3XzcV1GPJb9NRoBRhksAjcUuENJ72ff5MU7OSoSjQsdh6WJzh2KyW0a1ZrQTBMbjxUyr7rPzVjPn9i1QynGqOWA6a4n2ysMbY/o6WeHw60dugr0QKBgFPU3Q6hfvam4kdi1YS34tivAS/oOoa18EIucX6F9p+m0p7WMz2tZFcWm7ryHGxNa+D7lvr+igFEc+9DhrNOGErWTO//jvTuJC3ZxPYIHyyGG2+iMW37NzCSw/QHxFBOljTweH088F6iYIIuaxKN/nCMbe4sx0l2HEDfFT3oXOo5AoGBAKgbpmE1He0YAGZ0FSVbGu513sM0hyR90kXyZFhZqOoujDyNAK7SOCphzQCoM7XyX+0G5PLPS5W4BJHcjjXj9+keTi9TE4Lin0sIFYw7cb7gPHWDeNoqgJMOWUHKpdtnyr+kJ1w97guhky2GfbaFYndZ4VaxTIi4tSvS4lbwuUZ5\n-----END RSA PRIVATE KEY-----`;
+            let sign = crypto.createSign(WxPayData.SIGN_TYPE_RSA2).update(this.AliSignStr(), "utf8").sign(privateKey, 'base64');
+            console.log('商户生成的签名：');
+            console.log(sign);
+            return sign;
         } else {
             throw new Error("sign_type 不合法");
         }
     }
 
+    AliSignStr() {
+        let af = Array.from(this.m_values), m = new Map(af.sort());
+        let decamelizeParams = Object.create(null);
+        for (let [k, v] of m) {
+            decamelizeParams[k] = v;
+        }
+
+        // 排序
+        const signStr = Object.keys(decamelizeParams).sort().map((key) => {
+            let data = decamelizeParams[key];
+            if (Array.prototype.toString.call(data) !== '[object String]') {
+                data = JSON.stringify(data);
+            }
+            return `${key}=${iconv.encode(data, 'utf8')}`;
+
+            //}).join('&amp;').replace(/\"/ig, "&quot;");
+        }).join('&');
+
+        console.log('商户签名：');
+        console.log(signStr);
+
+
+
+        return signStr;
+    }
+
     ToUrl() {
+        let buff = '', array_values = Array.from(this.m_values), i = 0;
+        this.m_values = new Map(array_values.sort());
+
+        this.m_values.forEach(function (value, key) {
+            i++;
+            if (!value) {
+                throw new Error(`WxPayData内部含有值为null的字段:${key}!`);
+            }
+            if (key != "sign" && value != "") {
+                buff += key + "=" + value + "&";
+            }
+
+        });
+
+        buff = buff.trim().substr(0, buff.length - 1);
+
+        return buff;
+    }
+
+    ToUrl_Ali() {
         let buff = '', array_values = Array.from(this.m_values), i = 0;
         this.m_values = new Map(array_values.sort());
         let size = this.m_values.size;
@@ -170,7 +225,7 @@ export class WxPayData {
             if (!value) {
                 throw new Error(`WxPayData内部含有值为null的字段:${key}!`);
             }
-            if (key != "sign" && value != "") {
+            if (value != "") {
                 buff += key + "=" + value + "&";
             }
 
@@ -394,7 +449,7 @@ export class RedPackInfo {
      * @memberof RedPackInfo
      */
     public total_num: number;
-    
+
     /**
      * 祝福语
      *
