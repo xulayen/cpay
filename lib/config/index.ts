@@ -1,6 +1,7 @@
 
 import * as Model from '../Model';
-import { Util } from 'lib/Util';
+import { Util } from '../Util';
+import { Mode } from 'fs';
 
 
 //export namespace cPay_Config {
@@ -89,6 +90,42 @@ export interface IMySqlConfig {
     user: string,
     password: string,
     database: string
+}
+
+export interface IAlipayConfig {
+    GetAppID(): string;
+    GetPrivateKey(): string;
+    GetAesKey(): string;
+    GetNotify_url(): string;
+}
+
+export class AlipayPayConfig implements IAlipayConfig {
+
+
+
+    constructor(CustomerAlipayConfig: Model.AlipayConfig) {
+        this.CustomerAlipayConfig = CustomerAlipayConfig;
+        Config.alipayconfig = this;
+    }
+
+    CustomerAlipayConfig: Model.AlipayConfig;
+
+    GetAppID(): string {
+        return this.CustomerAlipayConfig && this.CustomerAlipayConfig.AppID || "";
+    }
+    GetPrivateKey(): string {
+        let fw = `-----BEGIN RSA PRIVATE KEY-----\n{0}\n-----END RSA PRIVATE KEY-----`,
+            key = this.CustomerAlipayConfig && this.CustomerAlipayConfig.PrivateKey || "";
+        return Util.format(fw, key);
+    }
+    GetAesKey(): string {
+        return this.CustomerAlipayConfig && this.CustomerAlipayConfig.AesKey || "";
+    }
+
+    GetNotify_url(): string {
+        return this.CustomerAlipayConfig && this.CustomerAlipayConfig.Notify_url || "";
+    }
+
 }
 
 export class WeixinPayConfig implements IWxConfig {
@@ -200,6 +237,11 @@ export class Config {
         this._wxconfig = value;
     }
 
+    private static _alipayconfig: IAlipayConfig;
+    public static set alipayconfig(value: IAlipayConfig) {
+        this._alipayconfig = value;
+    }
+
     private static _redisconfig: IRedisConfig;
     public static get redisconfig(): IRedisConfig {
         return Config._redisconfig;
@@ -228,6 +270,13 @@ export class Config {
         return this._wxconfig;
     }
 
+    public static GetAlipayConfig(CustomerAlipayConfig?: Model.AlipayConfig) {
+        if (!this._wxconfig) {
+            this._alipayconfig = new AlipayPayConfig(CustomerAlipayConfig);
+        }
+        return this._alipayconfig;
+    }
+
     public static GetRedisConfig(host?: string, port?: string, db?: number, auth?: string): IRedisConfig {
         if (!this._redisconfig) {
             this._redisconfig = new RedisConfig(host, port, db, auth);
@@ -241,6 +290,8 @@ export class Config {
         }
         return this._mysqlconfig;
     }
+
+
 
 
 

@@ -29,10 +29,17 @@ weixin.OpenAppid = Config.weixin.openAppid;
 weixin.OpenAppsecret = Config.weixin.openAppsecrect;
 weixin.OpenAesKey = Config.weixin.openAesKey;
 
+let alipay = new cPay.Model.AlipayConfig();
+alipay.AppID = Config.Alipay.AppID;
+alipay.PrivateKey = Config.Alipay.PrivateKey;
+alipay.AesKey = Config.Alipay.AesKey;
+alipay.Notify_url = Config.Alipay.Notify_url;
+
 new cPay.Config.WeixinPayConfig(weixin);
 new cPay.Config.RedisConfig(Config.redis.host, Config.redis.port, Config.redis.db);
 new cPay.Config.MySqlConfig(Config.mySql.host, Config.mySql.user, Config.mySql.pwd, Config.mySql.db);
 
+new cPay.Config.AlipayPayConfig(alipay);
 
 app.get('/auth', async function (req: any, res: any, next: any) {
     let ojsapipay = new cPay.JsApiPay(req, res, next);

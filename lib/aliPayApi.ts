@@ -34,7 +34,7 @@ export class AliPayApi extends AlipayBase {
         let biz_content = inputObj.ToJson(),
             method = Constant.ALIPAY_OPENAPI_method_trade_pay,
             data = this.StructureCommonParameter(method, biz_content),
-            url = `${Constant.ALIPAY_OPENAPI}${encodeURI(data.ToUrl_Ali())}`;
+            url = `${Constant.ALIPAY_OPENAPI}${data.ToUrl_Ali()}`;
 
         console.log("AliPayApi", "支付宝-统一收单交易支付 request : " + url);
         let res = await Util.setMethodWithUri({

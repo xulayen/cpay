@@ -28,6 +28,12 @@ export default {
         user: process.env.mysql_user,
         pwd: process.env.mysql_pwd,
         db: process.env.mysql_db
+    },
+    Alipay:{
+        AppID:process.env.Alipay_appid,
+        PrivateKey:process.env.Private_key,
+        AesKey:process.env.Alipay_AES,
+        Notify_url:process.env.AlipayNotify_url
     }
 
 }

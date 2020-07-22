@@ -2,6 +2,7 @@ import * as  cPay_Util from './Util';
 import { format } from 'date-fns';
 import * as Model from './Model';
 import * as BLL from './BLL/cPayBLL';
+import * as Config from './Config';
 
 const Util = cPay_Util.Util;
 
@@ -81,15 +82,17 @@ export class AlipayBase extends BaseApi {
 
 
     static StructureCommonParameter(method: string, biz_content: object, app_auth_token?: string): Model.WxPayData {
-        let input = new Model.WxPayData();
-        input.SetValue("app_id", "2021001180633158");
+        let input = new Model.WxPayData(), notify_url = Config.Config.GetAlipayConfig().GetNotify_url();
+        input.SetValue("app_id", Config.Config.GetAlipayConfig().GetAppID());
         input.SetValue("method", method);
         input.SetValue("format", "JSON");
         input.SetValue("charset", "utf-8");
         input.SetValue("sign_type", "RSA2");
-        input.SetValue("timestamp", "2020-07-17 15:41:18");
+        input.SetValue("timestamp", this.GenerateTimeFormat());
         input.SetValue("version", "1.0");
-        input.SetValue("notify_url", "http://baidu.com/");
+        if (notify_url) {
+            input.SetValue("notify_url", notify_url);
+        }
         if (app_auth_token)
             input.SetValue("app_auth_token", app_auth_token);
         input.SetValue("biz_content", JSON.stringify(biz_content));
