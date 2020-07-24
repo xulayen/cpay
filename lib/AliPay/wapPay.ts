@@ -19,7 +19,7 @@ export class WapPay extends BaseRequest {
         for (let key in options) {
             inputObj.SetValue(key, options[key]);
         }
-        let res = await AliPayApi.UnifiedOrder(inputObj);
+        let res = await AliPayApi.WapPay(inputObj);
         return res;
     }
 

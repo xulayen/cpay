@@ -409,6 +409,18 @@ app.get('/aliPay/MicroPay', async function (req: any, res: any, next: any) {
     res.render('ali_MicroPay', { data: data });
 });
 
+app.get('/aliPay/h5', async function (req: any, res: any, next: any) {
+    res.render('ali_wappay', {});
+});
+
+
+//http://public.xulayen.com/aliPay/wappay
+app.get('/aliPay/wappay', async function (req: any, res: any, next: any) {
+    let redpack = new cPay.AliPay.WapPay();
+    let data = await redpack.UnifiedOrder(new Date().getTime() + '', "http://baidu.com/", 100, "测试", "12121212121");
+});
+
+
 app.listen(80, function (err: any) {
     if (err) {
         console.error('err:', err);

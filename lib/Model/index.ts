@@ -270,7 +270,12 @@ export class WxPayData {
     }
 }
 
-
+/**
+ * 响应返回的结果，微信API使用
+ *
+ * @export
+ * @class ResponseData
+ */
 export class ResponseData {
     constructor() {
 
@@ -283,17 +288,36 @@ export class ResponseData {
     msg: string;
 }
 
+/**
+ * 响应返回的结果
+ *
+ * @export
+ * @class ResponseResult
+ * @template T 具体的类型
+ */
+export class ResponseResult<T> {
+    constructor() {
+
+    }
+    public ResponseHttpCode: number;
+    public IsSuccess: boolean;
+    public ErrCode: string;
+    public SubErrCode: string;
+    public ErrMessage: string;
+    public ResponseData: T;
+}
+
 export class AlipayConfig {
     constructor() {
         this.AppID = "";
         this.PrivateKey = "";
-        this.AesKey="";
-        this.Notify_url="";
+        this.AesKey = "";
+        this.Notify_url = "";
     }
-    public AppID:string;
-    public PrivateKey:string;
-    public AesKey:string;
-    public Notify_url:string;
+    public AppID: string;
+    public PrivateKey: string;
+    public AesKey: string;
+    public Notify_url: string;
 
 
 }

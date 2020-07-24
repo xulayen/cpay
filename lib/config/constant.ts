@@ -244,4 +244,13 @@ export default class Constant {
      * @memberof Constant
      */
     public static readonly ALIPAY_OPENAPI_method_trade_pay: string = "alipay.trade.pay";
+
+    /**
+     * 统一收单交易支付接口（手机H5支付）
+     *
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static readonly ALIPAY_OPENAPI_method_wap_pay: string = "alipay.trade.wap.pay";
 }
