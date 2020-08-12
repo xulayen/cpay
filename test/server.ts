@@ -377,13 +377,17 @@ app.get('/jssdk', async function (req: any, res: any, next: any) {
 //http://public.xulayen.com:8888/sendredpack
 app.get('/sendredpack', async function (req: any, res: any, next: any) {
     let redpack = new cPay.SendRedpack(), redinfo = new cPay.Model.RedPackInfo();
-    redinfo.act_name = "测试活动";
+    redinfo.act_name = "营销活动";
+    //oi4qm1YENTE4MS99-KVkNqWpR12g 熙妈
+    //oi4qm1cAO4em3nUtBgOsOORvJhOk 我
+    //oi4qm1ecq6mhu8Jglfk0cTrMfSu0 她
+    //oi4qm1Qw_ZT_UKisrRIH5IQZB1ec 姐
     redinfo.openid = "oi4qm1cAO4em3nUtBgOsOORvJhOk";
-    redinfo.remark = "测试";
+    redinfo.remark = "恭喜发财！";
     redinfo.send_name = "中商网络";
     redinfo.total_amount = 100;
     redinfo.scene_id = cPay.Model.RedPackSceneEnum.Draw;
-    redinfo.wishing = "感谢您参加猜灯谜活动，祝您元宵节快乐！";
+    redinfo.wishing = "恭喜发财！";
     let data = await redpack.Send(redinfo);
     console.log(data);
     res.send(data);
@@ -393,7 +397,7 @@ app.get('/sendredpack', async function (req: any, res: any, next: any) {
 //http://public.xulayen.com:8888/transfer
 app.get('/transfer', async function (req: any, res: any, next: any) {
     let redpack = new cPay.SendRedpack();
-    let data = await redpack.Transfer("oi4qm1cAO4em3nUtBgOsOORvJhOk", 100, "测试");
+    let data = await redpack.Transfer("oi4qm1cAO4em3nUtBgOsOORvJhOk", 100, "恭喜发财！");
     console.log(data);
     res.send(data);
     // res.render('redpack', { data: data });
