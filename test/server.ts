@@ -378,14 +378,16 @@ app.get('/jssdk', async function (req: any, res: any, next: any) {
 app.get('/sendredpack', async function (req: any, res: any, next: any) {
     let redpack = new cPay.SendRedpack(), redinfo = new cPay.Model.RedPackInfo();
     redinfo.act_name = "营销活动";
-    //oi4qm1YENTE4MS99-KVkNqWpR12g 熙妈
-    //oi4qm1cAO4em3nUtBgOsOORvJhOk 我
-    //oi4qm1ecq6mhu8Jglfk0cTrMfSu0 她
-    //oi4qm1Qw_ZT_UKisrRIH5IQZB1ec 姐
-    redinfo.openid = "oi4qm1cAO4em3nUtBgOsOORvJhOk";
+    //oi4qm1YENTE4MS99-KVkNqWpR12g huaduoduoxx
+    //oi4qm1cAO4em3nUtBgOsOORvJhOk ME
+    //oi4qm1ecq6mhu8Jglfk0cTrMfSu0 LP
+    //oi4qm1Qw_ZT_UKisrRIH5IQZB1ec JJ
+    //oi4qm1VPTJYiDW3IANj7hRFbtsi4 MM
+    //oi4qm1eCxMdOhvGpRYXaG3A6Ww1s 01
+    redinfo.openid = "oi4qm1eCxMdOhvGpRYXaG3A6Ww1s";
     redinfo.remark = "恭喜发财！";
     redinfo.send_name = "中商网络";
-    redinfo.total_amount = 100;
+    redinfo.total_amount = 200;
     redinfo.scene_id = cPay.Model.RedPackSceneEnum.Draw;
     redinfo.wishing = "恭喜发财！";
     let data = await redpack.Send(redinfo);
