@@ -385,6 +385,7 @@ app.get('/sendredpack', async function (req: any, res: any, next: any) {
     //oi4qm1VPTJYiDW3IANj7hRFbtsi4 MM
     //oi4qm1eCxMdOhvGpRYXaG3A6Ww1s 01
     //oi4qm1QZDFoVHcQOOQGpB-7F5FtQ 02
+    //oi4qm1bfaUjdpBnFGSr-3E2y1goQ 03
     redinfo.openid = "oi4qm1eCxMdOhvGpRYXaG3A6Ww1s";
     redinfo.remark = "恭喜发财！";
     redinfo.send_name = "中商网络";
