@@ -8,6 +8,7 @@
 # testing
 /.vscode
 .nyc_output
+/.vs
 
 # production
 /dist
