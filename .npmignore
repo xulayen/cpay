@@ -9,6 +9,7 @@
 /.vs
 .nyc_output
 /test
+/electron
 
 # production
 /dist

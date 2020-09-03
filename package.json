@@ -1,6 +1,6 @@
 {
   "name": "cpay",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "the payment component developed by Typescript is based on Express framework",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,12 @@
     "pay",
     "alipay",
     "微信公众平台",
-    "微信开放平台"
+    "微信开放平台",
+    "微信支付",
+    "支付宝支付",
+    "零钱转账",
+    "企业红包",
+    "企业收款"
   ],
   "author": "xulayen",
   "license": "ISC",
