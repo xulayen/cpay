@@ -74,6 +74,18 @@ weixin.OpenAesKey = "开放平台消息加解密KEY";
 new cPay.Config.WeixinPayConfig(weixin);
 ```
 
+### 支付宝支付参数设置
+
+``` js
+// 支付宝支付配置对象
+let alipay = new cPay.Model.AlipayConfig();
+alipay.AppID = "支付宝应用ID";
+alipay.PrivateKey = "支付宝私钥";
+alipay.AesKey = "支付宝AES密钥";
+alipay.Notify_url = "支付宝通知地址";
+new cPay.Config.AlipayPayConfig(alipay);
+```
+
 ### Redis配置
 
 ``` js
