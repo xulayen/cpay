@@ -476,8 +476,8 @@ app.get('/jssdk', async function (req: any, res: any, next: any) {
 
 ## 打赏
 <!-- ![avatar](./test/doc/wxqrcode.jpg)  -->
-<img src="./test/doc/wxqrcode.jpg" width="400px"/>
-<img src="./test/doc/alipayqrcode.jpg" width="400px"/>
+<img src="./test/doc/wxqrcode.jpg" width="350px"/>
+<img src="./test/doc/alipayqrcode.jpg" width="350px"/>
 
 
 
