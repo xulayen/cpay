@@ -475,8 +475,9 @@ app.get('/jssdk', async function (req: any, res: any, next: any) {
 - [徐大腿](http://xulayen.com/)
 
 ## 打赏
-![avatar](./test/doc/wxqrcode.jpg) 
-
+<!-- ![avatar](./test/doc/wxqrcode.jpg)  -->
+<img src="./test/doc/wxqrcode.jpg" width="400px"/>
+<img src="./test/doc/alipayqrcode.jpg" width="400px"/>
 
 
 
