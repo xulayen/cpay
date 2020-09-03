@@ -99,6 +99,7 @@ new cPay.Config.MySqlConfig("数据库实例地址", "登录帐号","密码", "c
 #### 付款码支付
 
 ``` js
+// 微信
 // 使用付款码支付API实例
 let microPay = new cPay.MicroPay();
 // 创建商品信息
@@ -109,6 +110,14 @@ microPay.orderInfo.attach = "附加数据";
 microPay.orderInfo.detail = "商品详情";
 microPay.orderInfo.goods_tag = "商品标记";
 let data = await microPay.Scan("商户订单号", "用户付款码","其他可选参数，JSON对象");
+```
+
+``` js
+// 支付宝
+let microPay = new cPay.AliPay.MicroPay();
+//条码支付，取值：bar_code
+//声波支付，取值：wave_code
+let data = await microPay.UnifiedOrder("订单号", "bar_code", "付款码", "备注");
 ```
 
 #### 扫码支付，模式1
@@ -144,6 +153,7 @@ let url = await nativepay.GetPayUrl("商品ID","其他可选参数，JSON对象"
 #### H5支付
 
 ``` js
+// 微信
 // 使用H5支付API
 let h5pay = new cPay.H5Pay(),
 scene = new cPay.Model.SceneInfo("场景类型", "WAP网站URL地址", "WAP 网站名");
@@ -155,6 +165,12 @@ h5pay.orderInfo.detail = "商品详情";
 h5pay.orderInfo.goods_tag = "商品标记";
 // H5支付统一下单API
 let res_order = await h5pay.UnifiedOrder("商户订单号", scene, "应用回调地址","其他可选参数，JSON对象");
+```
+
+``` js
+// 支付宝
+let h5pay = new cPay.AliPay.WapPay();
+let data = await h5pay.UnifiedOrder("订单号", "应用回调地址", "订单总金额，单位：元", "标题", "销售产品码，商家和支付宝签约的产品码");
 ```
 
 #### JSAPI支付
