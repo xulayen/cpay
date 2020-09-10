@@ -28,7 +28,7 @@ weixin.Facid = Config.weixin.Facid;
 weixin.OpenAppid = Config.weixin.openAppid;
 weixin.OpenAppsecret = Config.weixin.openAppsecrect;
 weixin.OpenAesKey = Config.weixin.openAesKey;
-
+ 
 let alipay = new cPay.Model.AlipayConfig();
 alipay.AppID = Config.Alipay.AppID;
 alipay.PrivateKey = Config.Alipay.PrivateKey;
@@ -386,10 +386,10 @@ app.get('/sendredpack', async function (req: any, res: any, next: any) {
     //oi4qm1eCxMdOhvGpRYXaG3A6Ww1s 01
     //oi4qm1QZDFoVHcQOOQGpB-7F5FtQ 02
     //oi4qm1bfaUjdpBnFGSr-3E2y1goQ 03
-    redinfo.openid = "oi4qm1eCxMdOhvGpRYXaG3A6Ww1s";
+    redinfo.openid = "oi4qm1cAO4em3nUtBgOsOORvJhOk";
     redinfo.remark = "恭喜发财！";
     redinfo.send_name = "中商网络";
-    redinfo.total_amount = 200;
+    redinfo.total_amount = 100 * 10;
     redinfo.scene_id = cPay.Model.RedPackSceneEnum.Draw;
     redinfo.wishing = "恭喜发财！";
     let data = await redpack.Send(redinfo);

@@ -1,6 +1,6 @@
 {
   "name": "cpay",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "the payment component developed by Typescript is based on Express framework",
   "main": "index.js",
   "scripts": {
