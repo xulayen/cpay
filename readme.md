@@ -303,7 +303,7 @@ app.get('/sendredpack', async function (req: any, res: any, next: any) {
 ``` js
 
 app.get('/selectwxhb', async function (req: any, res: any, next: any) {
-    let orderinfo= await cPay.BaseWxApi.GetRedPackInfo("20200910162833727");
+    let orderinfo= await cPay.BaseWxApi.GetRedPackInfo("商户订单号");
     res.send(orderinfo);
 });
 
@@ -325,7 +325,7 @@ app.get('/transfer', async function (req: any, res: any, next: any) {
 ``` js
 
 app.get('/selecttransfer', async function (req: any, res: any, next: any) {
-    let orderinfo= await cPay.BaseWxApi.GetTransferInfo("20200812160148752");
+    let orderinfo= await cPay.BaseWxApi.GetTransferInfo("商户订单号");
     res.send(orderinfo);
 });
 
