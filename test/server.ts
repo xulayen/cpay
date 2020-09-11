@@ -188,7 +188,7 @@ app.post('/orderquery', async function (req: any, res: any, next: any) {
     paydata.SetValue("out_trade_no", ordernumber);
 
     try {
-        orderinfo = await cPay.BaseApi.OrderQuery(paydata);
+        orderinfo = await cPay.BaseWxApi.OrderQuery(paydata);
 
     } catch (error) {
         orderinfo = error.message;
@@ -205,7 +205,7 @@ app.post('/closeorder', async function (req: any, res: any, next: any) {
     paydata.SetValue("out_trade_no", "111");
 
     try {
-        orderinfo = await cPay.BaseApi.CloseOrder(paydata);
+        orderinfo = await cPay.BaseWxApi.CloseOrder(paydata);
 
     } catch (error) {
         orderinfo = error.message;
@@ -226,7 +226,7 @@ app.post('/Refund', async function (req: any, res: any, next: any) {
     paydata.SetValue("total_fee", "11111111111");
 
     try {
-        orderinfo = await cPay.BaseApi.Refund(paydata);
+        orderinfo = await cPay.BaseWxApi.Refund(paydata);
 
     } catch (error) {
         orderinfo = error.message;
@@ -243,7 +243,7 @@ app.post('/RefundQuery', async function (req: any, res: any, next: any) {
     paydata.SetValue("out_refund_no", "111");
 
     try {
-        orderinfo = await cPay.BaseApi.RefundQuery(paydata);
+        orderinfo = await cPay.BaseWxApi.RefundQuery(paydata);
 
     } catch (error) {
         orderinfo = error.message;
@@ -261,7 +261,7 @@ app.post('/ShortUrl', async function (req: any, res: any, next: any) {
     paydata.SetValue("long_url", "111");
 
     try {
-        orderinfo = await cPay.BaseApi.ShortUrl(paydata);
+        orderinfo = await cPay.BaseWxApi.ShortUrl(paydata);
 
     } catch (error) {
         orderinfo = error.message;
@@ -396,6 +396,38 @@ app.get('/sendredpack', async function (req: any, res: any, next: any) {
     console.log(data);
     res.send(data);
     // res.render('redpack', { data: data });
+});
+
+//http://public.xulayen.com:8888/selectwxhb
+app.get('/selectwxhb', async function (req: any, res: any, next: any) {
+
+    let orderinfo;
+
+    try {
+        orderinfo = await cPay.BaseWxApi.GetRedPackInfo("20200910162833727");
+
+    } catch (error) {
+        orderinfo = error.message;
+    }
+
+    res.send(orderinfo);
+
+});
+
+//http://public.xulayen.com:8888/selecttransfer
+app.get('/selecttransfer', async function (req: any, res: any, next: any) {
+
+    let orderinfo;
+
+    try {
+        orderinfo = await cPay.BaseWxApi.GetTransferInfo("20200812160148752");
+
+    } catch (error) {
+        orderinfo = error.message;
+    }
+
+    res.send(orderinfo);
+
 });
 
 //http://public.xulayen.com:8888/transfer
