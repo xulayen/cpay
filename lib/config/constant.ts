@@ -59,6 +59,16 @@ export default class Constant {
      */
     public static readonly WEIXIN_wxpay_sendredpack: string = "https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack";
 
+
+    /**
+     * https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_6&index=5
+     * 查询红包
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static readonly WEIXIN_wxpay_gethbinfo: string = "https://api.mch.weixin.qq.com/mmpaymkttransfers/gethbinfo";
+
     /**
      *
      * https://pay.weixin.qq.com/wiki/doc/api/tools/mch_pay.php?chapter=14_2
@@ -68,6 +78,15 @@ export default class Constant {
      * @memberof Constant
      */
     public static readonly WEIXIN_wxpay_transfers: string = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
+
+    /**
+     * https://pay.weixin.qq.com/wiki/doc/api/tools/mch_pay.php?chapter=14_3
+     * 查询零钱转账
+     * @static
+     * @type {string}
+     * @memberof Constant
+     */
+    public static readonly WEIXIN_wxpay_gettransferinfo: string = "https://api.mch.weixin.qq.com/mmpaymkttransfers/gettransferinfo";
 
     /**
      * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_3

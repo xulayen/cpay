@@ -33,7 +33,7 @@ const cPay = {
     ComponentLogin,
     AccountWebsiteAuth,
     JssdkSign,
-    BaseApi: WxPayApi,
+    BaseWxApi: WxPayApi,
     AliPay,
     Util
 

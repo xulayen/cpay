@@ -153,6 +153,94 @@ export class WxPayApi extends BaseApi {
     }
 
     /**
+     * 查询红包
+     *
+     * @static
+     * @param {string} mch_billno 商户订单号
+     * @returns {Promise<Model.ResponseData>}
+     * @memberof WxPayApi
+     */
+    static async GetRedPackInfo(mch_billno: string): Promise<Model.ResponseData> {
+        let url = Constant.WEIXIN_wxpay_gethbinfo, response_data = new Model.ResponseData(),
+            inputObj: Model.WxPayData = new Model.WxPayData();
+        inputObj.SetValue("mch_billno", mch_billno);
+        //检测必填参数
+        if (!inputObj.IsSet("mch_billno")) {
+            throw new WxPayException("查询红包接口接口必填参数mch_billno！");
+        }
+
+        inputObj.SetValue("bill_type", "MCHT");//MCHT:通过商户订单号获取红包信息。
+        inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr());
+        inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID());
+        inputObj.SetValue("appid", WxPayConfig.GetWxPayConfig().GetAppID());
+        inputObj.SetValue("sign", inputObj.MakeSign(Model.WxPayData.SIGN_TYPE_MD5));
+        let xml = inputObj.ToXml();
+
+        console.log("WxPayApi", "查询红包 request : " + xml);
+        let res = await Util.setMethodWithUri({
+            url: url,
+            method: 'post',
+            data: xml,
+            headers: {
+                'content-type': 'text/xml'
+            },
+            cert: WxPayConfig.GetWxPayConfig().GetSSlCertPath(),
+        });
+        console.log("WxPayApi", "查询红包 response : " + res);
+        this.Log(inputObj, res, url);
+
+        let result = new Model.WxPayData();
+        await result.FromXml(res);
+        response_data = this.Flatten(result);
+        return response_data;
+
+    }
+
+
+    /**
+     * 查询零钱转账
+     *
+     * @static
+     * @param {string} partner_trade_no 商户订单号
+     * @returns {Promise<Model.ResponseData>}
+     * @memberof WxPayApi
+     */
+    static async GetTransferInfo(partner_trade_no: string): Promise<Model.ResponseData> {
+        let url = Constant.WEIXIN_wxpay_gettransferinfo, response_data = new Model.ResponseData(),
+            inputObj: Model.WxPayData = new Model.WxPayData();
+        inputObj.SetValue("partner_trade_no", partner_trade_no);
+        //检测必填参数
+        if (!inputObj.IsSet("partner_trade_no")) {
+            throw new WxPayException("查询零钱转账接口接口必填参数partner_trade_no！");
+        }
+
+        inputObj.SetValue("nonce_str", WxPayApi.GenerateNonceStr());
+        inputObj.SetValue("mch_id", WxPayConfig.GetWxPayConfig().GetMchID());
+        inputObj.SetValue("appid", WxPayConfig.GetWxPayConfig().GetAppID());
+        inputObj.SetValue("sign", inputObj.MakeSign(Model.WxPayData.SIGN_TYPE_MD5));
+        let xml = inputObj.ToXml();
+
+        console.log("WxPayApi", "查询零钱转账 request : " + xml);
+        let res = await Util.setMethodWithUri({
+            url: url,
+            method: 'post',
+            data: xml,
+            headers: {
+                'content-type': 'text/xml'
+            },
+            cert: WxPayConfig.GetWxPayConfig().GetSSlCertPath(),
+        });
+        console.log("WxPayApi", "查询零钱转账 response : " + res);
+        this.Log(inputObj, res, url);
+
+        let result = new Model.WxPayData();
+        await result.FromXml(res);
+        response_data = this.Flatten(result);
+        return response_data;
+
+    }
+
+    /**
      * 企业零钱转账
      *
      * @static
