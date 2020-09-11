@@ -23,8 +23,8 @@
 | [微信短链接生成](#短链接生成)        | ✔      |   微信开放平台不支持    |   ✖    |
 | [微信网页授权](#公众号发起网页授权)        | ✔      |   ✔    |   ✖    |
 | [微信JSSDK](#开放平台代替公众号使用jssdk)         |   ✖   |   ✔    |   ✖    |
-| [微信红包](#微信现金红包)        |   ✔   |   微信开放平台不支持    |   ✖    |
-| [微信零钱转账](#微信零钱转账)        |   ✔   |   微信开放平台不支持    |   ✖    |
+| [微信红包](#微信现金红包)  [查询微信红包](#查询微信现金红包)       |   ✔   |   微信开放平台不支持    |   ✖    |
+| [微信零钱转账](#微信零钱转账)   [查询微信零钱转账](#查询微信零钱转账)       |   ✔   |   微信开放平台不支持    |   ✖    |
 
 
 ## 安装
@@ -298,6 +298,17 @@ app.get('/sendredpack', async function (req: any, res: any, next: any) {
 
 ```
 
+#### 查询微信现金红包
+
+``` js
+
+app.get('/selectwxhb', async function (req: any, res: any, next: any) {
+    let orderinfo= await cPay.BaseWxApi.GetRedPackInfo("20200910162833727");
+    res.send(orderinfo);
+});
+
+```
+
 #### 微信零钱转账
 
 ``` js
@@ -305,6 +316,17 @@ app.get('/sendredpack', async function (req: any, res: any, next: any) {
 app.get('/transfer', async function (req: any, res: any, next: any) {
     let redpack = new cPay.SendRedpack();
     let data = await redpack.Transfer("微信用户OPENID","金额，单位：分","描述");
+});
+
+```
+
+#### 查询微信零钱转账
+
+``` js
+
+app.get('/selecttransfer', async function (req: any, res: any, next: any) {
+    let orderinfo= await cPay.BaseWxApi.GetTransferInfo("20200812160148752");
+    res.send(orderinfo);
 });
 
 ```
@@ -341,7 +363,7 @@ app.post('/notice/native', async function (req: any, res: any, next: any) {
 
 let paydata = new cPay.Model.WxPayData(), orderinfo;
 paydata.SetValue("out_trade_no", "商户订单号");
-orderinfo = await cPay.BaseApi.OrderQuery(paydata);
+orderinfo = await cPay.BaseWxApi.OrderQuery(paydata);
 
 ```
 
@@ -351,7 +373,7 @@ orderinfo = await cPay.BaseApi.OrderQuery(paydata);
 
 let paydata = new cPay.Model.WxPayData(), orderinfo;
 paydata.SetValue("out_trade_no", "商户订单号");
-orderinfo = await cPay.BaseApi.CloseOrder(paydata);
+orderinfo = await cPay.BaseWxApi.CloseOrder(paydata);
 
 ```
 
@@ -365,7 +387,7 @@ paydata.SetValue("out_trade_no", "商户订单号");
 paydata.SetValue("refund_fee", "退款金额：订单总金额，单位为分，只能为整数");
 paydata.SetValue("op_user_id", "操作员");
 paydata.SetValue("total_fee", "订单金额：订单总金额，单位为分，只能为整数");
-orderinfo = await cPay.BaseApi.Refund(paydata);
+orderinfo = await cPay.BaseWxApi.Refund(paydata);
 
 ```
 
@@ -375,7 +397,7 @@ orderinfo = await cPay.BaseApi.Refund(paydata);
 
 let paydata = new cPay.Model.WxPayData(), orderinfo;
 paydata.SetValue("out_refund_no", "商户退款单号");
-orderinfo = await cPay.BaseApi.RefundQuery(paydata);
+orderinfo = await cPay.BaseWxApi.RefundQuery(paydata);
 
 ```
 
@@ -385,7 +407,7 @@ orderinfo = await cPay.BaseApi.RefundQuery(paydata);
 
 let paydata = new cPay.Model.WxPayData(), orderinfo;
 paydata.SetValue("long_url", "需要转换的URL，传输需URL encode");
-orderinfo = await cPay.BaseApi.ShortUrl(paydata);
+orderinfo = await cPay.BaseWxApi.ShortUrl(paydata);
 
 ```
 
