@@ -28,7 +28,7 @@ weixin.Facid = Config.weixin.Facid;
 weixin.OpenAppid = Config.weixin.openAppid;
 weixin.OpenAppsecret = Config.weixin.openAppsecrect;
 weixin.OpenAesKey = Config.weixin.openAesKey;
- 
+
 let alipay = new cPay.Model.AlipayConfig();
 alipay.AppID = Config.Alipay.AppID;
 alipay.PrivateKey = Config.Alipay.PrivateKey;
@@ -386,6 +386,7 @@ app.get('/sendredpack', async function (req: any, res: any, next: any) {
     //oi4qm1eCxMdOhvGpRYXaG3A6Ww1s 01
     //oi4qm1QZDFoVHcQOOQGpB-7F5FtQ 02
     //oi4qm1bfaUjdpBnFGSr-3E2y1goQ 03
+    //oi4qm1ds6LBBD7_A47Ko7lS7KziU 04
     redinfo.openid = "oi4qm1cAO4em3nUtBgOsOORvJhOk";
     redinfo.remark = "恭喜发财！";
     redinfo.send_name = "中商网络";
@@ -432,8 +433,8 @@ app.get('/selecttransfer', async function (req: any, res: any, next: any) {
 
 //http://public.xulayen.com:8888/transfer
 app.get('/transfer', async function (req: any, res: any, next: any) {
-    let redpack = new cPay.SendRedpack();
-    let data = await redpack.Transfer("oi4qm1cAO4em3nUtBgOsOORvJhOk", 100, "恭喜发财！");
+    let redpack = new cPay.SendRedpack(), openid = req.query.openid;
+    let data = await redpack.Transfer(openid, 88, "恭喜发财！");
     console.log(data);
     res.send(data);
     // res.render('redpack', { data: data });
