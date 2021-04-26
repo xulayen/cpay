@@ -378,15 +378,16 @@ app.get('/jssdk', async function (req: any, res: any, next: any) {
 app.get('/sendredpack', async function (req: any, res: any, next: any) {
     let redpack = new cPay.SendRedpack(), redinfo = new cPay.Model.RedPackInfo();
     redinfo.act_name = "营销活动";
+    //http://127.0.0.1:3333/transfer?openid=oi4qm1ds6LBBD7_A47Ko7lS7KziU
     //oi4qm1YENTE4MS99-KVkNqWpR12g huaduoduoxx
     //oi4qm1cAO4em3nUtBgOsOORvJhOk ME
     //oi4qm1ecq6mhu8Jglfk0cTrMfSu0 LP
     //oi4qm1Qw_ZT_UKisrRIH5IQZB1ec JJ
-    //oi4qm1VPTJYiDW3IANj7hRFbtsi4 MM
-    //oi4qm1eCxMdOhvGpRYXaG3A6Ww1s 01
-    //oi4qm1QZDFoVHcQOOQGpB-7F5FtQ 02
-    //oi4qm1bfaUjdpBnFGSr-3E2y1goQ 03
-    //oi4qm1ds6LBBD7_A47Ko7lS7KziU 04
+    //oi4qm1VPTJYiDW3IANj7hRFbtsi4 MM http://127.0.0.1:3333/transfer?openid=oi4qm1VPTJYiDW3IANj7hRFbtsi4
+    //oi4qm1eCxMdOhvGpRYXaG3A6Ww1s 01 http://127.0.0.1:3333/transfer?openid=oi4qm1eCxMdOhvGpRYXaG3A6Ww1s
+    //oi4qm1QZDFoVHcQOOQGpB-7F5FtQ 02 http://127.0.0.1:3333/transfer?openid=oi4qm1QZDFoVHcQOOQGpB-7F5FtQ
+    //oi4qm1bfaUjdpBnFGSr-3E2y1goQ 03 http://127.0.0.1:3333/transfer?openid=oi4qm1bfaUjdpBnFGSr-3E2y1goQ
+    //oi4qm1ds6LBBD7_A47Ko7lS7KziU 04 http://127.0.0.1:3333/transfer?openid=oi4qm1ds6LBBD7_A47Ko7lS7KziU
     redinfo.openid = "oi4qm1cAO4em3nUtBgOsOORvJhOk";
     redinfo.remark = "恭喜发财！";
     redinfo.send_name = "中商网络";
