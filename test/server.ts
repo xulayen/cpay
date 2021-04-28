@@ -379,7 +379,7 @@ app.get('/sendredpack', async function (req: any, res: any, next: any) {
     let redpack = new cPay.SendRedpack(), redinfo = new cPay.Model.RedPackInfo();
     redinfo.act_name = "营销活动";
     //http://127.0.0.1:3333/transfer?openid=oi4qm1ds6LBBD7_A47Ko7lS7KziU
-    //oi4qm1YENTE4MS99-KVkNqWpR12g huaduoduoxx
+    //oi4qm1YENTE4MS99-KVkNqWpR12g huaduoduoxx http://127.0.0.1:3333/transfer?openid=oi4qm1YENTE4MS99-KVkNqWpR12g
     //oi4qm1cAO4em3nUtBgOsOORvJhOk ME
     //oi4qm1ecq6mhu8Jglfk0cTrMfSu0 LP
     //oi4qm1Qw_ZT_UKisrRIH5IQZB1ec JJ
