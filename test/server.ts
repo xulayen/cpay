@@ -383,11 +383,14 @@ app.get('/sendredpack', async function (req: any, res: any, next: any) {
     //oi4qm1cAO4em3nUtBgOsOORvJhOk ME
     //oi4qm1ecq6mhu8Jglfk0cTrMfSu0 LP
     //oi4qm1Qw_ZT_UKisrRIH5IQZB1ec JJ
-    //oi4qm1VPTJYiDW3IANj7hRFbtsi4 MM http://127.0.0.1:3333/transfer?openid=oi4qm1VPTJYiDW3IANj7hRFbtsi4
-    //oi4qm1eCxMdOhvGpRYXaG3A6Ww1s 01 http://127.0.0.1:3333/transfer?openid=oi4qm1eCxMdOhvGpRYXaG3A6Ww1s
-    //oi4qm1QZDFoVHcQOOQGpB-7F5FtQ 02 http://127.0.0.1:3333/transfer?openid=oi4qm1QZDFoVHcQOOQGpB-7F5FtQ
-    //oi4qm1bfaUjdpBnFGSr-3E2y1goQ 03 http://127.0.0.1:3333/transfer?openid=oi4qm1bfaUjdpBnFGSr-3E2y1goQ
-    //oi4qm1ds6LBBD7_A47Ko7lS7KziU 04 http://127.0.0.1:3333/transfer?openid=oi4qm1ds6LBBD7_A47Ko7lS7KziU
+    //oi4qm1VPTJYiDW3IANj7hRFbtsi4 MM http://127.0.0.1:3333/transfer?openid=oi4qm1Z56XlFReA9Y7T4S07P1rU8
+    //oi4qm1eCxMdOhvGpRYXaG3A6Ww1s love1xiaoxi 01 http://127.0.0.1:3333/transfer?openid=oi4qm1eCxMdOhvGpRYXaG3A6Ww1s ×
+    //oi4qm1QZDFoVHcQOOQGpB-7F5FtQ heroyou2020 02 http://127.0.0.1:3333/transfer?openid=oi4qm1QZDFoVHcQOOQGpB-7F5FtQ ×
+    //oi4qm1bfaUjdpBnFGSr-3E2y1goQ hervip2020 03 http://127.0.0.1:3333/transfer?openid=oi4qm1bfaUjdpBnFGSr-3E2y1goQ ×
+    //oi4qm1ds6LBBD7_A47Ko7lS7KziU talkme1997 04 http://127.0.0.1:3333/transfer?openid=oi4qm1ds6LBBD7_A47Ko7lS7KziU ×
+    //oi4qm1bk7yt7jnhBR-3Z0jelFupQ sakurayou2021 05 http://127.0.0.1:3333/transfer?openid=oi4qm1bk7yt7jnhBR-3Z0jelFupQ
+    //oi4qm1QGX7wrCVKPtQZNv7dW-tJU smmokq 06 http://127.0.0.1:3333/transfer?openid=oi4qm1QGX7wrCVKPtQZNv7dW-tJU ×
+    //oi4qm1Uay1geJ99Skz3wdsnaO2gQ w205fyb 07 http://127.0.0.1:3333/transfer?openid=oi4qm1Uay1geJ99Skz3wdsnaO2gQ
     redinfo.openid = "oi4qm1cAO4em3nUtBgOsOORvJhOk";
     redinfo.remark = "恭喜发财！";
     redinfo.send_name = "中商网络";
@@ -416,13 +419,25 @@ app.get('/selectwxhb', async function (req: any, res: any, next: any) {
 
 });
 
+
+// m_values: Map {
+//     'return_code' => 'SUCCESS',
+//     'return_msg' => '',
+//     'mch_appid' => 'wx6e8dfa0d32f32337',
+//     'mchid' => '1499013532',
+//     'nonce_str' => '1631512323410',
+//     'result_code' => 'SUCCESS',
+//     'partner_trade_no' => '20210913135202867',
+//     'payment_no' => '10100960621962109130705052116751',
+//     'payment_time' => '2021-09-13 13:52:03'
+//   }
 //http://public.xulayen.com:8888/selecttransfer
 app.get('/selecttransfer', async function (req: any, res: any, next: any) {
 
     let orderinfo;
 
     try {
-        orderinfo = await cPay.BaseWxApi.GetTransferInfo("20200812160148752");
+        orderinfo = await cPay.BaseWxApi.GetTransferInfo("20210913135202867");
 
     } catch (error) {
         orderinfo = error.message;
@@ -462,12 +477,22 @@ app.get('/aliPay/wappay', async function (req: any, res: any, next: any) {
     let data = await redpack.UnifiedOrder(new Date().getTime() + '', "http://baidu.com/", 100, "测试", "12121212121");
 });
 
+function onGetTimeFrameToTime(starTime:any, endTime:any) {
+    let m = new Date(starTime);
+    let mt = m.getTime();
+    let n = new Date(endTime);
+    let nt = n.getTime();
+    let s = nt - mt;
+    let sm = Math.floor(Math.random() * s);
+    return new Date(mt + sm);
+}
 
-app.listen(80, function (err: any) {
+
+app.listen(7777, function (err: any) {
     if (err) {
         console.error('err:', err);
     } else {
-        var _content = `===> api server is running at at http://127.0.0.1:80`;
+        var _content = `===> api server is running at at http://127.0.0.1:7777`;
         console.info(_content);
     }
 });
