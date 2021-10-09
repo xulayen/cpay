@@ -388,7 +388,7 @@ app.get('/sendredpack', async function (req: any, res: any, next: any) {
     //oi4qm1QZDFoVHcQOOQGpB-7F5FtQ heroyou2020 02 http://127.0.0.1:3333/transfer?openid=oi4qm1QZDFoVHcQOOQGpB-7F5FtQ ×
     //oi4qm1bfaUjdpBnFGSr-3E2y1goQ hervip2020 03 http://127.0.0.1:3333/transfer?openid=oi4qm1bfaUjdpBnFGSr-3E2y1goQ ×
     //oi4qm1ds6LBBD7_A47Ko7lS7KziU talkme1997 04 http://127.0.0.1:3333/transfer?openid=oi4qm1ds6LBBD7_A47Ko7lS7KziU ×
-    //oi4qm1bk7yt7jnhBR-3Z0jelFupQ sakurayou2021 05 http://127.0.0.1:3333/transfer?openid=oi4qm1bk7yt7jnhBR-3Z0jelFupQ
+    //oi4qm1bk7yt7jnhBR-3Z0jelFupQ sakurayou2021 05 http://127.0.0.1:3333/transfer?openid=oi4qm1bk7yt7jnhBR-3Z0jelFupQ ×
     //oi4qm1QGX7wrCVKPtQZNv7dW-tJU smmokq 06 http://127.0.0.1:3333/transfer?openid=oi4qm1QGX7wrCVKPtQZNv7dW-tJU ×
     //oi4qm1Uay1geJ99Skz3wdsnaO2gQ w205fyb 07 http://127.0.0.1:3333/transfer?openid=oi4qm1Uay1geJ99Skz3wdsnaO2gQ
     redinfo.openid = "oi4qm1cAO4em3nUtBgOsOORvJhOk";
